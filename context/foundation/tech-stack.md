@@ -1,6 +1,6 @@
 ---
 starter_id: next
-package_manager: npm
+package_manager: pnpm
 project_name: gin
 hints:
   language_family: js
