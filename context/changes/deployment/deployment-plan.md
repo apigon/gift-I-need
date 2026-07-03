@@ -103,10 +103,10 @@ The local stack runs Postgres, **GoTrue (Auth)**, Studio, and **Mailpit** (email
       import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
       export default defineCloudflareConfig({ incrementalCache: r2IncrementalCache });
       ```
-- [x] **`next.config.ts`** — ✅ appended `initializeOpenNextCloudflareForDev()` so `next dev` can see Workers bindings:
+- [x] **`next.config.ts`** — ✅ appended `initOpenNextCloudflareForDev()` so `next dev` can see Workers bindings (⚠️ corrected in Phase 2 — was recorded as the non-existent `initializeOpenNextCloudflareForDev`):
       ```ts
-      import { initializeOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-      initializeOpenNextCloudflareForDev();
+      import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+      initOpenNextCloudflareForDev();
       ```
 - [x] **`public/_headers`** — ✅ created (long-cache static assets):
       ```
@@ -129,28 +129,31 @@ The local stack runs Postgres, **GoTrue (Auth)**, Studio, and **Mailpit** (email
 
 Use `@supabase/ssr`; **create the client per-request, never as a module-global** (Workers cannot reuse a connection across requests).
 
-- [ ] `pnpm add @supabase/supabase-js @supabase/ssr` (pin `@supabase/ssr` **≥ 0.10.0** — it auto-emits CDN cache headers on token refresh, preventing Cloudflare from caching a `Set-Cookie` and signing users in as each other).
-- [ ] **`src/utils/supabase/client.ts`** — browser client via `createBrowserClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)`.
-- [ ] **`src/utils/supabase/server.ts`** — `createServerClient` with the **anon key**, reading/writing cookies through `next/headers` `cookies()`; instantiate inside each call (per-request) so RLS applies with the user's session (`auth.uid()`). **No service_role helper** — see the decision below.
-- [ ] **`middleware.ts`** at repo root — session-refresh middleware (`updateSession` pattern from Supabase Next.js SSR docs). Make sure `setAll` writes the refreshed cookies back onto the response so the `@supabase/ssr` cache headers take effect.
-- [ ] **Decision — v1 is anon-key + RLS only (no service_role):** the service_role/secret key **bypasses RLS**, which is exactly the mechanism enforcing the organizer-blindness rule — so not wiring it removes the top leak vector from infrastructure.md's risk register. GIN v1 has no admin role, no background jobs, and no webhooks (per CLAUDE.md / tech-stack.md), so there is no legitimate need. All access — auth, browse, claim, and the organizer's **post-event reveal** — runs through RLS with the user's session; the reveal is an RLS policy `USING (event_date < now())` (the query-level event-date filter CLAUDE.md mandates), and any signup-side row creation uses a `SECURITY DEFINER` Postgres trigger, not app-side elevation.
-- [ ] **Guardrail:** if a future feature ever genuinely needs service_role, it must be a **deliberate, reviewed, server-only** addition with a test proving it can't touch claim-status read paths before the event date — never a default import.
-- [ ] **Smoke component:** a tiny server component (or `app/api/health/route.ts`) that calls `supabase.auth.getUser()` and returns ok — gives Phase 4 something real to exercise the cookie/Workers path against. (Remove or keep as a health endpoint.)
+> ⚠️ **Next.js 16 deviations from this plan's text (verified against `node_modules/next/dist/docs/`, 2026-07-03):**
+> 1. **`middleware.ts` → `proxy.ts`.** Next.js 16 deprecated/renamed the `middleware` file convention to **`proxy`** (function `middleware()` → `proxy()`); it defaults to the **Node.js runtime**. The file lives at **`src/proxy.ts`** (same level as `src/app`), *not* repo root, because `app/` is under `src/`. Implemented as `src/proxy.ts`.
+> 2. **`cookies()` is async** in Next.js 16 — the server client `await`s it.
+
+- [x] `pnpm add @supabase/supabase-js @supabase/ssr` — ✅ installed `@supabase/ssr` **pinned to 0.12.0** (satisfies ≥ 0.10.0; auto-emits CDN cache headers on token refresh) + `@supabase/supabase-js 2.110.0` (2026-07-03).
+- [x] **`src/utils/supabase/client.ts`** — ✅ browser client via `createBrowserClient(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)`.
+- [x] **`src/utils/supabase/server.ts`** — ✅ `createServerClient` with the **anon key**, `await cookies()` (async in Next 16), instantiated per-call so RLS applies with the user's session (`auth.uid()`). `setAll` wrapped in try/catch for the Server-Component case. **No service_role helper.**
+- [x] **`src/proxy.ts`** (Next.js 16 Proxy, was "`middleware.ts`") — ✅ session-refresh via `updateSession` helper in **`src/utils/supabase/proxy.ts`**; `setAll` rebuilds the response and writes refreshed cookies back so `@supabase/ssr` cache headers take effect; returns the `supabaseResponse` unmodified. Matcher excludes `_next/static`, `_next/image`, favicon, and image assets. No route-protection redirects (scaffold has none; auth enforced at the data layer via RLS).
+- [x] **Decision — v1 is anon-key + RLS only (no service_role):** the service_role/secret key **bypasses RLS**, which is exactly the mechanism enforcing the organizer-blindness rule — so not wiring it removes the top leak vector from infrastructure.md's risk register. GIN v1 has no admin role, no background jobs, and no webhooks (per CLAUDE.md / tech-stack.md), so there is no legitimate need. All access — auth, browse, claim, and the organizer's **post-event reveal** — runs through RLS with the user's session; the reveal is an RLS policy `USING (event_date < now())` (the query-level event-date filter CLAUDE.md mandates), and any signup-side row creation uses a `SECURITY DEFINER` Postgres trigger, not app-side elevation. — ✅ honored: no service_role imported anywhere.
+- [x] **Guardrail:** if a future feature ever genuinely needs service_role, it must be a **deliberate, reviewed, server-only** addition with a test proving it can't touch claim-status read paths before the event date — never a default import. — ✅ recorded; no service_role helper exists to import by accident.
+- [x] **Smoke component:** ✅ `src/app/api/health/route.ts` (GET) calls `supabase.auth.getUser()` and returns `{ ok, authenticated }` — gives Phase 4 something real to exercise the cookie/Workers path against.
+
+> **Phase 1 fix made here (blocked the build):** `next.config.ts` imported `initializeOpenNextCloudflareForDev`, which **does not exist** in `@opennextjs/cloudflare` 1.20.1 — the real export is **`initOpenNextCloudflareForDev`**. Corrected both the import and the call; `pnpm exec tsc --noEmit` is now clean. (Phase 1's recorded snippet used the wrong name.)
 
 ## Phase 3 — Environment (no app secrets in v1)
 
 Only the **two public** `NEXT_PUBLIC_*` values, inlined at build. **v1 has no runtime Supabase secret** (service_role is intentionally unused — Phase 2 decision), so there is no `wrangler secret put` step for the app.
 
-- [ ] **`.dev.vars`** (gitignored) for local Workers preview:
-      ```
-      NEXTJS_ENV=development
-      NEXT_PUBLIC_SUPABASE_URL=...
-      NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-      ```
-- [ ] **`.env.local`** (gitignored) — same `NEXT_PUBLIC_*` pair so `next dev` and the build inline them.
-- [ ] **`.env.example`** (committed) — the var **names only**, no values, as documentation.
-- [ ] **No Worker secret to set for v1.** (If service_role is ever introduced later, *that* is when a `pnpm exec wrangler secret put …` step gets added — human-only.)
-- [ ] **Build-time publics for prod:** `NEXT_PUBLIC_SUPABASE_URL` / `_ANON_KEY` must be present during `opennextjs-cloudflare build`. For manual deploys they come from `.env.local`; for Workers Builds they come from build variables (Phase 6).
+- [x] **`.dev.vars`** (gitignored) for local Workers preview — ✅ created with `NEXTJS_ENV=development` + the two `NEXT_PUBLIC_*` placeholders. ⏳ **Awaiting values** (paste hosted Project URL + anon key).
+- [x] **`.env.local`** (gitignored) — ✅ created with the two `NEXT_PUBLIC_*` placeholders so `next dev` and the build inline them. ⏳ **Awaiting values** (same hosted pair).
+- [x] **`.env.example`** (committed) — ✅ created with var **names only** + instructions, no values. Required a `!.env.example` negation in `.gitignore` (the existing `.env*` rule was ignoring it).
+- [x] **No Worker secret to set for v1.** — ✅ confirmed nothing to do (`wrangler secret put` only returns if service_role is ever introduced — human-only).
+- [x] **Build-time publics for prod:** ✅ noted — for manual deploys they come from `.env.local`; for Workers Builds from build variables (Phase 6). (Effective once values are pasted.)
+
+> ⏳ **Human step before Phase 4:** paste the hosted Supabase **Project URL** and **anon key** into the 4 placeholders across `.env.local` and `.dev.vars` (same values in both). Source: Supabase dashboard → **Settings → API**.
 
 > **Local Supabase stack is deferred — see the last section of this plan.** It is **not** on the deployment critical path: Phases 1–6 all run against the **hosted** Supabase project (Phase 4's preview *must* use hosted anyway, per the `global_fetch_strictly_public` gotcha). So for the whole deploy, point **both** `.env.local` and `.dev.vars` at the **hosted** project. Stand up the local Docker stack (`supabase start`) later, when you start building GIN's features — that's **"Feature-dev inner loop"** at the end.
 
