@@ -38,7 +38,7 @@ Each block ends with a **verify** command/check; do not move past a block until 
 - [ ] **Scoped API token** *(optional now — only for token-based/headless deploy; `wrangler login` is simpler for the manual first deploy, and Workers Builds in Phase 6 uses its own OAuth connection, no repo token):* My Profile → **API Tokens** → **Create Token** → **Edit Cloudflare Workers** template → restrict **Account Resources** to this account and **Zone Resources** to none; **no DNS, no billing, no unrelated Secrets**. Store the token in your shell/secret manager, never in the repo.
 - [ ] **Verify:** you can load **Workers & Pages** in the dashboard (plan can be Free at this point).
 
-> **Credential-plane boundary.** The Account ID and API token are **Cloudflare deploy credentials** — they do NOT go in `.env*`/`.dev.vars` (those are for the app's Supabase runtime vars only, Phase 3). Account ID isn't secret (safe in `wrangler.jsonc` or via `wrangler whoami`); an API token, *if ever used*, lives in the shell/secret manager as `CLOUDFLARE_API_TOKEN`, never committed. With `wrangler login` you need neither in a file.
+> **Credential-plane boundary.** The Account ID and API token are **Cloudflare deploy credentials** — they do NOT go in `.env*` (those are for the app's Supabase runtime vars only, Phase 3). Account ID isn't secret (safe in `wrangler.jsonc` or via `wrangler whoami`); an API token, *if ever used*, lives in the shell/secret manager as `CLOUDFLARE_API_TOKEN`, never committed. With `wrangler login` you need neither in a file.
 
 > **Wrangler CLI auth is NOT a prereq — it moved into Phase 1**, because `wrangler` is installed there (as a pinned project dev-dependency, never global). You'll run `wrangler login` / `wrangler whoami` right after the install. See Phase 1.
 
@@ -147,15 +147,18 @@ Use `@supabase/ssr`; **create the client per-request, never as a module-global**
 
 Only the **two public** `NEXT_PUBLIC_*` values, inlined at build. **v1 has no runtime Supabase secret** (service_role is intentionally unused — Phase 2 decision), so there is no `wrangler secret put` step for the app.
 
-- [x] **`.dev.vars`** (gitignored) for local Workers preview — ✅ created with `NEXTJS_ENV=development` + the two `NEXT_PUBLIC_*` placeholders. ⏳ **Awaiting values** (paste hosted Project URL + anon key).
-- [x] **`.env.local`** (gitignored) — ✅ created with the two `NEXT_PUBLIC_*` placeholders so `next dev` and the build inline them. ⏳ **Awaiting values** (same hosted pair).
-- [x] **`.env.example`** (committed) — ✅ created with var **names only** + instructions, no values. Required a `!.env.example` negation in `.gitignore` (the existing `.env*` rule was ignoring it).
+> 🔄 **Revised architecture (2026-07-03) — `.dev.vars` removed, single source of truth.** The original plan duplicated the hosted pair into both `.env.local` (build) and `.dev.vars` (preview runtime). Verified against the installed adapter source: `@opennextjs/cloudflare` **does its own `.env*` loading** (it launches wrangler with `CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false`), bakes the Next.js env cascade for all modes into `.open-next/cloudflare/next-env.mjs` at build, and injects it into the Workers runtime (`process.env[k] ??= …`, mode = `NEXTJS_ENV ?? "production"`). So `.env*` values **already reach the preview/prod worker** — `.dev.vars` was pure duplication (and v1 has no secrets that must override). New layout below.
+
+- [x] **`.env`** (gitignored) — ✅ **single source of truth for the HOSTED project** (URL + anon key). Read by `pnpm dev` (default), the build's `NEXT_PUBLIC_*` inlining, and the Workers preview/prod runtime (via the adapter's `next-env.mjs` injection, production mode). Replaces the former `.env.local`.
+- [x] **`.env.localdb`** (gitignored) — ✅ **LOCAL stack values** (`http://127.0.0.1:54321` + anon key from `supabase status`). A **non-Next-recognized** filename, loaded **only** by `pnpm dev:local` (`dotenv -e .env.localdb -- next dev`) so plain `pnpm dev` stays hosted. URL pre-filled; anon key placeholder until the local stack is up.
+- [x] **`package.json` scripts** — ✅ `dev` = `next dev` (hosted), `dev:local` = `dotenv -e .env.localdb -- next dev` (local). Added `dotenv-cli` (MIT) as a dev-dependency (pure JS → no pnpm-11 build-script gate).
+- [x] **~~`.dev.vars`~~ deleted** — ✅ redundant under the adapter's injection model; recreate only if a real runtime secret is ever introduced (not in v1).
+- [x] **`.env.example`** (committed) — ✅ var **names only** + the `.env`/`.env.localdb` model documented. Uses a `!.env.example` negation in `.gitignore` (the `.env*` rule was ignoring it).
 - [x] **No Worker secret to set for v1.** — ✅ confirmed nothing to do (`wrangler secret put` only returns if service_role is ever introduced — human-only).
-- [x] **Build-time publics for prod:** ✅ noted — for manual deploys they come from `.env.local`; for Workers Builds from build variables (Phase 6). (Effective once values are pasted.)
+- [x] **Build-time publics for prod:** ✅ for manual deploys they come from `.env`; for Workers Builds from build variables (Phase 6).
+- [x] **Values pasted** — ✅ hosted Project URL + anon key are in `.env` (source: Supabase → Settings → API).
 
-> ⏳ **Human step before Phase 4:** paste the hosted Supabase **Project URL** and **anon key** into the 4 placeholders across `.env.local` and `.dev.vars` (same values in both). Source: Supabase dashboard → **Settings → API**.
-
-> **Local Supabase stack is deferred — see the last section of this plan.** It is **not** on the deployment critical path: Phases 1–6 all run against the **hosted** Supabase project (Phase 4's preview *must* use hosted anyway, per the `global_fetch_strictly_public` gotcha). So for the whole deploy, point **both** `.env.local` and `.dev.vars` at the **hosted** project. Stand up the local Docker stack (`supabase start`) later, when you start building GIN's features — that's **"Feature-dev inner loop"** at the end.
+> **Local Supabase stack is deferred — see the last section of this plan.** Not on the deployment critical path: Phases 1–6 all run against the **hosted** project (Phase 4's preview *must*, per the `global_fetch_strictly_public` gotcha). During deploy, only `.env` (hosted) matters; `.env.localdb` is unused until you start feature dev. Switching `pnpm dev` to the local Docker stack is now a **script** (`pnpm dev:local`), not a file re-point — see **"Feature-dev inner loop"** at the end.
 
 ## Phase 4 — Local Workers preview (the gate — do NOT skip)
 
@@ -218,24 +221,24 @@ Dropping/altering production Postgres, deleting the Worker / R2 bucket / KV name
 
 ## Artifacts produced
 
-`wrangler.jsonc` (incl. observability), `open-next.config.ts`, updated `next.config.ts`/`package.json`/`.gitignore`, `public/_headers`, `src/utils/supabase/{client,server}.ts`, `middleware.ts`, `supabase/config.toml` + `supabase/migrations/*` (local stack config + schema/RLS migrations), `.dev.vars`/`.env.local`/`.env.example`, a connected **Workers Builds** Git integration (no repo CI files), and the reviewed deploy record at this file.
+`wrangler.jsonc` (incl. observability), `open-next.config.ts`, updated `next.config.ts`/`package.json` (incl. `dev:local` + `dotenv-cli`)/`.gitignore`, `public/_headers`, `src/utils/supabase/{client,server,proxy}.ts`, `src/proxy.ts` (Next.js 16 Proxy — the renamed `middleware`), `src/app/api/health/route.ts`, `supabase/config.toml` + `supabase/migrations/*` (local stack config + schema/RLS migrations), `.env`/`.env.localdb`/`.env.example` (no `.dev.vars` — see Phase 3 revised architecture), a connected **Workers Builds** Git integration (no repo CI files), and the reviewed deploy record at this file.
 
 ---
 
 ## Feature-dev inner loop — local Supabase stack *(NEXT track: start when you begin building GIN features, after the scaffold is deployed)*
 
-> **Why this is last / off the deployment path:** nothing in Phases 1–6 needs the running local stack — deployment uses the **hosted** project throughout (Phase 4's preview *must*, per the `workerd` + `global_fetch_strictly_public` gotcha). Stand this up when you start writing GIN's features (auth, claim, RLS). Concretely, it **repoints `.env.local`** from the hosted values you used during deploy to the **local** stack.
+> **Why this is last / off the deployment path:** nothing in Phases 1–6 needs the running local stack — deployment uses the **hosted** project throughout (Phase 4's preview *must*, per the `workerd` + `global_fetch_strictly_public` gotcha). Stand this up when you start writing GIN's features (auth, claim, RLS). Concretely, it means running `pnpm dev:local` (which loads `.env.localdb`) instead of `pnpm dev` — `.env` (hosted) is never touched.
 
 ### Start the local stack
 
 - [ ] **Init once:** `supabase init` (creates `supabase/config.toml` + migrations dir; commit these). *(Harmless to run earlier if you want the config committed sooner.)*
 - [ ] **Start:** `supabase start` — boots Postgres (`:54322`), Auth/GoTrue + API (`:54321`), Studio (`:54323`), Mailpit (`:54324`). Re-print URLs/keys anytime with `supabase status`; tear down with `supabase stop`. (Colima must be running first — prereq Block C.)
-- [ ] **Repoint `next dev` to local:** swap the hosted values in `.env.local` for the **local** ones:
+- [ ] **Fill `.env.localdb`:** paste the **local** anon key from `supabase status` into the existing `.env.localdb` (URL `http://127.0.0.1:54321` is already there). No change to `.env` — it stays hosted.
       ```
       NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
       NEXT_PUBLIC_SUPABASE_ANON_KEY=<local anon key from `supabase status`>
       ```
-- [ ] **Run:** `pnpm dev` → the app now talks to fully-local DB + Auth, offline.
+- [ ] **Run:** `pnpm dev:local` → the app now talks to fully-local DB + Auth, offline. (`pnpm dev` still targets hosted.)
 
 ### Auth flow locally (Mailpit)
 
@@ -249,15 +252,16 @@ Dropping/altering production Postgres, deleting the Worker / R2 bucket / KV name
 - [ ] Build and test the **organizer-blindness rule** (event-date query filter + RLS) here, locally, before it ever ships — this is the safe sandbox CLAUDE.md's hard rule needs.
 - [ ] Promote to the hosted project with `supabase db push` (links to the project from prereq Block B). *Reminder: DB migrations do NOT roll back with a Worker rollback — coordinate them separately (Phase 5 caveat).*
 
-### The two-loop gotcha (why `.env.local` and `.dev.vars` differ)
+### The two-loop gotcha (why the local target is its own file + script)
 
-Once the local stack is in play, `next dev` reaches `127.0.0.1` fine, but the **Workers preview runs under `workerd` with `global_fetch_strictly_public`**, which rejects `fetch()` to localhost/private IPs (*"resolves to a local or disallowed IP address"*). So the two loops target different Supabase URLs:
+Once the local stack is in play, `next dev` reaches `127.0.0.1` fine, but the **Workers preview runs under `workerd` with `global_fetch_strictly_public`**, which rejects `fetch()` to localhost/private IPs (*"resolves to a local or disallowed IP address"*). The env architecture keeps localhost **structurally** out of every workerd path: localhost lives only in `.env.localdb`, which is loaded **only** by the `dev:local` script (a filename Next never auto-loads), so neither the build nor the preview can pick it up.
 
-| Loop | Runtime | Env file | Point Supabase at |
-|---|---|---|---|
-| `pnpm dev` | Node (`next dev`) | `.env.local` | **local stack** `http://127.0.0.1:54321` |
-| `pnpm preview` | `workerd` | `.dev.vars` | **hosted** project URL (public) |
-| production | `workerd` | build vars | **hosted** project URL |
+| Loop | Runtime | Command | Env source | Supabase target |
+|---|---|---|---|---|
+| local feature dev | Node (`next dev`) | `pnpm dev:local` | `.env.localdb` (via dotenv-cli) | **local stack** `http://127.0.0.1:54321` |
+| dev against hosted | Node (`next dev`) | `pnpm dev` | `.env` | **hosted** project URL |
+| `pnpm preview` | `workerd` | `pnpm preview` | `.env` (baked into `next-env.mjs`, prod mode) | **hosted** project URL |
+| production | `workerd` | `pnpm deploy` / Workers Builds | `.env` / build vars | **hosted** project URL |
 
-- [ ] **Rule of thumb:** build features against the **local stack with `pnpm dev`**; when you run `pnpm preview` to validate Workers-runtime behavior (the Phase 4 gate), point `.dev.vars` at the **hosted** project, not the local one. *(During the initial deploy — before this loop exists — `.env.local` also points at hosted; this is the only step that changes that.)*
-- [ ] **Decision (current):** one Supabase project — **production** — for everything; a dedicated **staging** project is deferred. **Consequence:** `pnpm preview` and Phase 6 branch/preview deployments run against **production data**, so (a) keep destructive testing on the local stack, and (b) gate preview URLs behind **Cloudflare Access** (Phase 6) so pre-event claim state can't leak. Revisit with a staging project + a second `.dev.vars`/build-var set when the claim code lands.
+- [ ] **Rule of thumb:** build features with `pnpm dev:local` (local stack); validate Workers-runtime behavior with `pnpm preview` (the Phase 4 gate), which always uses `.env` (hosted). No file editing to switch — it's the command you run.
+- [ ] **Decision (current):** one Supabase project — **production** — for everything; a dedicated **staging** project is deferred. **Consequence:** `pnpm preview` and Phase 6 branch/preview deployments run against **production data**, so (a) keep destructive testing on the local stack, and (b) gate preview URLs behind **Cloudflare Access** (Phase 6) so pre-event claim state can't leak. Revisit with a staging project + a second build-var set when the claim code lands.
