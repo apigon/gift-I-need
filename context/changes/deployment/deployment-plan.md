@@ -70,14 +70,14 @@ The local stack runs Postgres, **GoTrue (Auth)**, Studio, and **Mailpit** (email
 
 ## Phase 1 — Add the adapter and Workers config
 
-- [ ] **Install tooling (pnpm only):**
+- [x] **Install tooling (pnpm only):** — ✅ installed `@opennextjs/cloudflare` **pinned to 1.20.1** (no `^`) + `wrangler ^4.106.0` (2026-07-03).
       `pnpm add -D @opennextjs/cloudflare@latest wrangler@latest`
       Confirm `wrangler --version` ≥ **3.99.0** and `@opennextjs/cloudflare` is a version that includes the #1160 fix (**≥ 1.17.2**, prefer latest). Record exact resolved versions in `package.json` (no `^` range on the adapter — **pin it** to avoid surprise bumps).
-- [ ] **Authenticate wrangler** *(was prereq Block B — lives here because it needs wrangler installed first; use `pnpm exec`, never a global install)*. Pick one method:
+- [x] **Authenticate wrangler** — ✅ `wrangler login` done (2026-07-03). *(was prereq Block B — lives here because it needs wrangler installed first; use `pnpm exec`, never a global install)*. Pick one method:
       - **Interactive (recommended):** `pnpm exec wrangler login` — browser OAuth. In this session run it as `! pnpm exec wrangler login` so the flow lands in the conversation.
       - **Token-based (headless/CI):** `export CLOUDFLARE_API_TOKEN="<scoped token>"`. Note it **overrides** any `wrangler login` session — unset a stale token when switching back to OAuth.
       - **Verify + grab Account ID:** `pnpm exec wrangler whoami` prints your account email + **Account ID** (this completes prereq Block A's Account-ID step and confirms which auth method is active).
-- [ ] **`wrangler.jsonc`** at repo root:
+- [x] **`wrangler.jsonc`** at repo root: — ✅ created (verbatim; `compatibility_date` kept at `2024-12-30`).
       ```jsonc
       {
         "$schema": "node_modules/wrangler/config-schema.json",
@@ -97,31 +97,33 @@ The local stack runs Postgres, **GoTrue (Auth)**, Studio, and **Mailpit** (email
       }
       ```
       (`name` must match the `WORKER_SELF_REFERENCE` service. R2 bucket is for ISR/Next cache — include it now so caching works once GIN adds dynamic routes; create the bucket in Phase 5.)
-- [ ] **`open-next.config.ts`** at repo root:
+- [x] **`open-next.config.ts`** at repo root: — ✅ created.
       ```ts
       import { defineCloudflareConfig } from "@opennextjs/cloudflare";
       import r2IncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/r2-incremental-cache";
       export default defineCloudflareConfig({ incrementalCache: r2IncrementalCache });
       ```
-- [ ] **`next.config.ts`** — append the dev-binding initializer so `next dev` can see Workers bindings:
+- [x] **`next.config.ts`** — ✅ appended `initializeOpenNextCloudflareForDev()` so `next dev` can see Workers bindings:
       ```ts
       import { initializeOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
       initializeOpenNextCloudflareForDev();
       ```
-- [ ] **`public/_headers`** — long-cache static assets:
+- [x] **`public/_headers`** — ✅ created (long-cache static assets):
       ```
       /_next/static/*
         Cache-Control: public,max-age=31536000,immutable
       ```
-- [ ] **`package.json` scripts** — add (keep existing `dev`/`build`/`lint`):
+- [x] **`package.json` scripts** — ✅ added `preview`/`deploy`/`cf-typegen` (kept `dev`/`build`/`start`/`lint`):
       ```jsonc
       "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
       "deploy":  "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
       "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
       ```
-- [ ] **`.gitignore`** — add `.open-next`, `.dev.vars`, `cloudflare-env.d.ts` (regenerated), and confirm `.env*` already ignored.
-- [ ] **`pnpm cf-typegen`** to generate `cloudflare-env.d.ts` typing the bindings/secrets.
-- [ ] **Edge-case sweep:** grep for `export const runtime = "edge"` and remove any (OpenNext uses the Node-compat Worker runtime; `edge` declarations break the build). None exist today — re-check after Supabase wiring.
+- [x] **`.gitignore`** — ✅ added `.open-next`, `.dev.vars`, `cloudflare-env.d.ts`; `.env*` already ignored.
+- [x] **`pnpm cf-typegen`** — ✅ generated `cloudflare-env.d.ts` (bindings `ASSETS`, `WORKER_SELF_REFERENCE`, `NEXT_INC_CACHE_R2_BUCKET` typed). Required approving pnpm 11 build scripts first (see note below).
+- [x] **Edge-case sweep:** — ✅ `grep -rn 'runtime.*=.*edge' src` returns none. Re-check after Supabase wiring.
+
+> **pnpm 11 build-script approval (done 2026-07-03).** `pnpm add` left `pnpm-workspace.yaml` with placeholder `allowBuilds:` entries for `workerd`, `esbuild`, `sharp`, `unrs-resolver`; unresolved placeholders made `pnpm install` (and every `pnpm <script>`) exit 1. Set all four to `true` — trusted native tooling we deliberately installed (`workerd`/`esbuild` are core to the OpenNext build + Phase 4 preview). **Commit `pnpm-workspace.yaml`** so CI / Workers Builds reproduce the approvals.
 
 ## Phase 2 — Wire Supabase (SSR client + middleware)
 
