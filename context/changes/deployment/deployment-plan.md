@@ -175,11 +175,13 @@ This is where the 16.2.9 × adapter compatibility is proven before touching prod
 
 ## Phase 5 — First production deploy (manual)
 
-- [ ] **Create the R2 cache bucket:** `pnpm exec wrangler r2 bucket create gin-inc-cache` (matches `wrangler.jsonc`).
-- [ ] **Authenticate wrangler:** `pnpm exec wrangler login` (interactive — run via `! wrangler login` in the session) **or** export the scoped `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` env vars.
-- [ ] **Deploy:** `pnpm deploy`. Note the `*.workers.dev` URL.
-- [ ] **Verify live:** load the URL; `pnpm exec wrangler tail --format json` to watch runtime logs; confirm the smoke endpoint + auth round-trip in production.
-- [ ] **Rollback rehearsal:** `pnpm exec wrangler versions list`; confirm `pnpm exec wrangler rollback [version-id]` is understood (seconds to revert). *Caveat: Supabase schema migrations do NOT roll back with the Worker — coordinate DB changes separately.*
+> 🟡 **R2 DEFERRED (Option B, 2026-07-03) — deployed without R2.** `wrangler r2 bucket create gin-inc-cache` failed: **R2 not enabled on the account** (`code: 10042`, "Please enable R2 through the Cloudflare Dashboard" — enabling prompts for a payment method). Since the scaffold has **no ISR/`revalidate` routes**, the incremental cache isn't exercised yet, so R2 was **commented out** of `wrangler.jsonc` (`r2_buckets`) and `open-next.config.ts` (`incrementalCache: r2IncrementalCache` → `defineCloudflareConfig({})`) to ship on the fully-free account. **RE-ENABLE BEFORE ANY ISR ROUTE SHIPS:** dashboard → R2 → Enable → `pnpm exec wrangler r2 bucket create gin-inc-cache` → uncomment both config blocks → `pnpm cf-typegen` → redeploy. (User was away at the decision point; chosen per their free/OSS preference + R2 not yet needed.)
+
+- [~] **Create the R2 cache bucket** — ⏸️ **deferred** (see note above). Not created; R2 wiring commented out so the deploy runs R2-free.
+- [x] **Authenticate wrangler** — ✅ already authenticated from Phase 1 (`wrangler whoami`: andrzej.pigon@gmail.com, account `875a82b3…`; token has `workers (write)`). No re-login needed.
+- [x] **Deploy:** `pnpm deploy`. — ✅ **live at `https://gin.andrzej-pigon.workers.dev`**. Version `2bb9976a-5404-433b-ad57-34f6ce4f0ef9`; Total Upload 5488 KiB / **gzip 1142 KiB (~1.12 MiB, under Free cap)**; Worker Startup 26 ms; bindings = `WORKER_SELF_REFERENCE` + `ASSETS` (no R2).
+- [x] **Verify live** — ✅ `/` → 200 (scaffold "Create Next App"); `/api/health` → `{"ok":true,"authenticated":false}` 200, **auth round-trip works in production** (5/5 stable). *Note: the very first `/api/health` hit right after deploy returned a transient `error 1042 / 404` — a post-deploy edge-propagation blip that cleared within ~2 s; stable 200 on every retry. `wrangler tail --format json` confirmed `response.status 200`.*
+- [x] **Rollback rehearsal** — ✅ `wrangler versions list --name gin` shows version `2bb9976a…`; revert path is `pnpm exec wrangler rollback [version-id] --name gin` (seconds). Not executed — only one version exists so far, nothing to roll back to yet. *Caveat: Supabase schema migrations do NOT roll back with the Worker — coordinate DB changes separately.* *(CLI note: worker name is the `--name` flag, not a positional arg.)*
 
 ## Phase 6 — Cloudflare Workers Builds (Git integration, branch deploys + previews)
 

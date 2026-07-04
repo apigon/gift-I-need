@@ -6,9 +6,15 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "gin" }],
-  "r2_buckets": [
-    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "gin-inc-cache" }
-  ],
+  // R2 incremental cache DEFERRED (Phase 5, 2026-07-03): R2 isn't enabled on the
+  // account (enabling it prompts for a payment method) and the scaffold has no
+  // ISR/cached routes yet, so R2 isn't functionally needed. Re-enable R2 in the
+  // dashboard, run `wrangler r2 bucket create gin-inc-cache`, and uncomment both
+  // this block and the r2IncrementalCache override in open-next.config.ts BEFORE
+  // shipping any route with `revalidate`/ISR. See deployment-plan.md Phase 5.
+  // "r2_buckets": [
+  //   { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "gin-inc-cache" }
+  // ],
   "observability": {
     "enabled": true,
     "logs": { "invocation_logs": true, "head_sampling_rate": 1 }
