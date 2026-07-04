@@ -189,14 +189,16 @@ No GitHub Actions. Use Cloudflare's **native** Git integration: it OAuth-connect
 
 > Confirm branch name during execution — repo default is **`main`** (you said "master"). Plan targets `main` as the production branch.
 
-- [ ] **Connect the repo** (Cloudflare dashboard → the `gin` Worker → Settings → **Builds** → Connect GitHub): authorize the Cloudflare GitHub App scoped to this repo only.
-- [ ] **Build configuration:**
+> ✅ **Git prep (2026-07-04):** all Phase 1–5 work merged to `main` via **PR #5** (`apigon/gift-I-need`, merge commit `274024f`). `main` is the production branch and carries the deploy config. **Node pin:** `.nvmrc` = `24` (matches local/tested v24.13.0, overriding the plan's original "Node 20"); added locally, to be committed as part of the pipeline-test change. If a Workers Builds image rejects Node 24, drop `.nvmrc` to `22`/`20`.
+
+- [x] **Connect the repo** — ✅ `gin` Worker connected to GitHub `apigon/gift-I-need` via Cloudflare's native Git integration (Workers Builds), GitHub App scoped to this repo.
+- [x] **Build configuration** — ✅ set:
       - **Build command:** `pnpm exec opennextjs-cloudflare build`
-      - **Deploy command (production):** `pnpm exec wrangler deploy` (Cloudflare auto-swaps this to `pnpm exec wrangler versions upload` on non-production branches → preview version, not promoted).
-      - **Production branch:** `main`. **Build watch paths:** default (whole repo) is fine for now.
-      - **Package manager:** ensure pnpm is detected (lockfile present); pin Node 20 via build settings if needed.
-- [ ] **Build-time variables** (Builds → Variables, NOT secrets — they're public): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` so `next build` inlines them. (No Supabase runtime secret in v1 — nothing else to configure.)
-- [ ] **Preview-state guardrail:** preview deployments hit the **same** Supabase project. Because they can surface pre-event claim state during testing, gate preview URLs behind **Cloudflare Access** (or point previews at a separate Supabase project) before any claim-status code exists.
+      - **Deploy command (production):** `pnpm exec wrangler deploy` (Cloudflare auto-swaps to `wrangler versions upload` on non-production branches → preview version, not promoted).
+      - **Production branch:** `main`. **Build watch paths:** default (whole repo).
+      - **Package manager:** pnpm (lockfile detected). **Node:** governed by `.nvmrc` once committed (leave dashboard Node unset to avoid a conflicting override).
+- [x] **Build-time variables** — ✅ `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_ANON_KEY` added. *(User may store them **encrypted/masked** in the console — harmless: both are public anyway, still available at build time to inline `NEXT_PUBLIC_*`. Not real secrets; RLS is the protection. No `service_role`.)* No Supabase runtime secret in v1.
+- [~] **Preview-state guardrail — DEFERRED (2026-07-04, tracked).** ⏸️ Cloudflare Access on preview URLs **skipped for now**: the app is scaffold-only, so there is **no claim-status data to leak yet**, and this guardrail is scoped "before any claim-status code exists." **🔒 HARD RE-ADD TRIGGER:** before the first commit that adds claim/reveal/organizer-view code, gate preview URLs behind **Cloudflare Access** *or* point previews at a separate Supabase project. This is the CLAUDE.md organizer-blindness rule — non-negotiable once claim code exists. (Preview-branch protection is a later-course topic per the user.)
 - [ ] **Validate:** push a feature branch → confirm a **preview deployment** is created with a working URL and a PR comment. Merge to `main` → confirm Workers Builds auto-deploys and the production URL updates.
 - [ ] **Observability check:** in the Worker → **Observability** tab (enabled via `wrangler.jsonc` in Phase 1), confirm invocation logs/metrics appear for both the preview and production deploys; logs are also live via `wrangler tail --format json`.
 
