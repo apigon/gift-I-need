@@ -48,6 +48,3 @@ cloudflare-env.d.ts
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# local pointer to the GitHub Project number (account-specific; script falls back to title match)
-.github/gin-project
