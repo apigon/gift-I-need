@@ -3,7 +3,7 @@ project: "GIN (Gift I Need)"
 version: 1
 status: draft
 created: 2026-07-09
-updated: 2026-07-09
+updated: 2026-08-03
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -31,7 +31,8 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 | ---- | -------------------------- | --------------------------------------------------------------- | ---------------- | ---------------------- | -------- |
 | F-01 | email-password-auth        | (foundation) email/password sign-up, sign-in, sign-out wired    | —                | FR-001, FR-002         | ready    |
 | F-02 | surprise-rule-data-contract| (foundation) schema + enforced organizer-blindness & single-claim | —              | NFR (both), FR-011     | ready    |
-| S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02       | US-01, FR-003, FR-004, FR-006 | proposed |
+| F-03 | design-system-baseline     | (foundation) shared design tokens + base theme (incl. available/taken status styles) | — | FR-007, FR-009, NFR (confirmation) | ready    |
+| S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | proposed |
 | S-02 | browse-shared-list         | browse a shared list unauthenticated and see available/taken    | S-01, F-02       | US-01, FR-007, FR-009  | proposed |
 | S-03 | claim-gift-item            | sign in and claim an unclaimed item; it flips to "taken"        | S-02, F-01, F-02 | US-01, FR-008, FR-009  | proposed |
 | S-04 | edit-list-items            | edit items on their own event list                              | S-01, F-01       | FR-005                 | proposed |
@@ -47,13 +48,14 @@ Navigation aid — groups items that share a Prerequisites chain. Canonical orde
 | B      | Core claim loop  | `F-02` → `S-01` → `S-02` → `S-03`  | The north-star path (S-03). S-01 also needs `F-01` from Stream A.        |
 | C      | List curation    | `S-04`                             | Parallel branch off `S-01`; independent of the claim path — a capacity lever. |
 | D      | Post-event reveal| `S-05`                             | Joins Stream B at `S-03`; exercises the reveal side of the surprise rule. |
+| E      | Design system    | `F-03`                             | Standalone foundation; underpins the UI of every slice (S-01–S-05). Land before parallel UI work to prevent visual drift. |
 
 ## Baseline
 
 What's already in place in the codebase as of `2026-07-09` (auto-researched + user-confirmed).
 Foundations below assume these are present and do NOT re-scaffold them.
 
-- **Frontend:** present — Next.js 16 App Router + React 19 + Tailwind v4; only a placeholder homepage (`src/app/page.tsx`). No feature UI yet.
+- **Frontend:** present — Next.js 16 App Router + React 19 + Tailwind v4; only a placeholder homepage (`src/app/page.tsx`). No feature UI yet. Tailwind is wired but there are no shared design tokens / theme layer (available/taken status styles, typography scale) — see F-03.
 - **Backend / API:** present — Server Action / API-route pattern established; only `src/app/api/health/route.ts` exists. No feature logic yet.
 - **Data:** absent — Supabase project linked (`supabase/.temp/`), but no schema, no migrations directory, no tables. Core gap.
 - **Auth:** partial — Supabase SSR clients wired (`src/utils/supabase/{client,server,proxy}.ts`), middleware refreshes the session, health route calls `getUser()`. No sign-up/sign-in UI and no auth Server Actions.
@@ -90,6 +92,19 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Risk:** This is the riskiest correctness surface in the product and the one place `speed` does not relax the bar — the surprise rule and duplicate-prevention are must-hold guarantees. Kept to a minimal enabler contract (only the entities the first slices need + the two invariants + a focused test), NOT a full data-layer build: every downstream slice still integrates and exercises these tables through a real user capability.
 - **Status:** ready
 
+### F-03: Design tokens + base theme
+
+- **Outcome:** (foundation) a shared visual layer over the existing Tailwind v4 setup — design tokens (color, typography scale, spacing) and a base theme that includes the load-bearing "available" vs "taken" status styles and a consistent claim-confirmation feedback state; every feature UI consumes it instead of inventing its own.
+- **Change ID:** design-system-baseline
+- **PRD refs:** FR-007 (unauthenticated browse surface), FR-009 (items shown as "taken"/"available" — a visual status distinction), NFR (claim confirmation is visible within 1s with no ambiguous pending state — needs a consistent feedback style)
+- **Unlocks:** S-01, S-02, S-03, S-04, S-05 — every user-facing slice renders UI against this token/theme layer; establishing it once gives parallel slice builds a shared visual contract so they don't diverge.
+- **Prerequisites:** — (Tailwind v4 present per Baseline; this adds the token/theme layer on top, no new framework)
+- **Parallel with:** F-01, F-02
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Off the north-star critical path and cuts against the `speed` bias if over-built, so kept deliberately minimal — tokens + base theme + status/feedback styles, NOT a component library or full design system (that stays folded into each slice's own UI work). Its real justification is `capacity`: when S-01–S-05 UIs fan out to separate agent runs, a shared visual contract prevents the drift that ad-hoc per-slice styling would cause. If it starts to grow into a component catalogue, split it back into the consuming slices.
+- **Status:** ready
+
 ## Slices
 
 ### S-01: Organizer creates an event, adds gift ideas, and shares a link
@@ -97,7 +112,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Outcome:** an authenticated organizer can create an event (name + date), add gift ideas (title; optional notes, link, price range), and get a shareable link.
 - **Change ID:** create-and-share-event-list
 - **PRD refs:** US-01 (sets up the shared list), FR-003, FR-004, FR-006
-- **Prerequisites:** F-01 (all writes require auth), F-02 (events/items schema)
+- **Prerequisites:** F-01 (all writes require auth), F-02 (events/items schema), F-03 (renders the create/list UI against the shared theme)
 - **Parallel with:** — (heads the core claim loop)
 - **Blockers:** —
 - **Unknowns:**
@@ -161,7 +176,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | ---------- | --------------------------- | ------------------------------------------------------------ | --------------------- | --------------------------------------- |
 | F-01       | email-password-auth         | Wire email/password sign-up, sign-in, sign-out               | yes                   | Run `/10x-plan email-password-auth`     |
 | F-02       | surprise-rule-data-contract | Schema + enforce organizer-blindness & single-claim, with tests | yes                | Run `/10x-plan surprise-rule-data-contract`; unblocks the whole graph |
-| S-01       | create-and-share-event-list | Organizer creates an event, adds items, shares a link        | no                    | After F-01 + F-02                       |
+| F-03       | design-system-baseline      | Design tokens + base theme (available/taken status styles)   | yes                   | Run `/10x-plan design-system-baseline`  |
+| S-01       | create-and-share-event-list | Organizer creates an event, adds items, shares a link        | no                    | After F-01 + F-02 + F-03                |
 | S-02       | browse-shared-list          | Guest browses a shared list; available/taken status          | no                    | After S-01                              |
 | S-03       | claim-gift-item             | Guest claims an unclaimed item (north star)                  | no                    | After S-02 + F-01 + F-02                |
 | S-04       | edit-list-items             | Organizer edits items on their list                          | no                    | After S-01 + F-01; parallel with claim path |
