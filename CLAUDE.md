@@ -38,12 +38,20 @@ No test runner is configured yet — add one before writing tests.
 - **Next.js 16** (App Router) + React 19 + TypeScript (strict)
 - **Tailwind CSS v4** — different from v3; `@apply` and config syntax changed
 - **Supabase** — PostgreSQL + email/password Auth SDK (not yet wired)
-- **Vercel** serverless — mutations go in Server Actions (`"use server"`), read-heavy routes in Server Components; API Routes (`app/api/`) only for endpoints that need an HTTP surface (webhooks, external clients)
+- **Cloudflare Workers** via `@opennextjs/cloudflare` (not Vercel) — mutations go in Server Actions (`"use server"`), read-heavy routes in Server Components; API Routes (`app/api/`) only for endpoints that need an HTTP surface (webhooks, external clients). `wrangler.jsonc` + `open-next.config.ts` are authoritative; middleware runs on the **Edge** runtime
 - Package manager: **pnpm only** — never npm or yarn
 
 ## Path alias
 
 `@/*` maps to `./src/*` — use it for all project imports.
+
+## Code structure convention
+
+- Use feature based architecture as much as possible
+- Child components should sit in ./{currentParentDir}/components/{componentNameDir}
+- Shared components should sit in src/components/{componentNameDir}
+- All components directories should expose index file which would export all components contained inside that component directory
+- All unit tests should sit in same directory as SUT
 
 <!-- BEGIN @przeprogramowani/10x-cli -->
 
@@ -59,12 +67,12 @@ Move from sprint-zero setup to project orchestration with the **roadmap chain**:
 
 ### Task Router - Where to start
 
-| Skill | Use it when |
-| --- | --- |
-| **Roadmap (lesson focus)** | |
-| `/10x-roadmap` | You have `context/foundation/prd.md` and a scaffolded project baseline, and you need a vertical-first MVP roadmap. The skill reads the PRD, inspects the code baseline, uses available foundation docs such as `tech-stack.md`, `infrastructure.md`, and `deploy-plan.md`, then writes `context/foundation/roadmap.md`. Use it BEFORE creating per-change folders or implementation plans. |
-| **Re-run upstream if needed** | |
-| `/10x-shape` / `/10x-prd` / `/10x-tech-stack-selector` / `/10x-bootstrapper` / `/10x-agents-md` / `/10x-infra-research` | Bundled from Module 1 so foundation contracts can be fixed before roadmap sequencing. If roadmap generation exposes a PRD gap, repair the PRD before pretending the backlog is ready. |
+| Skill                                                                                                                   | Use it when                                                                                                                                                                                                                                                                                                                                                                                |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Roadmap (lesson focus)**                                                                                              |                                                                                                                                                                                                                                                                                                                                                                                            |
+| `/10x-roadmap`                                                                                                          | You have `context/foundation/prd.md` and a scaffolded project baseline, and you need a vertical-first MVP roadmap. The skill reads the PRD, inspects the code baseline, uses available foundation docs such as `tech-stack.md`, `infrastructure.md`, and `deploy-plan.md`, then writes `context/foundation/roadmap.md`. Use it BEFORE creating per-change folders or implementation plans. |
+| **Re-run upstream if needed**                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                            |
+| `/10x-shape` / `/10x-prd` / `/10x-tech-stack-selector` / `/10x-bootstrapper` / `/10x-agents-md` / `/10x-infra-research` | Bundled from Module 1 so foundation contracts can be fixed before roadmap sequencing. If roadmap generation exposes a PRD gap, repair the PRD before pretending the backlog is ready.                                                                                                                                                                                                      |
 
 ### How the chain hands off
 
