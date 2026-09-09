@@ -53,6 +53,62 @@ No test runner is configured yet — add one before writing tests.
 - All components directories should expose index file which would export all components contained inside that component directory
 - All unit tests should sit in same directory as SUT
 
+## Branching and PR convention
+
+Branch names start with the board **Key** of the roadmap issue they deliver:
+
+```
+GIN-<issue-number>-<change-id>      # e.g. GIN-8-email-password-auth
+```
+
+The `<change-id>` half matches the `context/changes/<change-id>/` folder, so the
+branch, the change folder, and the board ticket all read as one unit. Multi-phase
+plans stay on a single branch — do not add a `-phase-N` suffix.
+
+**The branch name is a label, not a mechanism.** Nothing about it updates the
+board on its own. Two separate things do the real work:
+
+1. **`Closes #<n>` in the PR body** (see `.github/pull_request_template.md`) is
+   what closes the issue on merge and lets GitHub Projects' built-in
+   "item closed → Done" workflow move the ticket. Without that line the board
+   will not update, whatever the branch is called.
+2. **A linked-branch record** on the issue is what makes `gh pr create`
+   pre-fill that `Closes #<n>` line and makes the branch show up in the issue's
+   Development panel.
+
+Create the branch so it is linked from the start — the API creates the ref and
+the link together:
+
+```bash
+gh api graphql -f query='
+  mutation {
+    createLinkedBranch(input:{
+      issueId:"<issue node id>"
+      oid:"<base commit sha>"
+      name:"GIN-<n>-<change-id>"
+      repositoryId:"<repo node id>"
+    }) { linkedBranch { id ref { name } } }
+  }'
+git fetch origin && git checkout GIN-<n>-<change-id>
+```
+
+`createLinkedBranch` **creates** a ref; it will not adopt one that already
+exists. Pushing the branch first makes the mutation return
+`{"linkedBranch": null}` with no error — a silent no-op. If that happens, delete
+the remote ref (confirm it has no unique commits first) and re-run the mutation.
+
+Node ids come from:
+
+```bash
+gh api graphql -f query='
+  query { repository(owner:"apigon", name:"gift-I-need") {
+    id issue(number:<n>) { id }
+  } }'
+```
+
+When starting work on an issue, also move its board Status to **In Progress**
+and self-assign it; both are manual, neither is automated.
+
 <!-- BEGIN @przeprogramowani/10x-cli -->
 
 ## 10xDevs AI Toolkit - Module 2, Lesson 1
