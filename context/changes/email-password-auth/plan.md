@@ -500,14 +500,14 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 
 #### Automated
 
-- [ ] 1.1 Dependencies install cleanly: `pnpm install`
-- [ ] 1.2 Type checking passes: `pnpm typecheck`
-- [ ] 1.3 Linting passes: `pnpm lint`
-- [ ] 1.4 Production build succeeds: `pnpm build`
+- [x] 1.1 Dependencies install cleanly: `pnpm install`
+- [x] 1.2 Type checking passes: `pnpm typecheck`
+- [x] 1.3 Linting passes: `pnpm lint`
+- [x] 1.4 Production build succeeds: `pnpm build`
 
 #### Manual
 
-- [ ] 1.5 Public allowlist reviewed and agreed to cover FR-007's future shared-list route
+- [x] 1.5 Public allowlist reviewed and agreed to cover FR-007's future shared-list route
 
 ### Phase 2: Sign-up and sign-in
 

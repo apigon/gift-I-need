@@ -1,0 +1,51 @@
+import { z } from "zod";
+
+// Form validation schemas and the shared Server Action result shape.
+//
+// NOTE: this module imports zod and must NOT be imported into the middleware
+// path. `redirect.ts` and `routes.ts` are the Edge-safe siblings; keeping them
+// in separate modules (and giving this directory no barrel `index.ts`) is what
+// stops zod being dragged into the Edge bundle. See CLAUDE.md and the plan's
+// "Edge-runtime purity" note.
+
+export const PASSWORD_MIN_LENGTH = 8;
+
+export const SignUpSchema = z.object({
+  email: z.email({ message: "Enter a valid email address." }).trim(),
+  password: z
+    .string()
+    .min(PASSWORD_MIN_LENGTH, {
+      message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`,
+    }),
+});
+
+// Sign-in validates SHAPE ONLY — deliberately no length rule. An account
+// created before the policy changed must still be able to sign in; applying the
+// sign-up strength rule here would lock those users out with a validation error
+// rather than letting Supabase decide.
+export const SignInSchema = z.object({
+  email: z.email({ message: "Enter a valid email address." }).trim(),
+  password: z.string().min(1, { message: "Enter your password." }),
+});
+
+export type AuthFieldErrors = {
+  email?: string[];
+  password?: string[];
+};
+
+// The contract Server Actions return to `useActionState`. S-01's event form and
+// S-04's item form are expected to reuse this shape rather than invent their
+// own; when a second feature needs it, move it to `src/lib/forms/`.
+//
+// `status` discriminates so a form can tell "not submitted yet" from "submitted
+// and came back clean" — without it, an idle form and a successful one are
+// indistinguishable, and success normally ends in a redirect anyway.
+export type FormState =
+  | { status: "idle" }
+  | {
+      status: "error";
+      errors?: AuthFieldErrors;
+      message?: string;
+    };
+
+export const initialFormState: FormState = { status: "idle" };
