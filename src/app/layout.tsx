@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 
+import { Toaster } from "@/components";
+
 import { AuthStatus } from "./components";
 import "./globals.css";
 
@@ -45,6 +47,7 @@ export default function RootLayout({
           <AuthStatus />
         </header>
         {children}
+        <Toaster />
       </body>
     </html>
   );

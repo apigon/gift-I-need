@@ -546,33 +546,33 @@ There are no data changes. Everything happens on the single branch `GIN-17-desig
 
 #### Automated
 
-- [x] 1.1 Lint passes: `pnpm lint`
-- [x] 1.2 Type checking passes: `pnpm typecheck`
-- [x] 1.3 Production build succeeds: `pnpm build`
-- [x] 1.4 Drift-guard probe fails lint for palette, font-size (incl. responsive), and `dark:` classes
-- [x] 1.5 No off-system classes remain in `src`
+- [x] 1.1 Lint passes: `pnpm lint` — 2b99e26
+- [x] 1.2 Type checking passes: `pnpm typecheck` — 2b99e26
+- [x] 1.3 Production build succeeds: `pnpm build` — 2b99e26
+- [x] 1.4 Drift-guard probe fails lint for palette, font-size (incl. responsive), and `dark:` classes — 2b99e26
+- [x] 1.5 No off-system classes remain in `src` — 2b99e26
 
 #### Manual
 
-- [x] 1.6 Auth pages unchanged apart from colours/fonts; errors in danger colour
-- [x] 1.7 Home page on canvas; Fraunces font loads
-- [x] 1.8 App stays light under OS dark mode
-- [x] 1.9 Body text renders in Geist, not Arial
+- [x] 1.6 Auth pages unchanged apart from colours/fonts; errors in danger colour — 2b99e26
+- [x] 1.7 Home page on canvas; Fraunces font loads — 2b99e26
+- [x] 1.8 App stays light under OS dark mode — 2b99e26
+- [x] 1.9 Body text renders in Geist, not Arial — 2b99e26
 
 ### Phase 2: Primitives and toast layer
 
 #### Automated
 
-- [ ] 2.1 Lint passes: `pnpm lint`
-- [ ] 2.2 Type checking passes: `pnpm typecheck`
-- [ ] 2.3 Production build succeeds: `pnpm build`
-- [ ] 2.4 Sonner 2.x is a direct dependency
-- [ ] 2.5 Components barrel has no `"use client"`
-- [ ] 2.6 Only `toaster.tsx` is a client module in `src/components`
+- [x] 2.1 Lint passes: `pnpm lint`
+- [x] 2.2 Type checking passes: `pnpm typecheck`
+- [x] 2.3 Production build succeeds: `pnpm build`
+- [x] 2.4 Sonner 2.x is a direct dependency
+- [x] 2.5 Components barrel has no `"use client"`
+- [x] 2.6 Only `toaster.tsx` is a client module in `src/components`
 
 #### Manual
 
-- [ ] 2.7 Existing pages unchanged; mounted Toaster adds no visible element or console error
+- [x] 2.7 Existing pages unchanged; mounted Toaster adds no visible element or console error
 
 ### Phase 3: Design-system showcase route
 
