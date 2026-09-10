@@ -27,7 +27,8 @@ import { createClient } from "@/utils/supabase/server";
 const CONFIRM_ERROR_REDIRECT = "/login?error=confirmation_failed";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
+  const { searchParams, origin } = request.nextUrl;
+  const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
 
@@ -35,22 +36,44 @@ export async function GET(request: NextRequest) {
   // link), so it goes through the same validator as every other return path.
   const next = safeReturnTo(searchParams.get("next"));
 
-  if (!tokenHash || !type) {
-    return NextResponse.redirect(
-      new URL(CONFIRM_ERROR_REDIRECT, request.nextUrl.origin),
-    );
-  }
+  // Generic on purpose — never echo Supabase's message, which distinguishes
+  // "expired" from "invalid" and so leaks whether a token ever existed.
+  const failure = NextResponse.redirect(new URL(CONFIRM_ERROR_REDIRECT, origin));
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
 
-  if (error) {
-    // Generic on purpose — do not echo Supabase's message, which distinguishes
-    // "expired" from "invalid" and leaks whether a token ever existed.
-    return NextResponse.redirect(
-      new URL(CONFIRM_ERROR_REDIRECT, request.nextUrl.origin),
-    );
+  // PKCE — THIS is the branch that actually fires for this stack. @supabase/ssr
+  // 0.12.0 hardcodes `flowType: "pkce"` in both createServerClient and
+  // createBrowserClient, so Supabase's /auth/v1/verify endpoint redirects here
+  // with `?code=<uuid>` to be exchanged for a session. Checked first because a
+  // PKCE link never carries token_hash.
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) {
+      // The response body stays generic; the reason goes to the server log.
+      // Without this a failed confirmation is undiagnosable — the user just
+      // lands on /login with no indication of why.
+      console.error("[auth/confirm] code exchange failed", {
+        code: error.code,
+        status: error.status,
+        message: error.message,
+      });
+      return failure;
+    }
+    return NextResponse.redirect(new URL(next, origin));
   }
 
-  return NextResponse.redirect(new URL(next, request.nextUrl.origin));
+  // OTP fallback — `?token_hash=&type=`. Not produced while the clients use
+  // PKCE, but this is the shape Supabase's own docs hand out, and an email
+  // template switched to `{{ .TokenHash }}` would land here instead. Cheap to
+  // support, and its absence would be a silent failure rather than an error.
+  if (tokenHash && type) {
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash: tokenHash,
+    });
+    return error ? failure : NextResponse.redirect(new URL(next, origin));
+  }
+
+  return failure;
 }
