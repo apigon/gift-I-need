@@ -22,14 +22,17 @@ export function Input({
 
   return (
     <div className={cn("flex flex-col gap-1", className)}>
-      <label htmlFor={id} className="text-small text-fg">
+      <label htmlFor={id} className={cn("text-small", error ? "text-danger" : "text-fg")}>
         {label}
       </label>
       <input
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className="rounded-control border border-edge bg-surface px-2 py-1 text-body text-fg"
+        className={cn(
+          "rounded-control border bg-surface px-2 py-1 text-body text-fg",
+          error ? "border-danger" : "border-edge",
+        )}
         {...props}
       />
       {hint ? (

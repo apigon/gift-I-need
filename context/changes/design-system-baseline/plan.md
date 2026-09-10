@@ -30,7 +30,7 @@ This replaces the stock Next.js scaffold styling with GIN's shared visual contra
 - **Light only.** The app renders the light theme on every device, including devices set to dark mode.
 - **Primitives.** `src/components/` exports Heading, Text, Button, Link, TextField, StatusBadge, Alert, Toaster and `notify` from one barrel.
 - **Toasts.** A token-styled Sonner `<Toaster>` is mounted in the root layout.
-- **Showcase.** `/design-system` renders every token, status variant, primitive state and a live toast in development, and returns 404 in production.
+- **Showcase.** `/design-system` renders every token, status variant, primitive state and a live toast in development, and is unreachable by signed-out visitors in production (redirected to `/login`, the same as any other protected route), with the page's own `notFound()` as a second layer.
 - **Existing screens.** `/`, `/login`, `/signup` and the header render entirely through primitives and tokens, and the F-01 behaviour is unchanged.
 - **Agent guidance.** CLAUDE.md has a "Design system" section telling agents to use tokens and primitives only.
 
@@ -382,9 +382,9 @@ A dev-only `/design-system` page that renders every token and primitive state. I
 
 **File**: `src/lib/auth/routes.ts`
 
-**Intent**: Let signed-out developers and agents open the showcase in dev. Production 404s on its own, so nothing is exposed.
+**Intent**: Let signed-out developers and agents open the showcase in dev. In production the route is excluded from the allowlist entirely (defense in depth on top of the page's own `notFound()`), so it behaves like any other protected route rather than a special case.
 
-**Contract**: Add `"/design-system"` to `PUBLIC_EXACT_PATHS` with a comment saying it is dev-only and the page 404s in production. This is an exact match, not a prefix. Per the file header, this is a security-relevant edit, so call it out in the PR.
+**Contract**: Add `"/design-system"` to `PUBLIC_EXACT_PATHS` only when `process.env.NODE_ENV !== "production"`, with a comment saying it is dev-only and the page also 404s on its own in production. This is an exact match, not a prefix. Per the file header, this is a security-relevant edit, so call it out in the PR.
 
 ### Success Criteria:
 
@@ -394,7 +394,7 @@ A dev-only `/design-system` page that renders every token and primitive state. I
 - Type checking passes: `pnpm typecheck`
 - Production build succeeds: `pnpm build`
 - In dev, signed out, the showcase serves: with `pnpm dev` running, `curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/design-system` prints `200`, not a `307` to `/login`
-- In production it 404s: after `pnpm build && pnpm start`, the same curl prints `404`
+- In production, signed out, the route is excluded from the allowlist: after `pnpm build && pnpm start`, the same curl prints `307` to `/login` (the same behavior as any other protected route). Signed in, the page's own `notFound()` still 404s.
 
 #### Manual Verification:
 
@@ -563,35 +563,35 @@ There are no data changes. Everything happens on the single branch `GIN-17-desig
 
 #### Automated
 
-- [x] 2.1 Lint passes: `pnpm lint`
-- [x] 2.2 Type checking passes: `pnpm typecheck`
-- [x] 2.3 Production build succeeds: `pnpm build`
-- [x] 2.4 Sonner 2.x is a direct dependency
-- [x] 2.5 Components barrel has no `"use client"`
-- [x] 2.6 Only `toaster.tsx` is a client module in `src/components`
+- [x] 2.1 Lint passes: `pnpm lint` — f0d455c
+- [x] 2.2 Type checking passes: `pnpm typecheck` — f0d455c
+- [x] 2.3 Production build succeeds: `pnpm build` — f0d455c
+- [x] 2.4 Sonner 2.x is a direct dependency — f0d455c
+- [x] 2.5 Components barrel has no `"use client"` — f0d455c
+- [x] 2.6 Only `toaster.tsx` is a client module in `src/components` — f0d455c
 
 #### Manual
 
-- [x] 2.7 Existing pages unchanged; mounted Toaster adds no visible element or console error
+- [x] 2.7 Existing pages unchanged; mounted Toaster adds no visible element or console error — f0d455c
 
 ### Phase 3: Design-system showcase route
 
 #### Automated
 
-- [ ] 3.1 Lint passes: `pnpm lint`
-- [ ] 3.2 Type checking passes: `pnpm typecheck`
-- [ ] 3.3 Production build succeeds: `pnpm build`
-- [ ] 3.4 `/design-system` returns 200 signed-out in dev
-- [ ] 3.5 `/design-system` returns 404 in production build
+- [x] 3.1 Lint passes: `pnpm lint`
+- [x] 3.2 Type checking passes: `pnpm typecheck`
+- [x] 3.3 Production build succeeds: `pnpm build`
+- [x] 3.4 `/design-system` returns 200 signed-out in dev
+- [x] 3.5 `/design-system` is unreachable signed-out in production (307 to `/login`, then 404 for a signed-in visitor)
 
 #### Manual
 
-- [ ] 3.6 Showcase matches `palette-proof.html` rev 2
-- [ ] 3.7 Headings show Fraunces SOFT 100
-- [ ] 3.8 Toasts render token-styled and are announced
-- [ ] 3.9 Visible focus ring on every interactive primitive
-- [ ] 3.10 Pending spinner static under reduced motion
-- [ ] 3.11 No horizontal overflow at 375px
+- [x] 3.6 Showcase matches `palette-proof.html` rev 2
+- [x] 3.7 Headings show Fraunces SOFT 100
+- [x] 3.8 Toasts render token-styled and are announced
+- [x] 3.9 Visible focus ring on every interactive primitive
+- [x] 3.10 Pending spinner static under reduced motion
+- [x] 3.11 No horizontal overflow at 375px
 
 ### Phase 4: Move current screens onto the design system
 
