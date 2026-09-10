@@ -37,6 +37,21 @@ const PUBLIC_PREFIXES = [
   "/lists/",
 ];
 
+// The credential entry points. A visitor who already has a session has no use
+// for these, so the middleware bounces them away — the mirror image of the
+// protection policy. Deliberately NOT the whole `/auth/` subtree: `/auth/confirm`
+// must stay reachable while signed in, since a confirmation link can be followed
+// by someone whose session is already established.
+const AUTH_ENTRY_PATHS = new Set(["/login", "/signup"]);
+
+/**
+ * True when `pathname` is a sign-in / sign-up form that an already-authenticated
+ * visitor should be redirected away from.
+ */
+export function isAuthEntryRoute(pathname: string): boolean {
+  return AUTH_ENTRY_PATHS.has(pathname);
+}
+
 /**
  * True when `pathname` may be served to an unauthenticated visitor.
  *
