@@ -564,10 +564,10 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 
 #### Automated
 
-- [x] 5.1 Type checking passes: `pnpm typecheck`
-- [x] 5.2 Linting passes: `pnpm lint`
-- [x] 5.3 Production build succeeds: `pnpm build`
-- [x] 5.4 Workers build and preview start cleanly: `pnpm preview`
+- [x] 5.1 Type checking passes: `pnpm typecheck` — 8ad9074
+- [x] 5.2 Linting passes: `pnpm lint` — 8ad9074
+- [x] 5.3 Production build succeeds: `pnpm build` — 8ad9074
+- [x] 5.4 Workers build and preview start cleanly: `pnpm preview` — 8ad9074
 
 #### Manual
 
