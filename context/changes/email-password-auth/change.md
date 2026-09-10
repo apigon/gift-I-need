@@ -1,7 +1,7 @@
 ---
 change_id: email-password-auth
 title: Wire email/password sign-up, sign-in, sign-out onto the Supabase SSR scaffold
-status: implementing
+status: implemented
 created: 2026-09-07
 updated: 2026-09-10
 archived_at: null
