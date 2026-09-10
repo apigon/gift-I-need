@@ -42,9 +42,22 @@ function buildConfirmUrl(next: string | null): string | undefined {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   if (!siteUrl) return undefined;
 
-  const url = new URL("/auth/confirm", siteUrl);
-  url.searchParams.set("next", safeReturnTo(next));
-  return url.toString();
+  try {
+    const url = new URL("/auth/confirm", siteUrl);
+    url.searchParams.set("next", safeReturnTo(next));
+    return url.toString();
+  } catch {
+    // `new URL` throws on a non-absolute base — e.g. `localhost:3000` with the
+    // scheme omitted, which .env.example invites by listing bare origins.
+    // Unguarded, that TypeError propagates out of the Server Action and takes
+    // sign-up down entirely. Fall back to the documented safe default instead:
+    // undefined means Supabase uses the project's own Site URL.
+    console.error(
+      "[auth] NEXT_PUBLIC_SITE_URL is not an absolute URL; ignoring it",
+      { siteUrl },
+    );
+    return undefined;
+  }
 }
 
 export async function signIn(

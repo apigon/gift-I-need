@@ -10,13 +10,20 @@ import { z } from "zod";
 
 export const PASSWORD_MIN_LENGTH = 8;
 
+// NOTE the ordering: trim BEFORE the email check, via `.pipe()`. Written the
+// other way round (`z.email().trim()`) the trim is dead code — the email rule
+// runs first and rejects "  user@example.com  " outright, so a padded value
+// never gets normalised, it just fails. Verified against zod 4.5.4.
+const emailField = z
+  .string()
+  .trim()
+  .pipe(z.email({ message: "Enter a valid email address." }));
+
 export const SignUpSchema = z.object({
-  email: z.email({ message: "Enter a valid email address." }).trim(),
-  password: z
-    .string()
-    .min(PASSWORD_MIN_LENGTH, {
-      message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`,
-    }),
+  email: emailField,
+  password: z.string().min(PASSWORD_MIN_LENGTH, {
+    message: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`,
+  }),
 });
 
 // Sign-in validates SHAPE ONLY — deliberately no length rule. An account
@@ -24,7 +31,7 @@ export const SignUpSchema = z.object({
 // sign-up strength rule here would lock those users out with a validation error
 // rather than letting Supabase decide.
 export const SignInSchema = z.object({
-  email: z.email({ message: "Enter a valid email address." }).trim(),
+  email: emailField,
   password: z.string().min(1, { message: "Enter your password." }),
 });
 

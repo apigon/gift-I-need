@@ -19,6 +19,17 @@ import { createClient } from "@/utils/supabase/server";
 // branch stops firing and sign-up silently reports success for an email that
 // already exists.
 //
+// ⚠️ SECOND ITEM ON THAT CHECKLIST — the OTP branch below is a latent login-CSRF
+// vector. Unlike PKCE, `verifyOtp({token_hash, type})` needs no code_verifier, so
+// it will establish a session for ANYONE holding a valid token_hash. If an email
+// template is ever switched to `{{ .TokenHash }}`, an attacker could lure a victim
+// to `/auth/confirm?token_hash=<attacker's>&type=signup` and silently sign them
+// into the ATTACKER's account — everything the victim then does lands in it.
+// Not reachable today: confirmations are off, and the PKCE clients produce
+// `?code=` links, never `token_hash`. Whoever enables confirmations must either
+// keep the PKCE template or add CSRF protection (e.g. a state/nonce cookie set
+// at sign-up and required here) before relying on the OTP branch.
+//
 // This is an HTTP surface rather than a Server Action because Supabase's email
 // links are external clients that need a real URL to hit.
 
@@ -26,11 +37,27 @@ import { createClient } from "@/utils/supabase/server";
 // expired token must never steer where the visitor lands.
 const CONFIRM_ERROR_REDIRECT = "/login?error=confirmation_failed";
 
+// EmailOtpType is `'signup' | ... | (string & {})`, so TypeScript accepts ANY
+// string and a bare cast would pass attacker-supplied junk straight into
+// verifyOtp. Validate against the real set instead.
+const EMAIL_OTP_TYPES = new Set<EmailOtpType>([
+  "signup",
+  "invite",
+  "magiclink",
+  "recovery",
+  "email_change",
+  "email",
+]);
+
+function parseOtpType(value: string | null): EmailOtpType | null {
+  return value !== null && EMAIL_OTP_TYPES.has(value) ? value : null;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as EmailOtpType | null;
+  const type = parseOtpType(searchParams.get("type"));
 
   // The onward destination is attacker-influenceable (it rides in the emailed
   // link), so it goes through the same validator as every other return path.
@@ -72,7 +99,17 @@ export async function GET(request: NextRequest) {
       type,
       token_hash: tokenHash,
     });
-    return error ? failure : NextResponse.redirect(new URL(next, origin));
+    if (error) {
+      // Mirrors the PKCE branch: generic to the caller, diagnosable in the log.
+      console.error("[auth/confirm] otp verification failed", {
+        type,
+        code: error.code,
+        status: error.status,
+        message: error.message,
+      });
+      return failure;
+    }
+    return NextResponse.redirect(new URL(next, origin));
   }
 
   return failure;
