@@ -500,32 +500,32 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 
 #### Automated
 
-- [x] 1.1 Dependencies install cleanly: `pnpm install`
-- [x] 1.2 Type checking passes: `pnpm typecheck`
-- [x] 1.3 Linting passes: `pnpm lint`
-- [x] 1.4 Production build succeeds: `pnpm build`
+- [x] 1.1 Dependencies install cleanly: `pnpm install` — b003011
+- [x] 1.2 Type checking passes: `pnpm typecheck` — b003011
+- [x] 1.3 Linting passes: `pnpm lint` — b003011
+- [x] 1.4 Production build succeeds: `pnpm build` — b003011
 
 #### Manual
 
-- [x] 1.5 Public allowlist reviewed and agreed to cover FR-007's future shared-list route
+- [x] 1.5 Public allowlist reviewed and agreed to cover FR-007's future shared-list route — b003011
 
 ### Phase 2: Sign-up and sign-in
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `pnpm typecheck`
-- [ ] 2.2 Linting passes: `pnpm lint`
-- [ ] 2.3 Production build succeeds: `pnpm build`
+- [x] 2.1 Type checking passes: `pnpm typecheck`
+- [x] 2.2 Linting passes: `pnpm lint`
+- [x] 2.3 Production build succeeds: `pnpm build`
 
 #### Manual
 
-- [ ] 2.4 Sign-up with a new email creates an account and redirects, no confirmation required
-- [ ] 2.5 Sign-up with an existing email shows the specific "already registered" message
-- [ ] 2.6 Sign-in succeeds with correct password; wrong password shows generic error copy
-- [ ] 2.7 Invalid email / short password show field-level errors without a Supabase round trip
-- [ ] 2.8 Submit button is disabled while the action is pending
-- [ ] 2.9 Hosted dashboard prerequisites confirmed (confirmations off, min length 8) — do before 2.4
-- [ ] 2.10 Form components follow the CLAUDE.md layout convention (own dir + `index.ts`, `src/components/` untouched)
+- [x] 2.4 Sign-up with a new email creates an account and redirects, no confirmation required
+- [x] 2.5 Sign-up with an existing email shows the specific "already registered" message
+- [x] 2.6 Sign-in succeeds with correct password; wrong password shows generic error copy
+- [x] 2.7 Invalid email / short password show field-level errors without a Supabase round trip
+- [x] 2.8 Submit button is disabled while the action is pending
+- [x] 2.9 Hosted dashboard prerequisites confirmed (confirmations off, min length 8) — do before 2.4
+- [x] 2.10 Form components follow the CLAUDE.md layout convention (own dir + `index.ts`, `src/components/` untouched)
 
 ### Phase 3: Auth header and sign-out
 
