@@ -513,35 +513,35 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `pnpm typecheck`
-- [x] 2.2 Linting passes: `pnpm lint`
-- [x] 2.3 Production build succeeds: `pnpm build`
+- [x] 2.1 Type checking passes: `pnpm typecheck` — 690ccbd
+- [x] 2.2 Linting passes: `pnpm lint` — 690ccbd
+- [x] 2.3 Production build succeeds: `pnpm build` — 690ccbd
 
 #### Manual
 
-- [x] 2.4 Sign-up with a new email creates an account and redirects, no confirmation required
-- [x] 2.5 Sign-up with an existing email shows the specific "already registered" message
-- [x] 2.6 Sign-in succeeds with correct password; wrong password shows generic error copy
-- [x] 2.7 Invalid email / short password show field-level errors without a Supabase round trip
-- [x] 2.8 Submit button is disabled while the action is pending
-- [x] 2.9 Hosted dashboard prerequisites confirmed (confirmations off, min length 8) — do before 2.4
-- [x] 2.10 Form components follow the CLAUDE.md layout convention (own dir + `index.ts`, `src/components/` untouched)
+- [x] 2.4 Sign-up with a new email creates an account and redirects, no confirmation required — 690ccbd
+- [x] 2.5 Sign-up with an existing email shows the specific "already registered" message — 690ccbd
+- [x] 2.6 Sign-in succeeds with correct password; wrong password shows generic error copy — 690ccbd
+- [x] 2.7 Invalid email / short password show field-level errors without a Supabase round trip — 690ccbd
+- [x] 2.8 Submit button is disabled while the action is pending — 690ccbd
+- [x] 2.9 Hosted dashboard prerequisites confirmed (confirmations off, min length 8) — do before 2.4 — 690ccbd
+- [x] 2.10 Form components follow the CLAUDE.md layout convention (own dir + `index.ts`, `src/components/` untouched) — 690ccbd
 
 ### Phase 3: Auth header and sign-out
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `pnpm typecheck`
-- [ ] 3.2 Linting passes: `pnpm lint`
-- [ ] 3.3 Production build succeeds: `pnpm build`
+- [x] 3.1 Type checking passes: `pnpm typecheck`
+- [x] 3.2 Linting passes: `pnpm lint`
+- [x] 3.3 Production build succeeds: `pnpm build`
 
 #### Manual
 
-- [ ] 3.4 Header shows the signed-in email after sign-in
-- [ ] 3.5 Sign out clears the session and reverts the header
-- [ ] 3.6 Signed-out state survives refresh and direct URL entry
-- [ ] 3.7 Sign-out works with JavaScript disabled
-- [ ] 3.8 `auth-status` follows the CLAUDE.md layout convention and adds no route
+- [x] 3.4 Header shows the signed-in email after sign-in
+- [x] 3.5 Sign out clears the session and reverts the header
+- [x] 3.6 Signed-out state survives refresh and direct URL entry
+- [x] 3.7 Sign-out works with JavaScript disabled
+- [x] 3.8 `auth-status` follows the CLAUDE.md layout convention and adds no route
 
 ### Phase 4: Allowlist route protection with returnTo
 

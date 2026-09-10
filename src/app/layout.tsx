@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+
+import { AuthStatus } from "./components";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,7 +29,17 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/* NOTE: AuthStatus calls getUser() -> cookies(), a request-time API, in
+            the ROOT layout — which opts every route in the app into dynamic
+            rendering. Accepted: wrangler.jsonc records R2 incremental caching as
+            deferred and no route uses revalidate/ISR, so there is no static
+            output to lose. Revisit if a marketing page is ever added. */}
+        <header className="flex justify-end border-b px-6 py-3">
+          <AuthStatus />
+        </header>
+        {children}
+      </body>
     </html>
   );
 }

@@ -50,7 +50,16 @@ No test runner is configured yet — add one before writing tests.
 - Use feature based architecture as much as possible
 - Child components should sit in ./{currentParentDir}/components/{componentNameDir}
 - Shared components should sit in src/components/{componentNameDir}
-- All components directories should expose index file which would export all components contained inside that component directory
+- Each `components/` directory exposes a single `index.ts` barrel that re-exports every component inside it. The barrel sits at `components/index.ts` — **not** one per component subdirectory — and consumers import from the `components` directory itself:
+
+  ```
+  src/app/(auth)/login/
+  ├── page.tsx                       // import { SignInForm } from "./components";
+  └── components/
+      ├── index.ts                   // export { SignInForm } from "./sign-in-form/sign-in-form";
+      └── sign-in-form/
+          └── sign-in-form.tsx
+  ```
 - All unit tests should sit in same directory as SUT
 
 ## Branching and PR convention

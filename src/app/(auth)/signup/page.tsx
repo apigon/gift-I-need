@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { SignUpForm } from "./components/sign-up-form";
+import { SignUpForm } from "./components";
 
 // Renders at `/signup` — see the route-group note in the sibling login page.
 

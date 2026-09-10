@@ -109,3 +109,15 @@ export async function signUp(
   // Outside try/catch — see the note in `signIn`.
   redirect(safeReturnTo(readNext(formData)));
 }
+
+export async function signOut(): Promise<void> {
+  const supabase = await createClient();
+
+  // Clear the session server-side — the same place middleware reads it. Signing
+  // out from the browser client instead would leave the server cookies intact
+  // until the next refresh, the client/server desync `proxy.ts` warns about.
+  await supabase.auth.signOut();
+
+  // Outside try/catch — see the note in `signIn`.
+  redirect("/");
+}

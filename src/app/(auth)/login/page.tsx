@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { SignInForm } from "./components/sign-in-form";
+import { SignInForm } from "./components";
 
 // The `(auth)` route group keeps the auth pages together without affecting the
 // URL — this renders at `/login`, not `/auth/login`.
