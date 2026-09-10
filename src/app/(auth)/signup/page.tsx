@@ -22,11 +22,11 @@ export default async function SignUpPage({
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-6 py-16">
-      <h1 className="text-2xl font-bold">Create an account</h1>
+      <h1 className="text-title font-bold">Create an account</h1>
 
       <SignUpForm next={next} />
 
-      <p className="text-sm">
+      <p className="text-small">
         Already have an account?{" "}
         <Link
           className="underline"

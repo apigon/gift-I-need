@@ -25,7 +25,7 @@ export async function AuthStatus() {
 
   if (!user) {
     return (
-      <nav className="flex items-center gap-4 text-sm">
+      <nav className="flex items-center gap-4 text-small">
         <Link className="underline" href="/login">
           Sign in
         </Link>
@@ -37,10 +37,10 @@ export async function AuthStatus() {
   }
 
   return (
-    <div className="flex items-center gap-4 text-sm">
+    <div className="flex items-center gap-4 text-small">
       <span>{user.email}</span>
       <form action={signOut}>
-        <button type="submit" className="border px-2 py-1">
+        <button type="submit" className="border-edge px-2 py-1">
           Sign out
         </button>
       </form>

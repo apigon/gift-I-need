@@ -3,7 +3,7 @@ project: "GIN (Gift I Need)"
 version: 1
 status: draft
 created: 2026-07-09
-updated: 2026-08-03
+updated: 2026-09-10
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -31,7 +31,7 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 | ---- | -------------------------- | --------------------------------------------------------------- | ---------------- | ---------------------- | -------- |
 | F-01 | email-password-auth        | (foundation) email/password sign-up, sign-in, sign-out wired    | —                | FR-001, FR-002         | ready    |
 | F-02 | surprise-rule-data-contract| (foundation) schema + enforced organizer-blindness & single-claim | —              | NFR (both), FR-011     | ready    |
-| F-03 | design-system-baseline     | (foundation) shared design tokens + base theme (incl. available/taken status styles) | — | FR-007, FR-009, NFR (confirmation) | ready    |
+| F-03 | design-system-baseline     | (foundation) shared design tokens + base theme (incl. available/taken status styles) | — | FR-007, FR-009, NFR (confirmation) | in-progress |
 | S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | proposed |
 | S-02 | browse-shared-list         | browse a shared list unauthenticated and see available/taken    | S-01, F-02       | US-01, FR-007, FR-009  | proposed |
 | S-03 | claim-gift-item            | sign in and claim an unclaimed item; it flips to "taken"        | S-02, F-01, F-02 | US-01, FR-008, FR-009  | proposed |
@@ -103,7 +103,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Off the north-star critical path and cuts against the `speed` bias if over-built, so kept deliberately minimal — tokens + base theme + status/feedback styles, NOT a component library or full design system (that stays folded into each slice's own UI work). Its real justification is `capacity`: when S-01–S-05 UIs fan out to separate agent runs, a shared visual contract prevents the drift that ad-hoc per-slice styling would cause. If it starts to grow into a component catalogue, split it back into the consuming slices.
-- **Status:** ready
+- **Status:** in-progress
 
 ## Slices
 

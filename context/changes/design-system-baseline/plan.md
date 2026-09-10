@@ -546,18 +546,18 @@ There are no data changes. Everything happens on the single branch `GIN-17-desig
 
 #### Automated
 
-- [ ] 1.1 Lint passes: `pnpm lint`
-- [ ] 1.2 Type checking passes: `pnpm typecheck`
-- [ ] 1.3 Production build succeeds: `pnpm build`
-- [ ] 1.4 Drift-guard probe fails lint for palette, font-size (incl. responsive), and `dark:` classes
-- [ ] 1.5 No off-system classes remain in `src`
+- [x] 1.1 Lint passes: `pnpm lint`
+- [x] 1.2 Type checking passes: `pnpm typecheck`
+- [x] 1.3 Production build succeeds: `pnpm build`
+- [x] 1.4 Drift-guard probe fails lint for palette, font-size (incl. responsive), and `dark:` classes
+- [x] 1.5 No off-system classes remain in `src`
 
 #### Manual
 
-- [ ] 1.6 Auth pages unchanged apart from colours/fonts; errors in danger colour
-- [ ] 1.7 Home page on canvas; Fraunces font loads
-- [ ] 1.8 App stays light under OS dark mode
-- [ ] 1.9 Body text renders in Geist, not Arial
+- [x] 1.6 Auth pages unchanged apart from colours/fonts; errors in danger colour
+- [x] 1.7 Home page on canvas; Fraunces font loads
+- [x] 1.8 App stays light under OS dark mode
+- [x] 1.9 Body text renders in Geist, not Arial
 
 ### Phase 2: Primitives and toast layer
 

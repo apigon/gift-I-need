@@ -37,7 +37,7 @@ export function SignInForm({ next }: { next?: string }) {
       {next ? <input type="hidden" name="next" value={next} /> : null}
 
       {message ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-small text-danger">
           {message}
         </p>
       ) : null}
@@ -54,10 +54,10 @@ export function SignInForm({ next }: { next?: string }) {
           onChange={(event) => setEmail(event.target.value)}
           aria-invalid={errors?.email ? true : undefined}
           aria-describedby={errors?.email ? "email-error" : undefined}
-          className="border px-2 py-1"
+          className="border-edge px-2 py-1"
         />
         {errors?.email ? (
-          <p id="email-error" className="text-sm text-red-600">
+          <p id="email-error" className="text-small text-danger">
             {errors.email[0]}
           </p>
         ) : null}
@@ -75,16 +75,16 @@ export function SignInForm({ next }: { next?: string }) {
           onChange={(event) => setPassword(event.target.value)}
           aria-invalid={errors?.password ? true : undefined}
           aria-describedby={errors?.password ? "password-error" : undefined}
-          className="border px-2 py-1"
+          className="border-edge px-2 py-1"
         />
         {errors?.password ? (
-          <p id="password-error" className="text-sm text-red-600">
+          <p id="password-error" className="text-small text-danger">
             {errors.password[0]}
           </p>
         ) : null}
       </div>
 
-      <button type="submit" disabled={pending} className="border px-3 py-1">
+      <button type="submit" disabled={pending} className="border-edge px-3 py-1">
         {pending ? "Signing in…" : "Sign in"}
       </button>
     </form>

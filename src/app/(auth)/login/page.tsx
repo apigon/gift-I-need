@@ -32,10 +32,10 @@ export default async function LoginPage({
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-6 py-16">
-      <h1 className="text-2xl font-bold">Sign in</h1>
+      <h1 className="text-title font-bold">Sign in</h1>
 
       {failedConfirmation ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-small text-danger">
           That confirmation link didn&apos;t work — it may have expired or
           already been used. Sign in below, or create a new account.
         </p>
@@ -43,7 +43,7 @@ export default async function LoginPage({
 
       <SignInForm next={next} />
 
-      <p className="text-sm">
+      <p className="text-small">
         Don&apos;t have an account?{" "}
         <Link
           className="underline"
