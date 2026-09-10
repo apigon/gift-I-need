@@ -575,6 +575,6 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 - [ ] 5.6 Protection redirect and returnTo behave identically under Workers
 - [x] 5.7 Session survives hard refresh and direct URL entry under Workers
 - [x] 5.8 `/api/health` on the preview reports the session correctly
-- [x] 5.9 With confirmations temporarily enabled locally, the email link establishes a session via `/auth/confirm`
+- [x] 5.9 With confirmations temporarily enabled locally, the email link establishes a session via `/auth/confirm` — 61f2bd8
 - [ ] 5.10 Full loop + hard refresh work against the deployed Cloudflare PR preview (not `pnpm preview`)
 - [ ] 5.11 Authenticated responses on the deployed preview are `Cache-Control: private`/`no-store` and never `cf-cache-status: HIT`
