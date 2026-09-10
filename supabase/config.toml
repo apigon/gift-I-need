@@ -160,7 +160,19 @@ site_url = "http://127.0.0.1:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+# Supabase matches these EXACTLY — no wildcards on the path, no scheme or host
+# coercion. The scaffold default was `https://127.0.0.1:3000`, which matched
+# nothing a local browser actually uses: the dev server is http, not https, and
+# the origin is `localhost`, not `127.0.0.1`.
+# LOCAL STACK ONLY. The hosted project's Auth -> URL Configuration is a separate
+# dashboard setting and must list the production Workers origin and any preview
+# origins by hand — no file in this repo can do it.
+additional_redirect_urls = [
+  "http://localhost:3000",
+  "http://localhost:3000/auth/confirm",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:3000/auth/confirm",
+]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.

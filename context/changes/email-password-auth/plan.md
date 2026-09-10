@@ -547,27 +547,27 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `pnpm typecheck`
-- [x] 4.2 Linting passes: `pnpm lint`
-- [x] 4.3 Production build succeeds: `pnpm build`
+- [x] 4.1 Type checking passes: `pnpm typecheck` — 1f6202e
+- [x] 4.2 Linting passes: `pnpm lint` — 1f6202e
+- [x] 4.3 Production build succeeds: `pnpm build` — 1f6202e
 
 #### Manual
 
-- [x] 4.4 Non-public path redirects to `/login?next=…` and returns there after sign-in
-- [x] 4.5 All allowlisted public paths load without a redirect
-- [x] 4.6 Off-site and protocol-relative `next` values fall back to `/`
-- [x] 4.7 Session survives repeated navigation (verifies the redirect cookie copy)
-- [x] 4.8 `/api/health` reports `authenticated` correctly in both states
-- [x] 4.9 Signed-out request to a non-allowlisted `/api/` path returns `401` JSON, not a redirect
+- [x] 4.4 Non-public path redirects to `/login?next=…` and returns there after sign-in — 1f6202e
+- [x] 4.5 All allowlisted public paths load without a redirect — 1f6202e
+- [x] 4.6 Off-site and protocol-relative `next` values fall back to `/` — 1f6202e
+- [x] 4.7 Session survives repeated navigation (verifies the redirect cookie copy) — 1f6202e
+- [x] 4.8 `/api/health` reports `authenticated` correctly in both states — 1f6202e
+- [x] 4.9 Signed-out request to a non-allowlisted `/api/` path returns `401` JSON, not a redirect — 1f6202e
 
 ### Phase 5: Confirmation path and Workers verification
 
 #### Automated
 
-- [ ] 5.1 Type checking passes: `pnpm typecheck`
-- [ ] 5.2 Linting passes: `pnpm lint`
-- [ ] 5.3 Production build succeeds: `pnpm build`
-- [ ] 5.4 Workers build and preview start cleanly: `pnpm preview`
+- [x] 5.1 Type checking passes: `pnpm typecheck`
+- [x] 5.2 Linting passes: `pnpm lint`
+- [x] 5.3 Production build succeeds: `pnpm build`
+- [x] 5.4 Workers build and preview start cleanly: `pnpm preview`
 
 #### Manual
 

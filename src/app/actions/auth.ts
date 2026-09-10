@@ -34,6 +34,19 @@ function readNext(formData: FormData): string | null {
   return typeof value === "string" ? value : null;
 }
 
+// Absolute URL of the confirmation handler, carrying the validated return path.
+// Returns undefined when NEXT_PUBLIC_SITE_URL is unset, in which case Supabase
+// falls back to the project's configured Site URL — the safe default, and why
+// this does not throw. Dormant while confirmations are off.
+function buildConfirmUrl(next: string | null): string | undefined {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) return undefined;
+
+  const url = new URL("/auth/confirm", siteUrl);
+  url.searchParams.set("next", safeReturnTo(next));
+  return url.toString();
+}
+
 export async function signIn(
   _prevState: FormState,
   formData: FormData,
@@ -86,6 +99,19 @@ export async function signUp(
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
+    options: {
+      // Where a confirmation link points if confirmations are ever enabled.
+      // Unused while they are off, but wrong-by-default otherwise: Supabase
+      // would send people to the site root instead of the handler that
+      // establishes their session.
+      //
+      // The origin comes from CONFIGURATION, never from the request. A Server
+      // Action has no request object, and the alternative — reading the Host
+      // header via await headers() — would let a caller influence the origin of
+      // a link that gets emailed. Supabase's redirect allowlist limits the blast
+      // radius but does not remove the class of problem.
+      emailRedirectTo: buildConfirmUrl(readNext(formData)),
+    },
   });
 
   if (error) {
