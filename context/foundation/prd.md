@@ -82,6 +82,27 @@ Guests who create an account to claim a gift are the same user type as organizer
 - FR-002: User can sign in and sign out. Priority: must-have
   > Socrates: Counter-argument considered: "sign-out is rarely used." Resolution: kept — simple to implement and necessary for shared-device scenarios.
 
+- FR-015: New accounts must confirm their email address before the account is treated as verified. Priority: v2
+  > Socrates: Counter-argument considered: "confirmation adds a step to the one flow that must not bounce (FR-001), and the claim wall already gates the only write a guest performs." Resolution: deferred to v2, not dropped — v1 accepts unverified addresses because a typo'd or someone else's address currently yields a working account, which becomes a real problem once FR-014's dashboard or any notification exists.
+  >
+  > Implementation constraints already discovered (F-01, `email-password-auth`):
+  > - The `/auth/confirm` route handler already exists and works; it is dormant only because `enable_confirmations = false`. Verified end to end against the local stack.
+  > - **Not a pure config flip.** Turning confirmations on requires simultaneously reverting the sign-up "already registered" copy in `src/app/actions/auth.ts` to a generic message, because Supabase deliberately obfuscates existing-user sign-up once confirmations are on — it returns a fake user object and no error, so the specific branch stops firing and sign-up silently reports success for an address that already exists.
+  > - **Needs a real SMTP provider.** Hosted Supabase's built-in SMTP is capped at ~2 emails/hour, which is why confirmations were disabled for v1 in the first place. This FR is blocked on choosing and wiring one.
+  > - Requires `NEXT_PUBLIC_SITE_URL` to be correct per environment, and the hosted project's Auth → URL Configuration to list every origin. Cloudflare preview URLs are per-deployment, so a single static value cannot be right for all previews.
+
+- FR-016: Password rules are strengthened beyond a bare minimum length. Priority: v2
+  > Socrates: Counter-argument considered: "stricter rules increase lockout risk, and v1 has no password reset — a forgotten password is a dead account." Resolution: this is exactly why it is v2 and not v1, and why it should land **after** or **with** a password-reset flow. Tightening credentials while the recovery path is missing trades one security problem for a support problem.
+  >
+  > Current state (F-01): minimum length 8, enforced in three places that must stay in sync — `PASSWORD_MIN_LENGTH` in `src/lib/auth/schemas.ts`, `minimum_password_length` in `supabase/config.toml` (local stack), and the hosted project's Auth → Policies setting (manual). No complexity or breach checks.
+  >
+  > Options, cheapest first:
+  > - `password_requirements` in `supabase/config.toml` — supports `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`. Currently `""`.
+  > - Leaked-password protection (Supabase checks candidates against HaveIBeenPwned). Materially better than composition rules at stopping real account takeover, and it does not punish long passphrases.
+  > - Mirror whichever rule is chosen into the zod schema so the client-side message matches what the server enforces; a divergence means a password the app rejects is still accepted by a direct API call.
+  >
+  > Note: composition rules are weaker than length or breach checks by modern guidance (NIST SP 800-63B discourages mandated composition). Prefer raising the minimum length and adding breach checks over requiring symbols.
+
 ### Event management
 
 - FR-003: Organizer can create an event with a name and date. Priority: must-have
