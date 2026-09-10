@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated artifacts (gitignored, never hand-edited):
     ".open-next/**", // OpenNext Cloudflare build output
+    ".wrangler/**", // wrangler dev/preview local state (appears after `pnpm preview`)
     "cloudflare-env.d.ts", // `wrangler types` / `pnpm cf-typegen` output
   ]),
 ]);

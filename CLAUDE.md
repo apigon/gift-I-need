@@ -50,52 +50,114 @@ No test runner is configured yet — add one before writing tests.
 - Use feature based architecture as much as possible
 - Child components should sit in ./{currentParentDir}/components/{componentNameDir}
 - Shared components should sit in src/components/{componentNameDir}
-- All components directories should expose index file which would export all components contained inside that component directory
+- Each `components/` directory exposes a single `index.ts` barrel that re-exports every component inside it. The barrel sits at `components/index.ts` — **not** one per component subdirectory — and consumers import from the `components` directory itself:
+
+  ```
+  src/app/(auth)/login/
+  ├── page.tsx                       // import { SignInForm } from "./components";
+  └── components/
+      ├── index.ts                   // export { SignInForm } from "./sign-in-form/sign-in-form";
+      └── sign-in-form/
+          └── sign-in-form.tsx
+  ```
 - All unit tests should sit in same directory as SUT
+
+## Branching and PR convention
+
+Branch names start with the board **Key** of the roadmap issue they deliver:
+
+```
+GIN-<issue-number>-<change-id>      # e.g. GIN-8-email-password-auth
+```
+
+The `<change-id>` half matches the `context/changes/<change-id>/` folder, so the
+branch, the change folder, and the board ticket all read as one unit. Multi-phase
+plans stay on a single branch — do not add a `-phase-N` suffix.
+
+**The branch name is a label, not a mechanism.** Nothing about it updates the
+board on its own. Two separate things do the real work:
+
+1. **`Closes #<n>` in the PR body** (see `.github/pull_request_template.md`) is
+   what closes the issue on merge and lets GitHub Projects' built-in
+   "item closed → Done" workflow move the ticket. Without that line the board
+   will not update, whatever the branch is called.
+2. **A linked-branch record** on the issue is what makes `gh pr create`
+   pre-fill that `Closes #<n>` line and makes the branch show up in the issue's
+   Development panel.
+
+Create the branch so it is linked from the start — the API creates the ref and
+the link together:
+
+```bash
+gh api graphql -f query='
+  mutation {
+    createLinkedBranch(input:{
+      issueId:"<issue node id>"
+      oid:"<base commit sha>"
+      name:"GIN-<n>-<change-id>"
+      repositoryId:"<repo node id>"
+    }) { linkedBranch { id ref { name } } }
+  }'
+git fetch origin && git checkout GIN-<n>-<change-id>
+```
+
+`createLinkedBranch` **creates** a ref; it will not adopt one that already
+exists. Pushing the branch first makes the mutation return
+`{"linkedBranch": null}` with no error — a silent no-op. If that happens, delete
+the remote ref (confirm it has no unique commits first) and re-run the mutation.
+
+Node ids come from:
+
+```bash
+gh api graphql -f query='
+  query { repository(owner:"apigon", name:"gift-I-need") {
+    id issue(number:<n>) { id }
+  } }'
+```
+
+When starting work on an issue, also move its board Status to **In Progress**
+and self-assign it; both are manual, neither is automated.
 
 <!-- BEGIN @przeprogramowani/10x-cli -->
 
-## 10xDevs AI Toolkit - Module 2, Lesson 1
+## 10xDevs AI Toolkit - Module 2, Lesson 3
 
-Move from sprint-zero setup to project orchestration with the **roadmap chain**:
+Review AI-generated code before merge with the **implementation review chain**:
 
 ```
-(Module 1 foundation docs) -> /10x-roadmap -> backlog-ready roadmap items
+/10x-implement -> /10x-impl-review -> triage -> (/10x-lesson | fix | skip | disagree)
 ```
 
-`/10x-roadmap` is the lesson focus. `/10x-new` is intentionally introduced in Module 2, Lesson 2, when a selected roadmap item becomes an implementation change folder.
+`/10x-impl-review` is the lesson focus. Review is a quality gate, not an instruction to fix every finding.
 
 ### Task Router - Where to start
 
-| Skill                                                                                                                   | Use it when                                                                                                                                                                                                                                                                                                                                                                                |
-| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Roadmap (lesson focus)**                                                                                              |                                                                                                                                                                                                                                                                                                                                                                                            |
-| `/10x-roadmap`                                                                                                          | You have `context/foundation/prd.md` and a scaffolded project baseline, and you need a vertical-first MVP roadmap. The skill reads the PRD, inspects the code baseline, uses available foundation docs such as `tech-stack.md`, `infrastructure.md`, and `deploy-plan.md`, then writes `context/foundation/roadmap.md`. Use it BEFORE creating per-change folders or implementation plans. |
-| **Re-run upstream if needed**                                                                                           |                                                                                                                                                                                                                                                                                                                                                                                            |
-| `/10x-shape` / `/10x-prd` / `/10x-tech-stack-selector` / `/10x-bootstrapper` / `/10x-agents-md` / `/10x-infra-research` | Bundled from Module 1 so foundation contracts can be fixed before roadmap sequencing. If roadmap generation exposes a PRD gap, repair the PRD before pretending the backlog is ready.                                                                                                                                                                                                      |
+| Skill | Use it when |
+| --- | --- |
+| **Code review (lesson focus)** | |
+| `/10x-impl-review <change-id>` | You have implemented code and want a structured review before merge. The skill checks plan adherence, scope discipline, safety and quality, architecture, pattern consistency, and success criteria, then presents findings for triage. |
+| **Recurring lesson outcome** | |
+| `/10x-lesson` | A finding reveals a recurring project rule or agent failure pattern. Record it in `context/foundation/lessons.md` instead of treating it as a one-off note. |
 
-### How the chain hands off
+### Triage discipline
 
-- `/10x-roadmap` bridges product and implementation. It does not choose frameworks, design schemas, or write a per-change implementation plan.
-- The output is `context/foundation/roadmap.md`: ordered milestones, vertical slices, bounded foundations, dependencies, unknowns, risk, and backlog handoff fields.
-- Roadmap items should receive stable human-readable identifiers in backlog tools. The actual `context/changes/<change-id>/` folder is created in Lesson 2 with `/10x-new`.
+- Severity says how bad the finding is. Impact says how much the decision matters now.
+- Valid outcomes: fix now, fix differently, skip, accept as risk, record as recurring rule (`/10x-lesson`), disagree.
+- Fix critical findings. Do not burn hours on low-impact observations just because the agent found them.
+- Conscious skipping of low-impact findings is a valid review outcome, not negligence.
+- If you disagree with a finding, record why. Wrong agent reasoning is also signal.
 
-### Roadmap boundaries
+### Review boundaries
 
-- Default to vertical slices: user-visible outcomes that cross UI, data, business logic, and integrations.
-- Horizontal work is allowed only as a bounded enabler that names the downstream vertical milestone it unlocks.
-- Avoid orphan horizontal work such as "build the whole database", "build all API endpoints", or "design the whole UI" before the first user-visible flow.
-- Roadmap is not a calendar estimate. Do not invent dates, story points, or sprint velocity unless the user explicitly asks for a separate planning artifact.
+- This lesson reviews implemented code. It does not create the plan, execute new phases, or teach CI review.
+- Testing strategy and quality gates are introduced in Module 3.
+- Do not use `/10x-contract` as a triage outcome in this lesson.
 
-### Foundation paths used by this lesson
+### Paths used by this lesson
 
-- `context/foundation/prd.md` - input
-- `context/foundation/tech-stack.md` - optional input
-- `context/foundation/infrastructure.md` - optional input
-- `context/deployment/deploy-plan.md` - optional input
-- `context/foundation/roadmap.md` - output
-- `context/foundation/lessons.md` - recurring rules and pitfalls
-- `docs/reference/contract-surfaces.md` - load-bearing names registry
+- `context/changes/<change-id>/plan.md` - expected implementation contract
+- `context/changes/<change-id>/reviews/` - review output
+- `context/foundation/lessons.md` - recurring lessons
 
 Skills must not write to `context/archive/`. Archived changes are immutable; if a resolved target path starts with `context/archive/`, abort with: "This change is archived. Open a new change with `/10x-new` instead."
 

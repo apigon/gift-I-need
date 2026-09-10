@@ -492,6 +492,53 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 - `redirect()` outside try/catch: `node_modules/next/dist/docs/01-app/03-api-reference/04-functions/redirect.md:50-52`
 - Plan brief: `context/changes/email-password-auth/plan-brief.md`
 
+## Deviations (recorded at impl-review, 2026-09-10)
+
+The plan body above describes the design as planned. Where the implementation
+differs, this section is authoritative — do not copy the superseded text.
+
+1. **Confirm route is PKCE-first** (61f2bd8) — supersedes Phase 5 item 1.
+   `@supabase/ssr` hardcodes `flowType: "pkce"`, so email links arrive as
+   `?code=` and are handled with `exchangeCodeForSession`. The planned
+   `token_hash`/`verifyOtp` handler never fires on this stack; it is kept only
+   as a fallback branch, with its login-CSRF risk documented in
+   `src/app/auth/confirm/route.ts`. See lessons.md "Supabase email callbacks
+   are PKCE".
+2. **One barrel per `components/` directory** (667690d) — supersedes the
+   per-component `index.ts` files in Phases 2–3. Each `components/index.ts`
+   re-exports its children and consumers import from `./components`, per
+   CLAUDE.md §Code structure convention.
+3. **Wildcard redirect URLs** (61f2bd8) — supersedes the exact `/auth/confirm`
+   entry in Phase 5 item 3. `additional_redirect_urls` uses `/**` entries
+   because Supabase matches the query string and silently falls back to
+   `site_url` on a mismatch. See lessons.md "Treat Supabase redirect-URL
+   rejection as a silent fallback".
+4. **`isAuthEntryRoute` bounce** (1f6202e) — an addition to Phase 4. Signed-in
+   users requesting `/login` or `/signup` are redirected to `safeReturnTo(next)`
+   (`src/utils/supabase/proxy.ts`), with cookies copied. `/auth/confirm` is
+   excluded.
+5. **303 for non-GET page redirects** (impl-review F1) — refines Phase 4
+   item 1. An unauthenticated POST to a protected page gets a 303, so a Server
+   Action is not replayed against `/login`. GET and HEAD still get a 307, and
+   `/api/*` still gets a 401.
+6. **`/auth/confirm` allowlisted exactly** (impl-review F7) — supersedes
+   Phase 1 item 4's "anything under `/auth/`". A future `/auth/*` route stays
+   protected unless it is added to `src/lib/auth/routes.ts` explicitly.
+
+### Unplanned changes on the branch
+
+- `src/app/api/health/route.ts` (0c17f58): no longer returns raw error text
+  from a public endpoint.
+- `eslint.config.mjs` (61f2bd8): ignores `.wrangler/**`, which broke lint
+  after `pnpm preview`.
+- `supabase/config.toml` `[analytics] enabled = false` (61f2bd8): works around
+  a colima Docker-socket failure on the local stack.
+- `README.md` (cf866c5): local-dev guide.
+- `context/foundation/prd.md` (cf866c5): FR-015 and FR-016 added as v2
+  follow-ups.
+- `CLAUDE.md` (498fc2e, 667690d): branching/PR convention; barrel rule
+  reworded.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
@@ -500,81 +547,81 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 
 #### Automated
 
-- [ ] 1.1 Dependencies install cleanly: `pnpm install`
-- [ ] 1.2 Type checking passes: `pnpm typecheck`
-- [ ] 1.3 Linting passes: `pnpm lint`
-- [ ] 1.4 Production build succeeds: `pnpm build`
+- [x] 1.1 Dependencies install cleanly: `pnpm install` — b003011
+- [x] 1.2 Type checking passes: `pnpm typecheck` — b003011
+- [x] 1.3 Linting passes: `pnpm lint` — b003011
+- [x] 1.4 Production build succeeds: `pnpm build` — b003011
 
 #### Manual
 
-- [ ] 1.5 Public allowlist reviewed and agreed to cover FR-007's future shared-list route
+- [x] 1.5 Public allowlist reviewed and agreed to cover FR-007's future shared-list route — b003011
 
 ### Phase 2: Sign-up and sign-in
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `pnpm typecheck`
-- [ ] 2.2 Linting passes: `pnpm lint`
-- [ ] 2.3 Production build succeeds: `pnpm build`
+- [x] 2.1 Type checking passes: `pnpm typecheck` — 690ccbd
+- [x] 2.2 Linting passes: `pnpm lint` — 690ccbd
+- [x] 2.3 Production build succeeds: `pnpm build` — 690ccbd
 
 #### Manual
 
-- [ ] 2.4 Sign-up with a new email creates an account and redirects, no confirmation required
-- [ ] 2.5 Sign-up with an existing email shows the specific "already registered" message
-- [ ] 2.6 Sign-in succeeds with correct password; wrong password shows generic error copy
-- [ ] 2.7 Invalid email / short password show field-level errors without a Supabase round trip
-- [ ] 2.8 Submit button is disabled while the action is pending
-- [ ] 2.9 Hosted dashboard prerequisites confirmed (confirmations off, min length 8) — do before 2.4
-- [ ] 2.10 Form components follow the CLAUDE.md layout convention (own dir + `index.ts`, `src/components/` untouched)
+- [x] 2.4 Sign-up with a new email creates an account and redirects, no confirmation required — 690ccbd
+- [x] 2.5 Sign-up with an existing email shows the specific "already registered" message — 690ccbd
+- [x] 2.6 Sign-in succeeds with correct password; wrong password shows generic error copy — 690ccbd
+- [x] 2.7 Invalid email / short password show field-level errors without a Supabase round trip — 690ccbd
+- [x] 2.8 Submit button is disabled while the action is pending — 690ccbd
+- [x] 2.9 Hosted dashboard prerequisites confirmed (confirmations off, min length 8) — do before 2.4 — 690ccbd
+- [x] 2.10 Form components follow the CLAUDE.md layout convention (own dir + `index.ts`, `src/components/` untouched) — 690ccbd
 
 ### Phase 3: Auth header and sign-out
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `pnpm typecheck`
-- [ ] 3.2 Linting passes: `pnpm lint`
-- [ ] 3.3 Production build succeeds: `pnpm build`
+- [x] 3.1 Type checking passes: `pnpm typecheck` — 667690d
+- [x] 3.2 Linting passes: `pnpm lint` — 667690d
+- [x] 3.3 Production build succeeds: `pnpm build` — 667690d
 
 #### Manual
 
-- [ ] 3.4 Header shows the signed-in email after sign-in
-- [ ] 3.5 Sign out clears the session and reverts the header
-- [ ] 3.6 Signed-out state survives refresh and direct URL entry
-- [ ] 3.7 Sign-out works with JavaScript disabled
-- [ ] 3.8 `auth-status` follows the CLAUDE.md layout convention and adds no route
+- [x] 3.4 Header shows the signed-in email after sign-in — 667690d
+- [x] 3.5 Sign out clears the session and reverts the header — 667690d
+- [x] 3.6 Signed-out state survives refresh and direct URL entry — 667690d
+- [x] 3.7 Sign-out works with JavaScript disabled — 667690d
+- [x] 3.8 `auth-status` follows the CLAUDE.md layout convention and adds no route — 667690d
 
 ### Phase 4: Allowlist route protection with returnTo
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `pnpm typecheck`
-- [ ] 4.2 Linting passes: `pnpm lint`
-- [ ] 4.3 Production build succeeds: `pnpm build`
+- [x] 4.1 Type checking passes: `pnpm typecheck` — 1f6202e
+- [x] 4.2 Linting passes: `pnpm lint` — 1f6202e
+- [x] 4.3 Production build succeeds: `pnpm build` — 1f6202e
 
 #### Manual
 
-- [ ] 4.4 Non-public path redirects to `/login?next=…` and returns there after sign-in
-- [ ] 4.5 All allowlisted public paths load without a redirect
-- [ ] 4.6 Off-site and protocol-relative `next` values fall back to `/`
-- [ ] 4.7 Session survives repeated navigation (verifies the redirect cookie copy)
-- [ ] 4.8 `/api/health` reports `authenticated` correctly in both states
-- [ ] 4.9 Signed-out request to a non-allowlisted `/api/` path returns `401` JSON, not a redirect
+- [x] 4.4 Non-public path redirects to `/login?next=…` and returns there after sign-in — 1f6202e
+- [x] 4.5 All allowlisted public paths load without a redirect — 1f6202e
+- [x] 4.6 Off-site and protocol-relative `next` values fall back to `/` — 1f6202e
+- [x] 4.7 Session survives repeated navigation (verifies the redirect cookie copy) — 1f6202e
+- [x] 4.8 `/api/health` reports `authenticated` correctly in both states — 1f6202e
+- [x] 4.9 Signed-out request to a non-allowlisted `/api/` path returns `401` JSON, not a redirect — 1f6202e
 
 ### Phase 5: Confirmation path and Workers verification
 
 #### Automated
 
-- [ ] 5.1 Type checking passes: `pnpm typecheck`
-- [ ] 5.2 Linting passes: `pnpm lint`
-- [ ] 5.3 Production build succeeds: `pnpm build`
-- [ ] 5.4 Workers build and preview start cleanly: `pnpm preview`
+- [x] 5.1 Type checking passes: `pnpm typecheck` — 8ad9074
+- [x] 5.2 Linting passes: `pnpm lint` — 8ad9074
+- [x] 5.3 Production build succeeds: `pnpm build` — 8ad9074
+- [x] 5.4 Workers build and preview start cleanly: `pnpm preview` — 8ad9074
 
 #### Manual
 
-- [ ] 5.5 Full sign-up / sign-in / sign-out loop works against `pnpm preview` (workerd)
-- [ ] 5.6 Protection redirect and returnTo behave identically under Workers
-- [ ] 5.7 Session survives hard refresh and direct URL entry under Workers
-- [ ] 5.8 `/api/health` on the preview reports the session correctly
-- [ ] 5.9 With confirmations temporarily enabled locally, the email link establishes a session via `/auth/confirm`
-- [ ] 5.10 Full loop + hard refresh work against the deployed Cloudflare PR preview (not `pnpm preview`)
-- [ ] 5.11 Authenticated responses on the deployed preview are `Cache-Control: private`/`no-store` and never `cf-cache-status: HIT`
+- [x] 5.5 Full sign-up / sign-in / sign-out loop works against `pnpm preview` (workerd)
+- [x] 5.6 Protection redirect and returnTo behave identically under Workers
+- [x] 5.7 Session survives hard refresh and direct URL entry under Workers
+- [x] 5.8 `/api/health` on the preview reports the session correctly
+- [x] 5.9 With confirmations temporarily enabled locally, the email link establishes a session via `/auth/confirm` — 61f2bd8
+- [x] 5.10 Full loop + hard refresh work against the deployed Cloudflare PR preview (not `pnpm preview`)
+- [x] 5.11 Authenticated responses on the deployed preview are `Cache-Control: private`/`no-store` and never `cf-cache-status: HIT`
