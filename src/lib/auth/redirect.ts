@@ -19,6 +19,7 @@ export const DEFAULT_REDIRECT = "/";
  *   - absolute URLs        `https://evil.example`
  *   - protocol-relative    `//evil.example`
  *   - backslash-prefixed   `/\evil.example`  (browsers may normalise \ to /)
+ *   - dot-segment smuggled `/.//evil.example` (normalises to `//evil.example`)
  *   - empty / null / undefined
  */
 export function safeReturnTo(next: string | null | undefined): string {
@@ -49,5 +50,21 @@ export function safeReturnTo(next: string | null | undefined): string {
     }
   }
 
-  return next;
+  // Parse rather than trust the prefix checks alone: dot-segments such as
+  // `/.//evil` or `/%2e%2e//evil` pass the `//` test above but normalise to the
+  // path `//evil`. Resolve against a placeholder origin, require the origin to
+  // survive, and re-check the NORMALISED path. (The URL parser already turns
+  // `\` into `/` for http URLs, so one `//` check covers both forms.)
+  const base = "http://placeholder.invalid";
+  let url: URL;
+  try {
+    url = new URL(next, base);
+  } catch {
+    return DEFAULT_REDIRECT;
+  }
+  if (url.origin !== base || url.pathname.startsWith("//")) {
+    return DEFAULT_REDIRECT;
+  }
+
+  return url.pathname + url.search + url.hash;
 }

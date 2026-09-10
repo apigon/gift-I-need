@@ -1,16 +1,25 @@
 import { NextResponse } from "next/server";
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/server";
 
 // Smoke endpoint for the Phase 4 Workers preview + Phase 5 prod verify: proves
 // the per-request Supabase server client and the cookie/session path round-trip
 // under `workerd`. `authenticated` reflects whether a valid session is present;
-// `ok` reports only that the Supabase call completed without throwing.
+// `ok` is false (503) when Supabase cannot be reached or answers with a 5xx.
+// A missing or stale session is not a failure — it is `authenticated: false`.
 export async function GET() {
   try {
     const supabase = await createClient();
     const {
       data: { user },
+      error,
     } = await supabase.auth.getUser();
+
+    // getUser reports failures in `error`; it does not throw (lessons.md).
+    if (isAuthRetryableFetchError(error)) {
+      console.error("[health] supabase unreachable", error);
+      return NextResponse.json({ ok: false }, { status: 503 });
+    }
 
     return NextResponse.json({ ok: true, authenticated: Boolean(user) });
   } catch (error) {

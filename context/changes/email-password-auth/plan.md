@@ -492,6 +492,53 @@ Rollback is a straight revert. The only stateful side effect is user accounts cr
 - `redirect()` outside try/catch: `node_modules/next/dist/docs/01-app/03-api-reference/04-functions/redirect.md:50-52`
 - Plan brief: `context/changes/email-password-auth/plan-brief.md`
 
+## Deviations (recorded at impl-review, 2026-09-10)
+
+The plan body above describes the design as planned. Where the implementation
+differs, this section is authoritative — do not copy the superseded text.
+
+1. **Confirm route is PKCE-first** (61f2bd8) — supersedes Phase 5 item 1.
+   `@supabase/ssr` hardcodes `flowType: "pkce"`, so email links arrive as
+   `?code=` and are handled with `exchangeCodeForSession`. The planned
+   `token_hash`/`verifyOtp` handler never fires on this stack; it is kept only
+   as a fallback branch, with its login-CSRF risk documented in
+   `src/app/auth/confirm/route.ts`. See lessons.md "Supabase email callbacks
+   are PKCE".
+2. **One barrel per `components/` directory** (667690d) — supersedes the
+   per-component `index.ts` files in Phases 2–3. Each `components/index.ts`
+   re-exports its children and consumers import from `./components`, per
+   CLAUDE.md §Code structure convention.
+3. **Wildcard redirect URLs** (61f2bd8) — supersedes the exact `/auth/confirm`
+   entry in Phase 5 item 3. `additional_redirect_urls` uses `/**` entries
+   because Supabase matches the query string and silently falls back to
+   `site_url` on a mismatch. See lessons.md "Treat Supabase redirect-URL
+   rejection as a silent fallback".
+4. **`isAuthEntryRoute` bounce** (1f6202e) — an addition to Phase 4. Signed-in
+   users requesting `/login` or `/signup` are redirected to `safeReturnTo(next)`
+   (`src/utils/supabase/proxy.ts`), with cookies copied. `/auth/confirm` is
+   excluded.
+5. **303 for non-GET page redirects** (impl-review F1) — refines Phase 4
+   item 1. An unauthenticated POST to a protected page gets a 303, so a Server
+   Action is not replayed against `/login`. GET and HEAD still get a 307, and
+   `/api/*` still gets a 401.
+6. **`/auth/confirm` allowlisted exactly** (impl-review F7) — supersedes
+   Phase 1 item 4's "anything under `/auth/`". A future `/auth/*` route stays
+   protected unless it is added to `src/lib/auth/routes.ts` explicitly.
+
+### Unplanned changes on the branch
+
+- `src/app/api/health/route.ts` (0c17f58): no longer returns raw error text
+  from a public endpoint.
+- `eslint.config.mjs` (61f2bd8): ignores `.wrangler/**`, which broke lint
+  after `pnpm preview`.
+- `supabase/config.toml` `[analytics] enabled = false` (61f2bd8): works around
+  a colima Docker-socket failure on the local stack.
+- `README.md` (cf866c5): local-dev guide.
+- `context/foundation/prd.md` (cf866c5): FR-015 and FR-016 added as v2
+  follow-ups.
+- `CLAUDE.md` (498fc2e, 667690d): branching/PR convention; barrel rule
+  reworded.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.

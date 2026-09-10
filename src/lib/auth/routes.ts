@@ -14,21 +14,31 @@
 // Whoever adds one of those files must allowlist it here, or signed-out
 // visitors AND crawlers will be 307'd to `/login`.
 //
+// ALSO NOT GATED: that matcher skips ANY path ending in .svg/.png/.jpg/.jpeg/
+// .gif/.webp — not only files in /public. A dynamic route requested as
+// `/events/abc.png` never reaches `isPublicRoute` at all. Harmless while no
+// route serves user data under an image-like URL (and RLS is the data boundary
+// regardless); whoever adds such a route must narrow the matcher first.
+//
 // EDGE RUNTIME: imported by middleware, which runs on the Edge under OpenNext.
 // Keep this module pure TypeScript — no Node built-ins, no `next/headers`, no
 // Supabase imports, and in particular no zod (that is why `src/lib/auth/` has
 // no barrel `index.ts`).
 
 // Paths that are public only as an exact match.
-const PUBLIC_EXACT_PATHS = new Set(["/", "/login", "/signup", "/api/health"]);
+const PUBLIC_EXACT_PATHS = new Set([
+  "/",
+  "/login",
+  "/signup",
+  "/api/health",
+  // Supabase confirmation callback (Phase 5), reached by users who are by
+  // definition not yet signed in. Exact, not an `/auth/` prefix, so a future
+  // `/auth/*` route cannot become public without an edit here.
+  "/auth/confirm",
+]);
 
 // Prefixes whose entire subtree is public.
 const PUBLIC_PREFIXES = [
-  // Supabase confirmation / OTP callbacks. `/auth/confirm` is the dormant
-  // handler shipped in Phase 5; the whole subtree is public because these are
-  // reached by users who are, by definition, not yet signed in.
-  "/auth/",
-
   // FORWARD DECLARATION for FR-007 (S-02's shared list), which does not exist
   // yet. Guests must browse a shared list without signing in, so S-01 must
   // either adopt this URL prefix or change this line. If it does neither,

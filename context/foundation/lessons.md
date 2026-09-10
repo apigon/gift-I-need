@@ -36,3 +36,10 @@
 - **Problem**: `z.email().trim()` applies the trim **after** the email rule, so a padded value is rejected outright and the trim never runs. The schema silently fails to honour its own stated contract, and the bug is invisible through a browser because `type="email"` inputs pre-sanitise.
 - **Rule**: Put transforms first and pipe into the format check: `z.string().trim().pipe(z.email())`. Verify with a deliberately padded input.
 - **Applies to**: implement, impl-review
+
+## signUp has three outcomes, not two
+
+- **Context**: src/app/actions/auth.ts:112 (`signUp` Server Action)
+- **Problem**: Only `{ error }` is read from `supabase.auth.signUp()`. With confirmations on, `signUp` returns `data.session === null` and no error, so the user is redirected to `next`, bounced back to `/login` by the proxy, and never told to check their email. It's latent while confirmations are off, and the "enable confirmations" checklist in `src/app/auth/confirm/route.ts:14-31` doesn't mention it.
+- **Rule**: Treat `supabase.auth.signUp` as returning three outcomes (error / session / no session and no error), and give the no-session case its own UI state ("check your email") even while confirmations are off.
+- **Applies to**: implement, impl-review
