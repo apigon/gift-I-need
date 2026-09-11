@@ -8,7 +8,11 @@ This version contains breaking changes from Next.js 13/14/15. Before writing any
 
 ## Key business logic
 
-The organizer's view **must never** expose claim status, claimer identity, or claim counts before the event date — this holds under concurrent updates, page refresh, and direct URL access. Enforce this at the data layer (query-level filter on event date), not only in the UI.
+The organizer's view **must never** expose claim status, claimer identity, or claim counts before the reveal (automatic at 00:00 on `event_date + 2` in the event's timezone; manual unlock from `event_date + 1`) — this holds under concurrent updates, page refresh, and direct URL access. Enforce this at the data layer — RLS and the `private.reveal_open` RPC gate in Postgres — never by a parallel app-side filter.
+
+- Claims are reachable only through the `get_shared_*` / `claim_item` / `mark_given` / `unlock_event` RPCs — never a direct table read or write.
+- List reads for the shared page go through `src/lib/lists/shared-list.ts`, never cached (no `unstable_cache`, `force-cache`, or `revalidate`).
+- Every new table ships its grants, RLS policies and pgTAP coverage in the same migration.
 
 ## Access control
 

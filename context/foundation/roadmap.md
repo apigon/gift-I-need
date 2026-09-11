@@ -3,7 +3,7 @@ project: "GIN (Gift I Need)"
 version: 1
 status: draft
 created: 2026-07-09
-updated: 2026-09-11
+updated: 2026-09-12
 prd_version: 1
 main_goal: speed
 top_blocker: capacity
@@ -88,7 +88,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Parallel with:** F-01
 - **Blockers:** —
 - **Unknowns:**
-  - Should the date gate be enforced purely in RLS, purely in query filters, or both (defense in depth)? — Owner: TBD (resolve in `/10x-plan`). Block: no.
+  - ~~Should the date gate be enforced purely in RLS, purely in query filters, or both (defense in depth)?~~ Resolved in `/10x-plan`: RLS plus `private.reveal_open`; no parallel app-side filter.
 - **Risk:** This is the riskiest correctness surface in the product and the one place `speed` does not relax the bar — the surprise rule and duplicate-prevention are must-hold guarantees. Kept to a minimal enabler contract (only the entities the first slices need + the two invariants + a focused test), NOT a full data-layer build: every downstream slice still integrates and exercises these tables through a real user capability.
 - **Status:** in-progress
 
@@ -122,14 +122,14 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ### S-02: Guest browses a shared list and sees available/taken status
 
-- **Outcome:** an unauthenticated visitor can open a shared link, view all items, and see each item's "available" or "taken" status.
+- **Outcome:** an unauthenticated visitor can open a shared link and view all items; seeing each item's "available" or "taken" status requires signing in (F-02, amended PRD US-01 AC1). The list is read via `getSharedList` (`src/lib/lists/shared-list.ts`) — no other query path.
 - **Change ID:** browse-shared-list
 - **PRD refs:** US-01 (browse step), FR-007, FR-009
 - **Prerequisites:** S-01 (a created + shared list to browse), F-02 (read the item/claim state)
 - **Parallel with:** S-04
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Read-only and unauthenticated, so the surprise rule does not apply to guests here — but this view must show "taken" without leaking claimer identity (FR-009), and it must not accidentally reuse an organizer-scoped query path. No claimer name to any guest.
+- **Risk:** Read-only, but the surprise rule still governs status: a signed-out visitor and the (possibly signed-out) organizer both get `status: null` from the RPC, so this view must show "taken" without leaking claimer identity (FR-009), and it must call `getSharedList` rather than any organizer-scoped query path. No claimer name to any guest.
 - **Status:** proposed
 
 ### S-03: Guest signs in and claims an unclaimed item
@@ -141,7 +141,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:**
-  - What does a guest see when they attempt to claim an item another guest just took (race loser UX)? — Owner: TBD (resolve in `/10x-plan`). Block: no.
+  - What does a guest see when they attempt to claim an item another guest just took (race loser UX)? The DAL (F-02) maps the race loser's `23505` to `already_taken` — this slice still owns the UX response to it. — Owner: TBD (resolve in `/10x-plan`). Block: no.
 - **Risk:** The north star and the highest-stakes slice: duplicate-prevention must be reliable under concurrent claims (rests on the F-02 DB constraint, not UI checks), the claim must confirm within ~1s (NFR), and claiming is irreversible in v1 (unclaim is parked). If F-02's invariants are sound, this slice is mostly wiring the action + optimistic UI.
 - **Status:** proposed
 
@@ -159,7 +159,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ### S-05: Post-event reveal and delivery confirmation
 
-- **Outcome:** after the event date passes, the organizer can see the full claim status, and both the claiming guest and the organizer can independently mark an item as "given".
+- **Outcome:** after the reveal opens — automatically at 00:00 on `event_date + 2` in the event's timezone, or earlier if the organizer unlocks manually from `event_date + 1` — the organizer can see the full claim status (never claimer identity), and either the claiming guest or the organizer can mark an item as "given": a single irreversible mark set by whichever party acts first.
 - **Change ID:** post-event-reveal
 - **PRD refs:** US-02, FR-010, FR-011
 - **Prerequisites:** S-03 (claims must exist to reveal), F-01 (marking given requires auth), F-02 (date-gated visibility policy)
@@ -167,7 +167,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:**
   - What is the event lifecycle after the reveal — can the organizer archive/delete the event? — Owner: user. Block: no (see Open Roadmap Questions).
-- **Risk:** Exercises the reveal side of the surprise rule: the gate must flip exactly on the event date and never before, under refresh/direct-URL access (NFR). "Given" can be set by either party, so the state model must tolerate both writers. This is the second half of the F-02 contract made user-visible.
+- **Risk:** Exercises the reveal side of the surprise rule via the `unlock_event` / `get_shared_*` RPCs (F-02): the gate must flip exactly at the computed reveal instant and never before, under refresh/direct-URL access (NFR), and the organizer must never see claimer identity even after the reveal. "Given" is a single mark, not independent per-party state, so the UI must treat a second mark-given call as a no-op rather than a second confirmation. This is the second half of the F-02 contract made user-visible.
 - **Status:** proposed
 
 ## Backlog Handoff

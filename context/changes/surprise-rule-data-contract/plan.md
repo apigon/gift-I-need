@@ -804,26 +804,26 @@ Bring the PRD, roadmap and supporting docs in line with the rule as built, recor
 
 #### Automated
 
-- [x] 4.1 Types regenerate with no diff: `pnpm db:types && git diff --exit-code src/utils/supabase/database.types.ts`
-- [x] 4.2 Unit tests pass: `pnpm test`
-- [x] 4.3 Race test passes against the local stack: `pnpm test:integration`
-- [x] 4.4 Type checking passes: `pnpm typecheck`
-- [x] 4.5 Linting passes including new guards: `pnpm lint`
-- [x] 4.6 Production build passes: `pnpm build`
+- [x] 4.1 Types regenerate with no diff: `pnpm db:types && git diff --exit-code src/utils/supabase/database.types.ts` — a4a0019
+- [x] 4.2 Unit tests pass: `pnpm test` — a4a0019
+- [x] 4.3 Race test passes against the local stack: `pnpm test:integration` — a4a0019
+- [x] 4.4 Type checking passes: `pnpm typecheck` — a4a0019
+- [x] 4.5 Linting passes including new guards: `pnpm lint` — a4a0019
+- [x] 4.6 Production build passes: `pnpm build` — a4a0019
 
 #### Manual
 
-- [x] 4.7 Lint guards fire on temporary `unstable_cache` and supabase-js imports, then reverted
-- [x] 4.8 `pnpm test:integration` passes three consecutive runs
+- [x] 4.7 Lint guards fire on temporary `unstable_cache` and supabase-js imports, then reverted — a4a0019
+- [x] 4.8 `pnpm test:integration` passes three consecutive runs — a4a0019
 
 ### Phase 5: Docs and Hosted Rollout
 
 #### Automated
 
-- [ ] 5.1 All local suites pass: `pnpm test && pnpm test:db && pnpm test:integration`
-- [ ] 5.2 Type checking, lint and build pass: `pnpm typecheck && pnpm lint && pnpm build`
-- [ ] 5.3 No stale statements remain (grep returns nothing)
-- [ ] 5.9 Committed types still match the final schema
+- [x] 5.1 All local suites pass: `pnpm test && pnpm test:db && pnpm test:integration`
+- [x] 5.2 Type checking, lint and build pass: `pnpm typecheck && pnpm lint && pnpm build`
+- [x] 5.3 No stale statements remain (grep returns nothing)
+- [x] 5.9 Committed types still match the final schema
 
 #### Manual
 

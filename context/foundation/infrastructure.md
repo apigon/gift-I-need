@@ -77,9 +77,9 @@ The Cloudflare bet cost the thing it was meant to save: time. The solo dev, new 
 ## Operational Story
 
 - **Preview deploys**: `wrangler versions upload` produces a preview version URL without promoting it; PR/branch previews via Workers Builds (Git integration) or CI calling `wrangler versions upload`. Gate preview URLs behind Cloudflare Access if they expose pre-event claim state during testing.
-- **Secrets**: Supabase keys and tokens live in **Workers Secrets** (`wrangler secret put SUPABASE_SERVICE_ROLE_KEY`) and in CI as repo secrets — never committed to `wrangler.toml` or `.mcp.json`. The Cloudflare API token is scoped to Workers for this one project (no DNS, no unrelated Secrets, no billing). Rotate via `wrangler secret put` (re-put overwrites).
+- **Secrets**: v1 has no runtime Supabase secret — every request uses the anon key under RLS (`wrangler secret put SUPABASE_URL` / `SUPABASE_ANON_KEY`), and there is no service-role key to rotate. The Cloudflare API token is scoped to Workers for this one project (no DNS, no unrelated Secrets, no billing) and lives in CI as a repo secret — never committed to `wrangler.toml` or `.mcp.json`. Rotate via `wrangler secret put` (re-put overwrites). *(amended 2026-09-11, F-02)*
 - **Rollback**: `wrangler rollback [version-id]` reverts to a prior version deterministically; `wrangler versions list` shows candidates. Time-to-revert is seconds. Caveat: Supabase schema migrations do **not** roll back with the Worker — coordinate DB migrations separately.
-- **Approval**: an agent may run `wrangler deploy` / `wrangler versions upload` / `wrangler tail` / `wrangler rollback` unattended. **Human-only**: rotating the Supabase service-role key, dropping/altering production Postgres, deleting the Worker or KV/R2 namespaces, and changing the billing tier — panel-by-hand even if the agent suggests them.
+- **Approval**: an agent may run `wrangler deploy` / `wrangler versions upload` / `wrangler tail` / `wrangler rollback` unattended. **Human-only**: dropping/altering production Postgres, deleting the Worker or KV/R2 namespaces, and changing the billing tier — panel-by-hand even if the agent suggests them.
 - **Logs**: `wrangler tail` streams live runtime logs (read-only); Workers Builds logs are viewable via the Observability MCP server or dashboard. The agent reads logs via `wrangler tail --format json` for structured parsing.
 
 ## Risk Register
@@ -87,14 +87,14 @@ The Cloudflare bet cost the thing it was meant to save: time. The solo dev, new 
 | Risk | Source | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
 | OpenNext adapter lags a Next.js 16.x release and breaks the build | Devil's advocate / Pre-mortem | M | H | Pin Next.js + `@opennextjs/cloudflare` versions; test `pnpm update` on a branch before merge; don't auto-bump Next near a launch date |
-| Organizer-blindness leaks via a service-role key bypassing Supabase RLS | Devil's advocate / Pre-mortem | M | H | Enforce the rule at the data layer (query-level filter on event date) per CLAUDE.md; default to anon key + RLS; reserve service-role for server-only paths; add a test before any claim-status code ships |
+| Organizer-blindness leaks via a service-role key bypassing Supabase RLS | Devil's advocate / Pre-mortem | M | H | Enforce the rule at the data layer (RLS plus `private.reveal_open` in Postgres, see F-02) per CLAUDE.md; there is no service-role key in v1 — every path uses the anon key under RLS; pgTAP locks the guarantee before any claim-status code ships |
 | Worker bundle exceeds 3 MiB (free) / 10 MiB (paid) cap | Devil's advocate | M | M | Watch bundle size on build; tree-shake; lazy-load heavy deps; upgrade to paid (already $5/mo) for the 10 MiB ceiling |
 | `workerd` Node-incompat surfaces a library failure at runtime | Devil's advocate / Unknown unknowns | M | M | Set `nodejs_compat` + compat date ≥ `2024-09-23`; prefer Workers-compatible Supabase SSR client; smoke-test auth/session on a deployed preview, not just local |
 | Supabase Postgres connection exhaustion from edge under concurrent claims | Unknown unknowns | L | H | Route Postgres through **Hyperdrive** for pooling; or use Supabase's pooled connection string; load-test the claim path |
 | Following legacy `next-on-pages` / mixing Pages vs Workers `wrangler` commands | Unknown unknowns / Research finding | M | M | Use only `@opennextjs/cloudflare` + Workers `wrangler deploy`; document the exact command set in the deploy plan |
 | Live "taken" status not truly real-time (Workers are request-scoped) | Research finding | M | M | Use Supabase Realtime for claim fan-out (or Durable Objects if ever needed); don't assume the platform pushes updates |
 | MCP server behavior shifts (unlabeled GA/beta) | Unknown unknowns | L | L | Keep `wrangler` CLI as the stable deploy/rollback path; treat MCP as convenience for live-state queries |
-| No test runner configured yet (CLAUDE.md) — RLS/caching regressions ship uncaught | Pre-mortem | M | H | Add a test runner before writing claim-status logic; cover the organizer-blindness guarantee explicitly |
+| RLS/caching regressions ship uncaught without automated tests | Pre-mortem | M | H | **Resolved (F-02)**: Vitest (unit + integration) plus a pgTAP suite lock the organizer-blindness and single-claim guarantees directly against Postgres |
 
 ## Getting Started
 
@@ -103,7 +103,7 @@ Versions matter — validate against the exact Next.js 16 / adapter versions in 
 1. **Add the adapter (pnpm only):** `pnpm add -D @opennextjs/cloudflare wrangler` — confirm the adapter version supports your pinned Next.js 16 minor.
 2. **Configure for Workers:** create `wrangler.toml` (or `wrangler.jsonc`) with `compatibility_flags = ["nodejs_compat"]` and `compatibility_date` ≥ `2024-09-23`; add the `open-next.config.ts`. Use the Workers path (`@opennextjs/cloudflare`), **not** `@cloudflare/next-on-pages`.
 3. **Local dev fidelity:** the Next.js dev server (`pnpm dev`) is the day-to-day loop; use the OpenNext preview (`pnpm exec opennextjs-cloudflare build && pnpm exec wrangler dev`) only to validate Workers-runtime behavior before deploying — it is not a replacement for `next dev`.
-4. **Wire Supabase as Workers Secrets:** `pnpm exec wrangler secret put SUPABASE_URL` / `SUPABASE_ANON_KEY` / (server-only) `SUPABASE_SERVICE_ROLE_KEY`. Do not commit them.
+4. **Wire Supabase as Workers Secrets:** `pnpm exec wrangler secret put SUPABASE_URL` / `SUPABASE_ANON_KEY`. v1 has no service-role key — every write goes through the anon key under RLS. Do not commit them. *(amended 2026-09-11, F-02)*
 5. **First deploy:** `pnpm exec opennextjs-cloudflare build && pnpm exec wrangler deploy`. Verify with `pnpm exec wrangler tail`. Take the next step (Plan Mode deploy) to produce the reviewed `context/deployment/deploy-plan.md` before any production mutation.
 
 ## Out of Scope
