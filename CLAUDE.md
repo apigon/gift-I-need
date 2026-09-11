@@ -62,6 +62,17 @@ No test runner is configured yet — add one before writing tests.
   ```
 - All unit tests should sit in same directory as SUT
 
+## Design system
+
+- Use only semantic tokens (`bg-canvas`, `text-fg`, `border-edge`, `text-title`, `rounded-control`, …) — never raw Tailwind palette classes, arbitrary hex, or `dark:` variants. This is lint-enforced (`eslint.config.mjs`).
+- Primitives come from `@/components` (Heading, Text, Button, Link, Input, StatusBadge, Alert, Toaster). `className` on a primitive is for layout only (margin, width, flex placement) — never colour or typography.
+- A claim/item status always renders through `StatusBadge`, with its label visible — never colour-only.
+- Toasts (`notify` from `@/components`) supplement an inline state change (e.g. Button `pending`, then a `StatusBadge` flip) and must never be the only confirmation.
+- Adding a new token means adding it to both `src/app/globals.css` and the `/design-system` showcase.
+- `context/changes/design-system-baseline/palette-proof.html` is the approved colour reference.
+- Primary buttons use `bg-primary`/`text-on-primary` (purple). `brand-rose` is decorative only — never a control fill.
+- Use `Link` from `@/components`, never `next/link` directly (lint-enforced).
+
 ## Branching and PR convention
 
 Branch names start with the board **Key** of the roadmap issue they deliver:

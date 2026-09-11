@@ -25,6 +25,18 @@
 // Supabase imports, and in particular no zod (that is why `src/lib/auth/` has
 // no barrel `index.ts`).
 
+// Dev-only routes, allowlisted only outside production. `process.env.NODE_ENV`
+// is inlined at build time (this module still ships no Node built-ins), so
+// the production bundle never carries "/design-system" in the public set at
+// all — defense in depth on top of that page's own `notFound()` call.
+const DEV_ONLY_EXACT_PATHS: string[] =
+  process.env.NODE_ENV === "production"
+    ? []
+    : [
+        // Design-system showcase (F-03 Phase 3). Exact, not a prefix.
+        "/design-system",
+      ];
+
 // Paths that are public only as an exact match.
 const PUBLIC_EXACT_PATHS = new Set([
   "/",
@@ -35,6 +47,7 @@ const PUBLIC_EXACT_PATHS = new Set([
   // definition not yet signed in. Exact, not an `/auth/` prefix, so a future
   // `/auth/*` route cannot become public without an edit here.
   "/auth/confirm",
+  ...DEV_ONLY_EXACT_PATHS,
 ]);
 
 // Prefixes whose entire subtree is public.

@@ -8,6 +8,7 @@ import { signIn } from "@/app/actions/auth";
 // validation it powers runs on the server. `import type` is erased at compile
 // time, so nothing ships. Keep the initial state local for the same reason.
 import type { FormState } from "@/lib/auth/schemas";
+import { Alert, Button, Input } from "@/components";
 
 const INITIAL_STATE: FormState = { status: "idle" };
 
@@ -36,57 +37,35 @@ export function SignInForm({ next }: { next?: string }) {
           headed. Validated server-side by safeReturnTo — never trusted here. */}
       {next ? <input type="hidden" name="next" value={next} /> : null}
 
-      {message ? (
-        <p role="alert" className="text-sm text-red-600">
-          {message}
-        </p>
-      ) : null}
+      {message ? <Alert tone="danger">{message}</Alert> : null}
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          aria-invalid={errors?.email ? true : undefined}
-          aria-describedby={errors?.email ? "email-error" : undefined}
-          className="border px-2 py-1"
-        />
-        {errors?.email ? (
-          <p id="email-error" className="text-sm text-red-600">
-            {errors.email[0]}
-          </p>
-        ) : null}
-      </div>
+      <Input
+        id="email"
+        name="email"
+        label="Email"
+        type="email"
+        autoComplete="email"
+        required
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        error={errors?.email?.[0]}
+      />
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          aria-invalid={errors?.password ? true : undefined}
-          aria-describedby={errors?.password ? "password-error" : undefined}
-          className="border px-2 py-1"
-        />
-        {errors?.password ? (
-          <p id="password-error" className="text-sm text-red-600">
-            {errors.password[0]}
-          </p>
-        ) : null}
-      </div>
+      <Input
+        id="password"
+        name="password"
+        label="Password"
+        type="password"
+        autoComplete="current-password"
+        required
+        value={password}
+        onChange={(event) => setPassword(event.target.value)}
+        error={errors?.password?.[0]}
+      />
 
-      <button type="submit" disabled={pending} className="border px-3 py-1">
-        {pending ? "Signing in…" : "Sign in"}
-      </button>
+      <Button type="submit" variant="primary" pending={pending} pendingLabel="Signing in…">
+        Sign in
+      </Button>
     </form>
   );
 }

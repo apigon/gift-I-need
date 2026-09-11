@@ -1,0 +1,538 @@
+<title>GIN Palette Proof</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..700,0..100&family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  /* Single committed light look — GIN is light-only for v1. Every colour painted explicitly. */
+  :root {
+    color-scheme: light;
+    --bg: #FFF5F5;
+    --surface: #FFFFFF;
+    --surface-tint: #F7D6D0;
+    --fg: #4A4A4A;
+    --fg-muted: #6B6B6B;
+    --border: #9C7D84;
+    --line: #EFD9DA;           /* decorative hairline only — never a UI boundary */
+    --brand-rose: #E2B4BD;     /* decorative brand colour — never a button fill */
+    --primary: #7B5EA7;
+    --primary-hover: #6D4C9F;
+    --on-primary: #FFFFFF;
+    --accent-strong: #6D4C9F;
+    --danger: #A33A3A;
+    --danger-bg: #FBE4E1;
+    --success: #2F6B4F;
+    --st-available-fg: #2F5D3A; --st-available-bg: #DDEEDD;
+    --st-taken-fg: #5A5A5A;     --st-taken-bg: #ECE6E6;
+    --st-mine-fg: #5B3F8C;      --st-mine-bg: #ECE4F7;
+    --st-given-fg: #7A5A1E;     --st-given-bg: #FBEBC8;
+
+    --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+    --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --text-display: 2.5rem;
+    --text-title: 1.5rem;
+    --text-heading: 1.125rem;
+    --text-body: 1rem;
+    --text-small: 0.875rem;
+    --text-caption: 0.75rem;
+
+    --radius-control: 0.625rem;
+    --radius-card: 1rem;
+    --radius-pill: 999px;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .display, .title, .heading {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 100;
+    font-optical-sizing: auto;
+    text-wrap: balance;
+    margin: 0;
+    color: var(--fg);
+  }
+  .display { font-size: var(--text-display); line-height: 1.1; font-weight: 600; letter-spacing: -0.01em; }
+  .title   { font-size: var(--text-title);   line-height: 1.2; font-weight: 600; }
+  .heading { font-size: var(--text-heading); line-height: 1.3; font-weight: 600; }
+  .small   { font-size: var(--text-small); }
+  .muted   { color: var(--fg-muted); }
+  .caption {
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: var(--fg-muted);
+  }
+  p { margin: 0; }
+
+  .page {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+    display: grid;
+    gap: 4rem;
+  }
+
+  header.intro { display: grid; gap: 0.75rem; max-width: 42rem; }
+  header.intro p { color: var(--fg-muted); max-width: 62ch; }
+
+  section { display: grid; gap: 1.5rem; }
+  .section-head { display: grid; gap: 0.35rem; max-width: 62ch; }
+
+  /* ---------- In-context mock ---------- */
+  .mock {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .mock { grid-template-columns: 1fr; } }
+
+  .list-frame {
+    background: var(--surface);
+    border-radius: var(--radius-card);
+    padding: 1.75rem;
+    display: grid;
+    gap: 1.25rem;
+    box-shadow: 0 1px 0 var(--line), 0 12px 32px -18px rgba(123, 94, 167, 0.28);
+  }
+  .event-head { display: grid; gap: 0.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line); }
+  .event-meta { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; font-size: var(--text-small); color: var(--fg-muted); }
+
+  .items { list-style: none; margin: 0; padding: 0; display: grid; }
+  .item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.35rem 1rem;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .item:last-child { border-bottom: 0; padding-bottom: 0; }
+  .item-main { display: grid; gap: 0.2rem; min-width: 0; }
+  .item-title { font-weight: 600; }
+  .item-sub { font-size: var(--text-small); color: var(--fg-muted); }
+  .item-actions { display: flex; align-items: center; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-caption);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+  }
+  .badge::before { content: ""; width: 0.45rem; height: 0.45rem; border-radius: 50%; background: currentColor; }
+  .badge.available { color: var(--st-available-fg); background: var(--st-available-bg); }
+  .badge.taken     { color: var(--st-taken-fg);     background: var(--st-taken-bg); }
+  .badge.mine      { color: var(--st-mine-fg);      background: var(--st-mine-bg); }
+  .badge.given     { color: var(--st-given-fg);     background: var(--st-given-bg); }
+
+  /* ---------- Controls ---------- */
+  .btn {
+    font: inherit;
+    font-size: var(--text-small);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    padding: 0 1.1rem;
+    border-radius: var(--radius-control);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+    white-space: nowrap;
+  }
+  .btn:focus-visible, .field input:focus-visible, a:focus-visible {
+    outline: 2px solid var(--accent-strong);
+    outline-offset: 2px;
+  }
+  .btn-primary { background: var(--primary); color: var(--on-primary); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--border); }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn[disabled], .btn[aria-disabled="true"] { cursor: not-allowed; opacity: 0.55; }
+  .btn[aria-busy="true"] { cursor: progress; opacity: 1; }
+
+  .spinner {
+    width: 0.9rem; height: 0.9rem;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: var(--on-primary);
+    animation: spin 700ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .spinner { animation: none; border-top-color: rgba(255,255,255,0.35); border-right-color: var(--on-primary); }
+    .btn { transition: none; }
+  }
+
+  a { color: var(--accent-strong); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+  a:hover { text-decoration-thickness: 2px; }
+
+  /* ---------- Sidebar: toast + alert ---------- */
+  .side { display: grid; gap: 1.5rem; }
+  .side-block { display: grid; gap: 0.6rem; }
+
+  .toast {
+    background: var(--surface);
+    border-radius: 0.875rem;
+    padding: 0.9rem 1rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.15rem 0.75rem;
+    align-items: start;
+    box-shadow: 0 10px 30px -12px rgba(74, 74, 74, 0.35), 0 0 0 1px var(--line);
+  }
+  .toast-icon {
+    grid-row: span 2;
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--st-available-bg);
+    color: var(--success);
+    font-size: 0.8rem; font-weight: 700;
+  }
+  .toast-icon.err { background: var(--danger-bg); color: var(--danger); }
+  .toast-title { font-weight: 600; font-size: var(--text-small); }
+  .toast-body { font-size: var(--text-small); color: var(--fg-muted); }
+
+  .alert {
+    border-radius: var(--radius-control);
+    padding: 0.75rem 0.9rem;
+    font-size: var(--text-small);
+    display: grid; gap: 0.15rem;
+  }
+  .alert strong { font-weight: 600; }
+  .alert.danger  { background: var(--danger-bg); color: var(--danger); }
+  .alert.success { background: var(--st-available-bg); color: var(--success); }
+  .alert.info    { background: var(--surface-tint); color: var(--fg); }
+
+  /* ---------- Swatches ---------- */
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12.5rem, 1fr));
+    gap: 1rem;
+  }
+  .swatch {
+    background: var(--surface);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: 5rem auto;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .chip { display: flex; align-items: flex-end; padding: 0.6rem 0.75rem; font-weight: 600; font-size: var(--text-small); }
+  .swatch-meta { padding: 0.7rem 0.75rem 0.8rem; display: grid; gap: 0.15rem; }
+  .token { font-family: var(--font-mono); font-size: var(--text-small); font-weight: 500; }
+  .hex { font-family: var(--font-mono); font-size: var(--text-caption); color: var(--fg-muted); }
+  .role { font-size: var(--text-caption); color: var(--fg-muted); }
+  .you { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-strong); }
+
+  .ratio-row { display: flex; justify-content: space-between; gap: 0.5rem; font-size: var(--text-caption); font-variant-numeric: tabular-nums; }
+  .pass { color: var(--success); font-weight: 600; }
+  .fail { color: var(--danger); font-weight: 600; }
+
+  /* ---------- Contrast table ---------- */
+  .table-wrap { overflow-x: auto; background: var(--surface); border-radius: var(--radius-card); box-shadow: 0 0 0 1px var(--line); }
+  table { border-collapse: collapse; width: 100%; min-width: 36rem; font-size: var(--text-small); }
+  th, td { text-align: left; padding: 0.7rem 1rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: var(--text-caption); text-transform: uppercase; letter-spacing: 0.08em; color: var(--fg-muted); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  td.num { font-variant-numeric: tabular-nums; font-family: var(--font-mono); }
+  .pair { display: inline-flex; align-items: center; justify-content: center; min-width: 3.25rem; padding: 0.25rem 0.5rem; border-radius: 0.4rem; font-weight: 600; box-shadow: 0 0 0 1px var(--line); }
+
+  /* ---------- Type specimen ---------- */
+  .specimen { display: grid; background: var(--surface); border-radius: var(--radius-card); box-shadow: 0 0 0 1px var(--line); }
+  .spec-row {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .spec-row:last-child { border-bottom: 0; }
+  .spec-label { display: grid; gap: 0.1rem; }
+  .spec-label .hex { white-space: nowrap; }
+  @media (max-width: 640px) { .spec-row { grid-template-columns: 1fr; gap: 0.35rem; } }
+
+  .soft-compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; }
+  .soft-card { background: var(--surface); border-radius: var(--radius-card); padding: 1.25rem 1.5rem; box-shadow: 0 0 0 1px var(--line); display: grid; gap: 0.5rem; }
+  .soft-card .sample { font-family: var(--font-display); font-size: 2.25rem; line-height: 1.1; font-weight: 600; }
+
+  /* ---------- Fields ---------- */
+  .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.25rem 1.5rem; background: var(--surface); border-radius: var(--radius-card); padding: 1.5rem; box-shadow: 0 0 0 1px var(--line); }
+  .field { display: grid; gap: 0.35rem; align-content: start; }
+  .field label { font-size: var(--text-small); font-weight: 600; }
+  .field input {
+    font: inherit;
+    color: var(--fg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    min-height: 2.5rem;
+    padding: 0 0.8rem;
+  }
+  .field input::placeholder { color: var(--fg-muted); }
+  .field.is-focus input { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+  .field.is-error input { border-color: var(--danger); border-width: 1.5px; }
+  .field .hint { font-size: var(--text-caption); color: var(--fg-muted); }
+  .field .err { font-size: var(--text-caption); color: var(--danger); font-weight: 500; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+
+  .dont {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem;
+  }
+  .dont-card { background: var(--surface); border-radius: var(--radius-card); padding: 1.25rem; box-shadow: 0 0 0 1px var(--line); display: grid; gap: 0.75rem; align-content: start; }
+  .dont-demo { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+  .x-btn { background: var(--brand-rose); color: #FFFFFF; border-radius: var(--radius-control); padding: 0.55rem 1rem; font-weight: 600; font-size: var(--text-small); }
+  .x-border { border: 1px solid var(--brand-rose); background: var(--surface); border-radius: var(--radius-control); padding: 0.55rem 0.8rem; font-size: var(--text-small); color: var(--fg-muted); min-width: 10rem; }
+  .x-dot { display: inline-flex; align-items: center; gap: 0.4rem; font-size: var(--text-small); }
+  .x-dot i { width: 0.75rem; height: 0.75rem; border-radius: 50%; display: inline-block; }
+
+  footer { font-size: var(--text-small); color: var(--fg-muted); border-top: 1px solid var(--line); padding-top: 1.25rem; max-width: 62ch; }
+</style>
+
+<main class="page">
+
+  <header class="intro">
+    <span class="caption">GIN · F-03 design-system-baseline · proposal for review</span>
+    <h1 class="display">Palette proof</h1>
+    <p>Revision 2: purple primary with white labels; "claimed by you" moved to lavender and "given" to honey. Your four colours, plus the tokens derived from them, shown first on a real shared gift list and then one by one. Every text pairing listed here has been checked against WCAG AA. Headings are set in Fraunces with its SOFT axis at 100, as a free stand-in for Gentle. Body text is Geist.</p>
+  </header>
+
+  <!-- In context -->
+  <section>
+    <div class="section-head">
+      <span class="caption">In context</span>
+      <h2 class="title">A guest's view of a shared list</h2>
+      <p class="muted">All four status variants appear, along with the pending state on a claim in flight and the toast that confirms it.</p>
+    </div>
+
+    <div class="mock">
+      <div class="list-frame">
+        <div class="event-head">
+          <span class="caption">Shared list</span>
+          <h3 class="title">Maja's 30th birthday</h3>
+          <div class="event-meta">
+            <span>Saturday, 14 November 2026</span>
+            <span>Organised by Maja K.</span>
+            <span>6 ideas</span>
+          </div>
+        </div>
+
+        <ul class="items">
+          <li class="item">
+            <div class="item-main">
+              <span class="item-title">Ceramic pour-over coffee set</span>
+              <span class="item-sub">Around 120–160 zł · <a href="#">Link from Maja</a></span>
+            </div>
+            <div class="item-actions">
+              <span class="badge available">Available</span>
+              <button class="btn btn-primary" type="button">Claim this gift</button>
+            </div>
+          </li>
+          <li class="item">
+            <div class="item-main">
+              <span class="item-title">Linen apron, dusty rose</span>
+              <span class="item-sub">Around 90 zł · "Size M, please"</span>
+            </div>
+            <div class="item-actions">
+              <span class="badge available">Available</span>
+              <button class="btn btn-primary" type="button" aria-busy="true" aria-disabled="true"><span class="spinner" aria-hidden="true"></span>Claiming…</button>
+            </div>
+          </li>
+          <li class="item">
+            <div class="item-main">
+              <span class="item-title">Botanical garden annual pass</span>
+              <span class="item-sub">Around 200 zł</span>
+            </div>
+            <div class="item-actions">
+              <span class="badge mine">Claimed by you</span>
+            </div>
+          </li>
+          <li class="item">
+            <div class="item-main">
+              <span class="item-title">Hardcover — <em>The Wild Robot</em> trilogy</span>
+              <span class="item-sub">Any edition</span>
+            </div>
+            <div class="item-actions">
+              <span class="badge taken">Taken</span>
+            </div>
+          </li>
+          <li class="item">
+            <div class="item-main">
+              <span class="item-title">Pottery class for two</span>
+              <span class="item-sub">Shown after the event date</span>
+            </div>
+            <div class="item-actions">
+              <span class="badge given">Given</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <aside class="side">
+        <div class="side-block">
+          <span class="caption">Toast · success</span>
+          <div class="toast" role="status">
+            <span class="toast-icon" aria-hidden="true">✓</span>
+            <span class="toast-title">You claimed this gift</span>
+            <span class="toast-body">Botanical garden annual pass is now marked "Taken" for other guests.</span>
+          </div>
+        </div>
+        <div class="side-block">
+          <span class="caption">Toast · error</span>
+          <div class="toast" role="status">
+            <span class="toast-icon err" aria-hidden="true">!</span>
+            <span class="toast-title">Someone else just claimed this</span>
+            <span class="toast-body">The list has been refreshed. Pick another idea.</span>
+          </div>
+        </div>
+        <div class="side-block">
+          <span class="caption">Inline alerts</span>
+          <div class="alert danger"><strong>That password is too short.</strong>Use at least 8 characters.</div>
+          <div class="alert success"><strong>Link copied.</strong>Paste it into your group chat.</div>
+          <div class="alert info"><strong>Sign in to claim.</strong>Browsing doesn't need an account.</div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Swatches -->
+  <section>
+    <div class="section-head">
+      <span class="caption">Tokens</span>
+      <h2 class="title">Palette</h2>
+      <p class="muted">Tokens are named by role, not by colour. Swatches tagged "yours" are the hex values you supplied.</p>
+    </div>
+
+    <div class="swatches">
+      <div class="swatch"><div class="chip" style="background:#FFF5F5;color:#4A4A4A;box-shadow:inset 0 -1px 0 #EFD9DA">Aa</div><div class="swatch-meta"><span class="you">Yours</span><span class="token">bg</span><span class="hex">#FFF5F5</span><span class="role">Page canvas</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#FFFFFF;color:#4A4A4A;box-shadow:inset 0 -1px 0 #EFD9DA">Aa</div><div class="swatch-meta"><span class="token">surface</span><span class="hex">#FFFFFF</span><span class="role">Cards, inputs, toasts</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#F7D6D0;color:#4A4A4A">Aa</div><div class="swatch-meta"><span class="you">Yours</span><span class="token">surface-tint</span><span class="hex">#F7D6D0</span><span class="role">Subtle fills, info, "mine"</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#4A4A4A;color:#FFF5F5">Aa</div><div class="swatch-meta"><span class="you">Yours</span><span class="token">fg</span><span class="hex">#4A4A4A</span><div class="ratio-row"><span>on bg</span><span class="pass">8.28 AA</span></div></div></div>
+      <div class="swatch"><div class="chip" style="background:#6B6B6B;color:#FFFFFF">Aa</div><div class="swatch-meta"><span class="token">fg-muted</span><span class="hex">#6B6B6B</span><div class="ratio-row"><span>on bg</span><span class="pass">4.98 AA</span></div></div></div>
+      <div class="swatch"><div class="chip" style="background:#9C7D84;color:#FFFFFF">Aa</div><div class="swatch-meta"><span class="token">border</span><span class="hex">#9C7D84</span><div class="ratio-row"><span>vs bg (UI ≥ 3)</span><span class="pass">3.46</span></div></div></div>
+      <div class="swatch"><div class="chip" style="background:#E2B4BD;color:#4A4A4A">Aa</div><div class="swatch-meta"><span class="you">Yours</span><span class="token">brand-rose</span><span class="hex">#E2B4BD</span><span class="role">Decorative only — accents, never buttons</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#7B5EA7;color:#FFFFFF">Aa</div><div class="swatch-meta"><span class="token">primary</span><span class="hex">#7B5EA7</span><div class="ratio-row"><span>white label</span><span class="pass">5.25 AA</span></div></div></div>
+      <div class="swatch"><div class="chip" style="background:#6D4C9F;color:#FFFFFF">Aa</div><div class="swatch-meta"><span class="token">primary-hover · accent-strong</span><span class="hex">#6D4C9F</span><div class="ratio-row"><span>white / links on bg</span><span class="pass">6.59 / 6.16</span></div></div></div>
+      <div class="swatch"><div class="chip" style="background:#FBE4E1;color:#A33A3A">Aa</div><div class="swatch-meta"><span class="token">danger / danger-bg</span><span class="hex">#A33A3A / #FBE4E1</span><div class="ratio-row"><span>text on fill</span><span class="pass">5.36 AA</span></div></div></div>
+      <div class="swatch"><div class="chip" style="background:#DDEEDD;color:#2F6B4F">Aa</div><div class="swatch-meta"><span class="token">success</span><span class="hex">#2F6B4F</span><div class="ratio-row"><span>on bg</span><span class="pass">5.88 AA</span></div></div></div>
+    </div>
+  </section>
+
+  <!-- Status contrast table -->
+  <section>
+    <div class="section-head">
+      <span class="caption">Load-bearing</span>
+      <h2 class="title">Status variants</h2>
+      <p class="muted">Each badge has a text label, a dot and an outline, so status never depends on colour alone. The pastel fills sit close to the canvas (sage 1.13:1, lavender 1.15:1 against bg). That's acceptable because the label carries the meaning.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Variant</th><th>Badge</th><th>Text</th><th>Fill</th><th>Contrast</th><th>Used by</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>available</td><td><span class="badge available">Available</span></td><td class="num">#2F5D3A</td><td class="num">#DDEEDD</td><td class="num"><span class="pass">6.31</span></td><td>S-02, S-03</td></tr>
+          <tr><td>taken</td><td><span class="badge taken">Taken</span></td><td class="num">#5A5A5A</td><td class="num">#ECE6E6</td><td class="num"><span class="pass">5.59</span></td><td>S-02, S-03</td></tr>
+          <tr><td>mine</td><td><span class="badge mine">Claimed by you</span></td><td class="num">#5B3F8C</td><td class="num">#ECE4F7</td><td class="num"><span class="pass">6.71</span></td><td>S-03</td></tr>
+          <tr><td>given</td><td><span class="badge given">Given</span></td><td class="num">#7A5A1E</td><td class="num">#FBEBC8</td><td class="num"><span class="pass">5.39</span></td><td>S-05</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Type -->
+  <section>
+    <div class="section-head">
+      <span class="caption">Type</span>
+      <h2 class="title">Fraunces SOFT for headings, Geist for everything else</h2>
+      <p class="muted">Fraunces is OFL-licensed and ships through <code>next/font/google</code>. Its SOFT axis rounds the serifs into something close to Gentle's retro warmth.</p>
+    </div>
+
+    <div class="specimen">
+      <div class="spec-row"><div class="spec-label"><span class="token">display</span><span class="hex">Fraunces 600 · 40/44</span></div><div class="display">Gifts they actually want</div></div>
+      <div class="spec-row"><div class="spec-label"><span class="token">title</span><span class="hex">Fraunces 600 · 24/29</span></div><div class="title">Maja's 30th birthday</div></div>
+      <div class="spec-row"><div class="spec-label"><span class="token">heading</span><span class="hex">Fraunces 600 · 18/23</span></div><div class="heading">Ceramic pour-over coffee set</div></div>
+      <div class="spec-row"><div class="spec-label"><span class="token">body</span><span class="hex">Geist 400 · 16/25</span></div><p style="max-width:62ch">Pick something from the list and claim it. Other guests will see it as taken right away. Maja won't see who claimed what until after the party.</p></div>
+      <div class="spec-row"><div class="spec-label"><span class="token">small</span><span class="hex">Geist 400 · 14/22</span></div><p class="small">Around 120–160 zł · Link from Maja</p></div>
+      <div class="spec-row"><div class="spec-label"><span class="token">caption</span><span class="hex">Geist 600 · 12 · caps</span></div><span class="caption">Shared list · 6 ideas</span></div>
+    </div>
+
+    <div class="soft-compare">
+      <div class="soft-card"><span class="caption">SOFT 0 — stock Fraunces</span><span class="sample" style="font-variation-settings:'SOFT' 0">Gift I Need</span></div>
+      <div class="soft-card"><span class="caption">SOFT 50</span><span class="sample" style="font-variation-settings:'SOFT' 50">Gift I Need</span></div>
+      <div class="soft-card"><span class="caption">SOFT 100 — proposed</span><span class="sample" style="font-variation-settings:'SOFT' 100">Gift I Need</span></div>
+    </div>
+  </section>
+
+  <!-- Controls -->
+  <section>
+    <div class="section-head">
+      <span class="caption">Primitives</span>
+      <h2 class="title">Button, TextField, Link</h2>
+      <p class="muted">Each state is shown here, the same set Phase 1's showcase route will render.</p>
+    </div>
+    <div class="fields">
+      <div class="field"><label for="f1">Email</label><input id="f1" type="email" placeholder="you@example.com"><span class="hint">We only use it to sign you in.</span></div>
+      <div class="field is-focus"><label for="f2">Event name</label><input id="f2" type="text" value="Maja's 30th birthday"><span class="hint">Focused state</span></div>
+      <div class="field is-error"><label for="f3">Password</label><input id="f3" type="password" value="short" aria-invalid="true" aria-describedby="f3e"><span class="err" id="f3e">Use at least 8 characters.</span></div>
+      <div class="field" style="align-content:end">
+        <div class="btn-row">
+          <button class="btn btn-primary" type="button">Create account</button>
+          <button class="btn btn-secondary" type="button">Cancel</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" type="button" disabled>Disabled</button>
+          <a href="#">Already have an account? Sign in</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Don'ts -->
+  <section>
+    <div class="section-head">
+      <span class="caption">Guardrails</span>
+      <h2 class="title">Pairings the tokens rule out</h2>
+      <p class="muted">These fail AA, so the plan leaves them out of the token system altogether.</p>
+    </div>
+    <div class="dont">
+      <div class="dont-card">
+        <div class="dont-demo"><span class="x-btn">Claim this gift</span></div>
+        <p class="small"><span class="fail">1.83</span> — <code>brand-rose</code> as a button fill. Rose-pink reads as "warning" and fails with white text. Buttons use purple <code>primary</code> instead.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-demo"><span class="x-border">you@example.com</span></div>
+        <p class="small"><span class="fail">1.71</span> — <code>brand-rose</code> used as an input border. Inputs use <code>border</code> (#9C7D84) instead.</p>
+      </div>
+      <div class="dont-card">
+        <div class="dont-demo"><span class="x-dot"><i style="background:#DDEEDD"></i>Available</span><span class="x-dot"><i style="background:#ECE6E6"></i>Taken</span></div>
+        <p class="small"><span class="fail">≈1.1</span> — status shown by a pastel dot alone. A badge always carries its text label and outline.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    This is a static proposal page, not app code. Hues can still be nudged: any change keeps the same roles and must stay above AA before it goes into <code>src/app/globals.css</code>.
+  </footer>
+</main>
