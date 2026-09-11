@@ -1,7 +1,7 @@
 ---
 change_id: surprise-rule-data-contract
 title: Surprise rule data contract
-status: implementing
+status: impl_reviewed
 created: 2026-09-11
 updated: 2026-09-12
 archived_at: null

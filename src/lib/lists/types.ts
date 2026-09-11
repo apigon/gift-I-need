@@ -8,11 +8,14 @@ import type { ListErrorCode } from "./errors";
 export type ItemStatus = "available" | "taken" | "mine" | "given";
 
 // Type-level assertion: every ItemStatus must render through StatusBadge.
-type AssertItemStatusIsBadgeStatus = ItemStatus extends BadgeStatus
-  ? true
-  : never;
+// Written as an assignment, not as `ItemStatus extends BadgeStatus ? true :
+// never` — that form is inert, because on divergence it simply evaluates to
+// `never` and assigning `never` to a type alias is legal, so tsc stays silent.
+// This form fails to compile the moment ItemStatus gains a member BadgeStatus
+// does not have.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-type _AssertItemStatusIsBadgeStatus = AssertItemStatusIsBadgeStatus;
+const _assertItemStatusIsBadgeStatus: BadgeStatus =
+  null as unknown as ItemStatus;
 
 export type SharedEvent = {
   id: string;
@@ -33,3 +36,12 @@ export type SharedItem = {
 };
 
 export type ListResult = { ok: true } | { ok: false; code: ListErrorCode };
+
+// A shared-list read has three outcomes, not two. Collapsing them into
+// `null` would render "list not found" during a database outage — the same
+// thing a deleted list shows, with nothing logged. `not_found` is reserved
+// for the case where both RPCs SUCCEEDED and returned no event.
+export type SharedListResult =
+  | { kind: "ok"; event: SharedEvent; items: SharedItem[] }
+  | { kind: "not_found" }
+  | { kind: "error"; code: ListErrorCode };

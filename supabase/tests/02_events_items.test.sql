@@ -97,8 +97,14 @@ select results_eq(
 );
 
 -- link = 'javascript:alert(1)' is rejected. -------------------------------
+-- The SQLSTATE is pinned deliberately: a bare throws_ok() asserts only that
+-- *something* was raised, so it would stay green on a format-string typo, a
+-- privilege error, or a bad cast -- i.e. while the constraint itself was gone.
 select throws_ok(
-  format($$ insert into public.items (event_id, title, link) values (%L, 'Bad Link', 'javascript:alert(1)') $$, :'fx_event_id')
+  format($$ insert into public.items (event_id, title, link) values (%L, 'Bad Link', 'javascript:alert(1)') $$, :'fx_event_id'),
+  '23514',
+  'new row for relation "items" violates check constraint "items_link_format"',
+  'a javascript: link is rejected by items_link_format'
 );
 
 insert into public.items (event_id, title) values (:'fx_event_id', 'Item One');

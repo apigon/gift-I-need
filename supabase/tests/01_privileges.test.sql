@@ -7,7 +7,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(37);
+select plan(40);
 
 -- Row-level security is on for every base table -----------------------------
 select ok(relrowsecurity, 'events has RLS enabled') from pg_class where oid = 'public.events'::regclass;
@@ -57,7 +57,17 @@ select * from is_empty(
         ('public.mark_given(uuid)', 'authenticated', true),
         ('public.mark_given(uuid)', 'anon', false),
         ('public.unlock_event(uuid)', 'authenticated', true),
-        ('public.unlock_event(uuid)', 'anon', false)
+        ('public.unlock_event(uuid)', 'anon', false),
+        -- Read RPCs (20260911221653): EXECUTE to anon AND authenticated, on
+        -- both the public wrappers and the private definer bodies.
+        ('public.get_shared_event(text)', 'authenticated', true),
+        ('public.get_shared_event(text)', 'anon', true),
+        ('public.get_shared_items(text)', 'authenticated', true),
+        ('public.get_shared_items(text)', 'anon', true),
+        ('private.get_shared_event(text)', 'authenticated', true),
+        ('private.get_shared_event(text)', 'anon', true),
+        ('private.get_shared_items(text)', 'authenticated', true),
+        ('private.get_shared_items(text)', 'anon', true)
     )
     select fn || ' / ' || role || ' expected ' || should
     from expected
@@ -66,11 +76,32 @@ select * from is_empty(
   'EXECUTE grants match the contract exactly for anon and authenticated'
 );
 
+-- ... and no function grants EXECUTE to PUBLIC -----------------------------
+-- The allowlist above is an enumeration: it says nothing about a function a
+-- FUTURE migration adds. PUBLIC holds EXECUTE on every new function by
+-- default, so without the global default-privilege revoke in
+-- 20260911232448 a forgotten `revoke` would silently expose it to anon.
+-- `proacl is null` means the default ACL (PUBLIC has EXECUTE); `=X/` is an
+-- explicit grant to PUBLIC.
+select * from is_empty(
+  $$
+    select n.nspname || '.' || p.proname
+    from pg_proc p
+    join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname in ('public', 'private')
+      and (p.proacl is null or array_to_string(p.proacl, ',') ~ '(^|,)=X/')
+  $$,
+  'no function in public or private grants EXECUTE to PUBLIC'
+);
+
 -- Table-level privileges ------------------------------------------------
--- authenticated only ever gets table-level SELECT; INSERT/UPDATE are
--- column-scoped, so they never show up at the table-privilege level.
-select * from table_privs_are('public', 'events', 'authenticated', array['SELECT']);
-select * from table_privs_are('public', 'items', 'authenticated', array['SELECT']);
+-- authenticated holds NO table-level privilege at all: SELECT, INSERT and
+-- UPDATE are every one of them column-scoped. Table-level SELECT would also
+-- grant the system columns (`xmax`, `ctid`, ...), and `xmax` leaks claim
+-- state to the organizer before the reveal -- see the
+-- 20260911231857_column_scoped_select migration.
+select * from table_privs_are('public', 'events', 'authenticated', array[]::name[]);
+select * from table_privs_are('public', 'items', 'authenticated', array[]::name[]);
 select * from table_privs_are('public', 'claims', 'authenticated', array[]::name[]);
 
 select * from table_privs_are('public', 'events', 'anon', array[]::name[]);
@@ -98,6 +129,13 @@ select * from column_privs_are('public', 'items', 'link', 'authenticated', array
 select * from column_privs_are('public', 'items', 'price_range', 'authenticated', array['SELECT', 'INSERT', 'UPDATE']);
 select * from column_privs_are('public', 'items', 'created_at', 'authenticated', array['SELECT']);
 select * from column_privs_are('public', 'items', 'updated_at', 'authenticated', array['SELECT']);
+
+-- System columns are not reachable ---------------------------------------
+-- A table-level SELECT would grant these; a column-scoped one does not.
+-- `xmax` is the organizer-blindness leak (see 20260911231857), so it is
+-- pinned here as a privilege invariant rather than only as a behaviour test.
+select ok(not has_table_privilege('authenticated', 'public.events', 'SELECT'), 'authenticated has no table-level SELECT on events (blocks xmax)');
+select ok(not has_table_privilege('authenticated', 'public.items', 'SELECT'), 'authenticated has no table-level SELECT on items (blocks xmax)');
 
 -- No role has DELETE on any public table -------------------------------
 select ok(not has_table_privilege('authenticated', 'public.events', 'DELETE'), 'authenticated has no DELETE on events');

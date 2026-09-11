@@ -1,0 +1,36 @@
+-- Make deny-by-default hold for FUNCTIONS, not just tables and sequences.
+--
+-- 20260911211956 revoked default privileges on tables/sequences/functions for
+-- `anon`, `authenticated` and `service_role` in schema `public`, and noted
+-- that this cannot remove the `PUBLIC` pseudo-role's built-in EXECUTE. That
+-- note is correct, and the consequence is bigger than it looks: EVERY function
+-- a future migration creates -- in `public` OR in `private` -- is executable by
+-- `anon` the moment it exists, unless that migration remembers to revoke.
+--
+-- `private` is reachable too: 20260911211956 grants `usage on schema private`
+-- to anon and authenticated so the public wrappers and RLS policies can call
+-- into it, so a forgotten revoke there is just as exposed.
+--
+-- The per-schema form does NOT fix this -- verified:
+--
+--   alter default privileges ... IN SCHEMA private revoke all on functions
+--     from public, anon, authenticated;
+--   create function private.probe() ...;
+--   -> has_function_privilege('anon', 'private.probe()', 'execute') = true
+--
+-- A per-schema default cannot revoke a global one. The global form (no
+-- `IN SCHEMA`) does work, and covers both schemas at once:
+--
+--   -> has_function_privilege('anon', 'private.probe()', 'execute') = false
+--   -> has_function_privilege('anon', 'public.probe()',  'execute') = false
+--
+-- Scoped to `for role postgres`, i.e. objects created by migrations. It does
+-- not touch functions owned by Supabase's own roles (supabase_admin et al).
+-- Explicit `grant execute` still works exactly as before -- and every function
+-- in this schema already carries one, so nothing in the current contract
+-- changes. This only closes the door for what comes next.
+--
+-- 01_privileges.test.sql pins it as an invariant: no function in `public` or
+-- `private` may grant EXECUTE to PUBLIC.
+
+alter default privileges for role postgres revoke execute on functions from public;

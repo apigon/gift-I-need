@@ -42,12 +42,22 @@ async function signedInClient(email: string): Promise<SupabaseClient<Database>> 
     auth: { persistSession: false },
   });
 
-  const { error } = await client.auth.signUp({
+  const { data, error } = await client.auth.signUp({
     email,
     password: "password1234",
   });
   if (error) {
     throw error;
+  }
+  // signUp has three outcomes, not two (context/foundation/lessons.md): with
+  // confirmations on it returns no session AND no error. Without this check
+  // every client would be anonymous, all five claims would fail with 42501,
+  // and the race assertion would report "expected [] to have length 1" —
+  // three layers away from the actual cause.
+  if (!data.session) {
+    throw new Error(
+      `signUp returned no session for ${email} — is enable_confirmations on in supabase/config.toml?`,
+    );
   }
 
   return client;
