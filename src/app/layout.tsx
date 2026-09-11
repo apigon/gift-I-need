@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Geist, Geist_Mono } from "next/font/google";
 
-import { Toaster } from "@/components";
+import { Link, Toaster } from "@/components";
 
 import { AuthStatus } from "./components";
 import "./globals.css";
@@ -43,7 +43,10 @@ export default function RootLayout({
             rendering. Accepted: wrangler.jsonc records R2 incremental caching as
             deferred and no route uses revalidate/ISR, so there is no static
             output to lose. Revisit if a marketing page is ever added. */}
-        <header className="flex justify-end border-b px-6 py-3">
+        <header className="flex items-center justify-between border-b border-hairline bg-surface px-6 py-3">
+          <Link href="/" className="font-display text-heading">
+            Gift I Need
+          </Link>
           <AuthStatus />
         </header>
         {children}

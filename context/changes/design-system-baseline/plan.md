@@ -578,36 +578,36 @@ There are no data changes. Everything happens on the single branch `GIN-17-desig
 
 #### Automated
 
-- [x] 3.1 Lint passes: `pnpm lint`
-- [x] 3.2 Type checking passes: `pnpm typecheck`
-- [x] 3.3 Production build succeeds: `pnpm build`
-- [x] 3.4 `/design-system` returns 200 signed-out in dev
-- [x] 3.5 `/design-system` is unreachable signed-out in production (307 to `/login`, then 404 for a signed-in visitor)
+- [x] 3.1 Lint passes: `pnpm lint` — 493f148
+- [x] 3.2 Type checking passes: `pnpm typecheck` — 493f148
+- [x] 3.3 Production build succeeds: `pnpm build` — 493f148
+- [x] 3.4 `/design-system` returns 200 signed-out in dev — 493f148
+- [x] 3.5 `/design-system` is unreachable signed-out in production (307 to `/login`, then 404 for a signed-in visitor) — 493f148
 
 #### Manual
 
-- [x] 3.6 Showcase matches `palette-proof.html` rev 2
-- [x] 3.7 Headings show Fraunces SOFT 100
-- [x] 3.8 Toasts render token-styled and are announced
-- [x] 3.9 Visible focus ring on every interactive primitive
-- [x] 3.10 Pending spinner static under reduced motion
-- [x] 3.11 No horizontal overflow at 375px
+- [x] 3.6 Showcase matches `palette-proof.html` rev 2 — 493f148
+- [x] 3.7 Headings show Fraunces SOFT 100 — 493f148
+- [x] 3.8 Toasts render token-styled and are announced — 493f148
+- [x] 3.9 Visible focus ring on every interactive primitive — 493f148
+- [x] 3.10 Pending spinner static under reduced motion — 493f148
+- [x] 3.11 No horizontal overflow at 375px — 493f148
 
 ### Phase 4: Move current screens onto the design system
 
 #### Automated
 
-- [ ] 4.1 Lint passes: `pnpm lint`
-- [ ] 4.2 Type checking passes: `pnpm typecheck`
-- [ ] 4.3 Production build succeeds: `pnpm build`
-- [ ] 4.4 No hand-rolled form markup or direct `next/link` import left
+- [x] 4.1 Lint passes: `pnpm lint`
+- [x] 4.2 Type checking passes: `pnpm typecheck`
+- [x] 4.3 Production build succeeds: `pnpm build`
+- [x] 4.4 No hand-rolled form markup or direct `next/link` import left
 
 #### Manual
 
-- [ ] 4.5 Sign-up validation error keeps typed email in the field
-- [ ] 4.6 Sign-in error shows danger Alert; button shows pending label
-- [ ] 4.7 Confirmation-failed Alert renders on `/login?error=confirmation_failed`
-- [ ] 4.8 Sign-out from header works
-- [ ] 4.9 `next` return path still honoured after sign-in
-- [ ] 4.10 Keyboard-only navigation with visible focus rings
-- [ ] 4.11 No horizontal scroll at 375px on auth pages and header
+- [x] 4.5 Sign-up validation error keeps typed email in the field
+- [x] 4.6 Sign-in error shows danger Alert; button shows pending label
+- [x] 4.7 Confirmation-failed Alert renders on `/login?error=confirmation_failed`
+- [x] 4.8 Sign-out from header works
+- [x] 4.9 `next` return path still honoured after sign-in
+- [x] 4.10 Keyboard-only navigation with visible focus rings
+- [x] 4.11 No horizontal scroll at 375px on auth pages and header

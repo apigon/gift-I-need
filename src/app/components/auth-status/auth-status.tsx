@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Button, Link, Text } from "@/components";
 
 import { signOut } from "@/app/actions/auth";
 import { createClient } from "@/utils/supabase/server";
@@ -26,23 +26,21 @@ export async function AuthStatus() {
   if (!user) {
     return (
       <nav className="flex items-center gap-4 text-small">
-        <Link className="underline" href="/login">
-          Sign in
-        </Link>
-        <Link className="underline" href="/signup">
-          Create account
-        </Link>
+        <Link href="/login">Sign in</Link>
+        <Link href="/signup">Create account</Link>
       </nav>
     );
   }
 
   return (
-    <div className="flex items-center gap-4 text-small">
-      <span>{user.email}</span>
+    <div className="flex items-center gap-4">
+      <Text variant="small" tone="muted">
+        {user.email}
+      </Text>
       <form action={signOut}>
-        <button type="submit" className="border-edge px-2 py-1">
+        <Button type="submit" variant="secondary">
           Sign out
-        </button>
+        </Button>
       </form>
     </div>
   );

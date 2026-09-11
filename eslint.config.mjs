@@ -27,6 +27,24 @@ const eslintConfig = defineConfig([
             "Off-system class detected. Use GIN's semantic tokens — see the \"Design system\" section in CLAUDE.md.",
         },
       ],
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "next/link",
+              message:
+                'Import Link from "@/components" instead — see the "Design system" section in CLAUDE.md.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/components/link/**"],
+    rules: {
+      "no-restricted-imports": "off",
     },
   },
   // Override default ignores of eslint-config-next.

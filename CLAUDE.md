@@ -71,6 +71,7 @@ No test runner is configured yet — add one before writing tests.
 - Adding a new token means adding it to both `src/app/globals.css` and the `/design-system` showcase.
 - `context/changes/design-system-baseline/palette-proof.html` is the approved colour reference.
 - Primary buttons use `bg-primary`/`text-on-primary` (purple). `brand-rose` is decorative only — never a control fill.
+- Use `Link` from `@/components`, never `next/link` directly (lint-enforced).
 
 ## Branching and PR convention
 

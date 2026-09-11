@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Heading, Link, Text } from "@/components";
 
 import { SignUpForm } from "./components";
 
@@ -21,20 +21,19 @@ export default async function SignUpPage({
   const next = first(params.next);
 
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-6 py-16">
-      <h1 className="text-title font-bold">Create an account</h1>
+    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-16">
+      <div className="flex flex-col gap-6 rounded-card bg-surface p-8">
+        <Heading level={1}>Create an account</Heading>
 
-      <SignUpForm next={next} />
+        <SignUpForm next={next} />
 
-      <p className="text-small">
-        Already have an account?{" "}
-        <Link
-          className="underline"
-          href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
-        >
-          Sign in
-        </Link>
-      </p>
+        <Text variant="small">
+          Already have an account?{" "}
+          <Link href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}>
+            Sign in
+          </Link>
+        </Text>
+      </div>
     </main>
   );
 }

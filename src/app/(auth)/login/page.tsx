@@ -1,12 +1,9 @@
-import Link from "next/link";
+import { Alert, Heading, Link, Text } from "@/components";
 
 import { SignInForm } from "./components";
 
 // The `(auth)` route group keeps the auth pages together without affecting the
 // URL — this renders at `/login`, not `/auth/login`.
-//
-// Markup is deliberately plain: F-03 (design-system-baseline) owns the visual
-// layer, and styling it now would only be thrown away.
 
 // Next supplies `string | string[] | undefined` — a repeated param (?next=/a&next=/b)
 // arrives as an array. Typing it as a bare string silently produced "/a,/b",
@@ -31,27 +28,28 @@ export default async function LoginPage({
   const failedConfirmation = first(params.error) === "confirmation_failed";
 
   return (
-    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-6 py-16">
-      <h1 className="text-title font-bold">Sign in</h1>
+    <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 py-16">
+      <div className="flex flex-col gap-6 rounded-card bg-surface p-8">
+        <Heading level={1}>Sign in</Heading>
 
-      {failedConfirmation ? (
-        <p role="alert" className="text-small text-danger">
-          That confirmation link didn&apos;t work — it may have expired or
-          already been used. Sign in below, or create a new account.
-        </p>
-      ) : null}
+        {failedConfirmation ? (
+          <Alert tone="danger">
+            That confirmation link didn&apos;t work — it may have expired or
+            already been used. Sign in below, or create a new account.
+          </Alert>
+        ) : null}
 
-      <SignInForm next={next} />
+        <SignInForm next={next} />
 
-      <p className="text-small">
-        Don&apos;t have an account?{" "}
-        <Link
-          className="underline"
-          href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
-        >
-          Create one
-        </Link>
-      </p>
+        <Text variant="small">
+          Don&apos;t have an account?{" "}
+          <Link
+            href={next ? `/signup?next=${encodeURIComponent(next)}` : "/signup"}
+          >
+            Create one
+          </Link>
+        </Text>
+      </div>
     </main>
   );
 }
