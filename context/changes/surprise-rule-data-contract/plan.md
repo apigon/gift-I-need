@@ -827,8 +827,15 @@ Bring the PRD, roadmap and supporting docs in line with the rule as built, recor
 
 #### Manual
 
-- [ ] 5.4 Human runs `supabase db push`; `supabase migration list` shows both applied remotely
+> Note on 5.6: the anon probes pass identically before and after the push,
+> because the `xmax` leak found in the implementation review was reachable by
+> an **authenticated organizer**, not by anon. They confirm the anon surface
+> and catch regressions; they are not evidence the leak fix landed. The
+> discriminating check is the `pg_class.relacl` / `pg_attribute.attacl`
+> query in `reviews/impl-review.md` (F1), still outstanding.
+
+- [x] 5.4 Human ran `supabase db push`; `supabase migration list --linked` shows all five migrations Local == Remote (the two originals plus the three impl-review fixes)
 - [ ] 5.5 Hosted Security Advisor clean
-- [ ] 5.6 Hosted anon probes return only the permitted surface
-- [ ] 5.7 Production `/api/health` returns 200
+- [x] 5.6 Hosted anon probes return only the permitted surface — 9/9: direct select on events/items/claims and on `items.xmax` all `42501`; both `get_shared_*` return `[]` for a bogus token; `claim_item` and `unlock_event` denied to anon
+- [x] 5.7 Production `/api/health` returns 200 (https://gin.andrzej-pigon.workers.dev, checked pre- and post-push)
 - [ ] 5.8 PRD / roadmap / CLAUDE.md edits read correctly cold
