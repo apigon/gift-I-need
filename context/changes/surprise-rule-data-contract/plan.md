@@ -779,26 +779,26 @@ Bring the PRD, roadmap and supporting docs in line with the rule as built, recor
 
 #### Automated
 
-- [x] 2.1 Local stack is up: `colima start --cpu 4 --memory 6 && supabase start`
-- [x] 2.2 Migration applies from scratch: `supabase db reset`
-- [x] 2.3 pgTAP suites pass: `pnpm test:db`
-- [x] 2.4 Existing checks still pass: `pnpm typecheck && pnpm lint && pnpm test`
+- [x] 2.1 Local stack is up: `colima start --cpu 4 --memory 6 && supabase start` — 39671cc
+- [x] 2.2 Migration applies from scratch: `supabase db reset` — 39671cc
+- [x] 2.3 pgTAP suites pass: `pnpm test:db` — 39671cc
+- [x] 2.4 Existing checks still pass: `pnpm typecheck && pnpm lint && pnpm test` — 39671cc
 
 #### Manual
 
-- [x] 2.5 Local Studio Advisors show no RLS-disabled / definer-in-exposed-schema findings
-- [x] 2.6 Migration read top-to-bottom; every grant intentional, no `delete`
+- [x] 2.5 Local Studio Advisors show no RLS-disabled / definer-in-exposed-schema findings — 39671cc
+- [x] 2.6 Migration read top-to-bottom; every grant intentional, no `delete` — 39671cc
 
 ### Phase 3: Shared-List Read RPCs (migration 2)
 
 #### Automated
 
-- [ ] 3.1 Migrations apply from scratch: `supabase db reset`
-- [ ] 3.2 All pgTAP suites pass: `pnpm test:db`
+- [x] 3.1 Migrations apply from scratch: `supabase db reset`
+- [x] 3.2 All pgTAP suites pass: `pnpm test:db`
 
 #### Manual
 
-- [ ] 3.3 Local `curl` probes: real token → null statuses; bogus token → `[]`; `GET /rest/v1/items` → permission denied
+- [x] 3.3 Local `curl` probes: real token → null statuses; bogus token → `[]`; `GET /rest/v1/items` → permission denied
 
 ### Phase 4: TypeScript Contract
 
