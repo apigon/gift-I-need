@@ -29,7 +29,7 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 
 | ID   | Change ID                  | Outcome (user can …)                                            | Prerequisites    | PRD refs               | Status   |
 | ---- | -------------------------- | --------------------------------------------------------------- | ---------------- | ---------------------- | -------- |
-| F-01 | email-password-auth        | (foundation) email/password sign-up, sign-in, sign-out wired    | —                | FR-001, FR-002         | ready    |
+| F-01 | email-password-auth        | (foundation) email/password sign-up, sign-in, sign-out wired    | —                | FR-001, FR-002         | done     |
 | F-02 | surprise-rule-data-contract| (foundation) schema + enforced organizer-blindness & single-claim | —              | NFR (both), FR-011     | ready    |
 | F-03 | design-system-baseline     | (foundation) shared design tokens + base theme (incl. available/taken status styles) | — | FR-007, FR-009, NFR (confirmation) | done |
 | S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | proposed |
@@ -76,7 +76,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Scaffold exists (clients, middleware), so this is the user-facing sign-up/sign-in surface + Server Actions, not a from-scratch auth build; the load-bearing verification is that the cookie/session path holds under `workerd` (the health route already smoke-tests it). Kept minimal — no OAuth, no dashboard (both parked).
-- **Status:** ready
+- **Status:** done
 
 ### F-02: Data schema + surprise-rule data contract
 
@@ -205,4 +205,5 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 (Empty on first generation. `/10x-archive` appends here — and flips the item's `Status` to `done` — when a change whose `Change ID` matches an item is archived.)
 
+- **F-01: (foundation) email/password sign-up, sign-in, sign-out wired** — Archived 2026-09-11 → `context/archive/2026-09-07-email-password-auth/`. Lesson: —.
 - **F-03: (foundation) a shared visual layer over the existing Tailwind v4 setup — design tokens (color, typography scale, spacing) and a base theme that includes the load-bearing "available" vs "taken" status styles and a consistent claim-confirmation feedback state; every feature UI consumes it instead of inventing its own.** — Archived 2026-09-11 → `context/archive/2026-09-10-design-system-baseline/`. Lesson: —.
