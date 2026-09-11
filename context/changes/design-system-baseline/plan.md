@@ -597,17 +597,17 @@ There are no data changes. Everything happens on the single branch `GIN-17-desig
 
 #### Automated
 
-- [x] 4.1 Lint passes: `pnpm lint`
-- [x] 4.2 Type checking passes: `pnpm typecheck`
-- [x] 4.3 Production build succeeds: `pnpm build`
-- [x] 4.4 No hand-rolled form markup or direct `next/link` import left
+- [x] 4.1 Lint passes: `pnpm lint` — 39c593c
+- [x] 4.2 Type checking passes: `pnpm typecheck` — 39c593c
+- [x] 4.3 Production build succeeds: `pnpm build` — 39c593c
+- [x] 4.4 No hand-rolled form markup or direct `next/link` import left — 39c593c
 
 #### Manual
 
-- [x] 4.5 Sign-up validation error keeps typed email in the field
-- [x] 4.6 Sign-in error shows danger Alert; button shows pending label
-- [x] 4.7 Confirmation-failed Alert renders on `/login?error=confirmation_failed`
-- [x] 4.8 Sign-out from header works
-- [x] 4.9 `next` return path still honoured after sign-in
-- [x] 4.10 Keyboard-only navigation with visible focus rings
-- [x] 4.11 No horizontal scroll at 375px on auth pages and header
+- [x] 4.5 Sign-up validation error keeps typed email in the field — 39c593c
+- [x] 4.6 Sign-in error shows danger Alert; button shows pending label — 39c593c
+- [x] 4.7 Confirmation-failed Alert renders on `/login?error=confirmation_failed` — 39c593c
+- [x] 4.8 Sign-out from header works — 39c593c
+- [x] 4.9 `next` return path still honoured after sign-in — 39c593c
+- [x] 4.10 Keyboard-only navigation with visible focus rings — 39c593c
+- [x] 4.11 No horizontal scroll at 375px on auth pages and header — 39c593c

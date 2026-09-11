@@ -1,9 +1,9 @@
 ---
 change_id: design-system-baseline
 title: Design tokens + base theme (available/taken status styles)
-status: implementing
+status: implemented
 created: 2026-09-10
-updated: 2026-09-10
+updated: 2026-09-11
 archived_at: null
 ---
 
