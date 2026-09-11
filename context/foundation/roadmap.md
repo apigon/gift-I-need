@@ -30,7 +30,7 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 | ID   | Change ID                  | Outcome (user can …)                                            | Prerequisites    | PRD refs               | Status   |
 | ---- | -------------------------- | --------------------------------------------------------------- | ---------------- | ---------------------- | -------- |
 | F-01 | email-password-auth        | (foundation) email/password sign-up, sign-in, sign-out wired    | —                | FR-001, FR-002         | done     |
-| F-02 | surprise-rule-data-contract| (foundation) schema + enforced organizer-blindness & single-claim | —              | NFR (both), FR-011     | ready    |
+| F-02 | surprise-rule-data-contract| (foundation) schema + enforced organizer-blindness & single-claim | —              | NFR (both), FR-011     | in-progress |
 | F-03 | design-system-baseline     | (foundation) shared design tokens + base theme (incl. available/taken status styles) | — | FR-007, FR-009, NFR (confirmation) | done |
 | S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | proposed |
 | S-02 | browse-shared-list         | browse a shared list unauthenticated and see available/taken    | S-01, F-02       | US-01, FR-007, FR-009  | proposed |
@@ -90,7 +90,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Should the date gate be enforced purely in RLS, purely in query filters, or both (defense in depth)? — Owner: TBD (resolve in `/10x-plan`). Block: no.
 - **Risk:** This is the riskiest correctness surface in the product and the one place `speed` does not relax the bar — the surprise rule and duplicate-prevention are must-hold guarantees. Kept to a minimal enabler contract (only the entities the first slices need + the two invariants + a focused test), NOT a full data-layer build: every downstream slice still integrates and exercises these tables through a real user capability.
-- **Status:** ready
+- **Status:** in-progress
 
 ### F-03: Design tokens + base theme
 

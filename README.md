@@ -135,9 +135,10 @@ curl -s -X DELETE 'http://localhost:54324/api/v1/messages'   # clear the mailbox
 pnpm lint         # ESLint
 pnpm typecheck    # tsc --noEmit
 pnpm build        # production build
+pnpm test             # unit tests (Vitest)
+pnpm test:db          # pgTAP suite — needs `colima start` and `supabase start`
+pnpm test:integration # local-stack race test — needs `colima start` and `supabase start`
 ```
-
-No test runner is configured yet — roadmap item **F-02** owns that choice. Add one before writing tests.
 
 ## Cloudflare Workers
 
