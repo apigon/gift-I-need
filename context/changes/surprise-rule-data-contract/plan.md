@@ -766,28 +766,28 @@ Bring the PRD, roadmap and supporting docs in line with the rule as built, recor
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `pnpm test`
-- [x] 1.2 Type checking passes: `pnpm typecheck`
-- [x] 1.3 Linting passes: `pnpm lint`
-- [x] 1.4 Production build passes: `pnpm build`
+- [x] 1.1 Unit tests pass: `pnpm test` — 4aeb9df
+- [x] 1.2 Type checking passes: `pnpm typecheck` — 4aeb9df
+- [x] 1.3 Linting passes: `pnpm lint` — 4aeb9df
+- [x] 1.4 Production build passes: `pnpm build` — 4aeb9df
 
 #### Manual
 
-- [x] 1.5 Deliberately broken `safeReturnTo` makes `pnpm test` fail, then reverted
+- [x] 1.5 Deliberately broken `safeReturnTo` makes `pnpm test` fail, then reverted — 4aeb9df
 
 ### Phase 2: Schema, Write Rules and Privileges (migration 1)
 
 #### Automated
 
-- [ ] 2.1 Local stack is up: `colima start --cpu 4 --memory 6 && supabase start`
-- [ ] 2.2 Migration applies from scratch: `supabase db reset`
-- [ ] 2.3 pgTAP suites pass: `pnpm test:db`
-- [ ] 2.4 Existing checks still pass: `pnpm typecheck && pnpm lint && pnpm test`
+- [x] 2.1 Local stack is up: `colima start --cpu 4 --memory 6 && supabase start`
+- [x] 2.2 Migration applies from scratch: `supabase db reset`
+- [x] 2.3 pgTAP suites pass: `pnpm test:db`
+- [x] 2.4 Existing checks still pass: `pnpm typecheck && pnpm lint && pnpm test`
 
 #### Manual
 
-- [ ] 2.5 Local Studio Advisors show no RLS-disabled / definer-in-exposed-schema findings
-- [ ] 2.6 Migration read top-to-bottom; every grant intentional, no `delete`
+- [x] 2.5 Local Studio Advisors show no RLS-disabled / definer-in-exposed-schema findings
+- [x] 2.6 Migration read top-to-bottom; every grant intentional, no `delete`
 
 ### Phase 3: Shared-List Read RPCs (migration 2)
 
