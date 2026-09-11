@@ -1,10 +1,10 @@
 ---
 change_id: design-system-baseline
 title: Design tokens + base theme (available/taken status styles)
-status: impl_reviewed
+status: archived
 created: 2026-09-10
 updated: 2026-09-11
-archived_at: null
+archived_at: 2026-09-11T12:08:15Z
 ---
 
 ## Notes
