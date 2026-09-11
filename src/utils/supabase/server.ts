@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import type { Database } from "./database.types";
+
 // Per-request server Supabase client. Workers cannot reuse a connection across
 // requests, so this MUST be created inside each call (never a module global).
 // Uses the anon key + the user's cookie session, so RLS applies with auth.uid()
@@ -9,7 +11,7 @@ import { cookies } from "next/headers";
 export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient(
+  return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {

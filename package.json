@@ -13,6 +13,7 @@
     "test:watch": "vitest --project unit",
     "test:integration": "dotenv -e .env.localdb -- vitest run --project integration",
     "test:db": "supabase test db",
+    "db:types": "supabase gen types typescript --local --schema public > src/utils/supabase/database.types.ts",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"

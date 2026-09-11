@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/server";
+import { isAuthRetryableFetchError } from "@/utils/supabase/errors";
 
 // Smoke endpoint for the Phase 4 Workers preview + Phase 5 prod verify: proves
 // the per-request Supabase server client and the cookie/session path round-trip

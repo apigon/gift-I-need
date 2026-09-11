@@ -793,28 +793,28 @@ Bring the PRD, roadmap and supporting docs in line with the rule as built, recor
 
 #### Automated
 
-- [x] 3.1 Migrations apply from scratch: `supabase db reset`
-- [x] 3.2 All pgTAP suites pass: `pnpm test:db`
+- [x] 3.1 Migrations apply from scratch: `supabase db reset` — 68281c7
+- [x] 3.2 All pgTAP suites pass: `pnpm test:db` — 68281c7
 
 #### Manual
 
-- [x] 3.3 Local `curl` probes: real token → null statuses; bogus token → `[]`; `GET /rest/v1/items` → permission denied
+- [x] 3.3 Local `curl` probes: real token → null statuses; bogus token → `[]`; `GET /rest/v1/items` → permission denied — 68281c7
 
 ### Phase 4: TypeScript Contract
 
 #### Automated
 
-- [ ] 4.1 Types regenerate with no diff: `pnpm db:types && git diff --exit-code src/utils/supabase/database.types.ts`
-- [ ] 4.2 Unit tests pass: `pnpm test`
-- [ ] 4.3 Race test passes against the local stack: `pnpm test:integration`
-- [ ] 4.4 Type checking passes: `pnpm typecheck`
-- [ ] 4.5 Linting passes including new guards: `pnpm lint`
-- [ ] 4.6 Production build passes: `pnpm build`
+- [x] 4.1 Types regenerate with no diff: `pnpm db:types && git diff --exit-code src/utils/supabase/database.types.ts`
+- [x] 4.2 Unit tests pass: `pnpm test`
+- [x] 4.3 Race test passes against the local stack: `pnpm test:integration`
+- [x] 4.4 Type checking passes: `pnpm typecheck`
+- [x] 4.5 Linting passes including new guards: `pnpm lint`
+- [x] 4.6 Production build passes: `pnpm build`
 
 #### Manual
 
-- [ ] 4.7 Lint guards fire on temporary `unstable_cache` and supabase-js imports, then reverted
-- [ ] 4.8 `pnpm test:integration` passes three consecutive runs
+- [x] 4.7 Lint guards fire on temporary `unstable_cache` and supabase-js imports, then reverted
+- [x] 4.8 `pnpm test:integration` passes three consecutive runs
 
 ### Phase 5: Docs and Hosted Rollout
 

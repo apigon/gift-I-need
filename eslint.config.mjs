@@ -38,15 +38,88 @@ const eslintConfig = defineConfig([
               message:
                 'Import Link from "@/components" instead — see the "Design system" section in CLAUDE.md.',
             },
+            {
+              name: "next/cache",
+              importNames: ["unstable_cache"],
+              message:
+                "The shared list is per-viewer (organizer-blindness) — caching it would leak claim state across viewers. See CLAUDE.md \"Key business logic\".",
+            },
+            {
+              name: "@supabase/supabase-js",
+              allowTypeImports: true,
+              message:
+                'Import from "@/lib/lists/shared-list" (or "@/utils/supabase/*" for infra) instead — see CLAUDE.md "Stack".',
+            },
+            {
+              name: "@supabase/ssr",
+              allowTypeImports: true,
+              message:
+                'Import from "@/lib/lists/shared-list" (or "@/utils/supabase/*" for infra) instead — see CLAUDE.md "Stack".',
+            },
           ],
         },
       ],
     },
   },
   {
+    // Only the next/link restriction is lifted here — Link itself must import
+    // next/link. The unstable_cache and Supabase restrictions still apply, so
+    // this re-declares the rule rather than turning it fully "off" (flat
+    // config replaces the whole rule per `files` block, it doesn't merge).
     files: ["src/components/link/**"],
     rules: {
-      "no-restricted-imports": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "next/cache",
+              importNames: ["unstable_cache"],
+              message:
+                "The shared list is per-viewer (organizer-blindness) — caching it would leak claim state across viewers. See CLAUDE.md \"Key business logic\".",
+            },
+            {
+              name: "@supabase/supabase-js",
+              allowTypeImports: true,
+              message:
+                'Import from "@/lib/lists/shared-list" (or "@/utils/supabase/*" for infra) instead — see CLAUDE.md "Stack".',
+            },
+            {
+              name: "@supabase/ssr",
+              allowTypeImports: true,
+              message:
+                'Import from "@/lib/lists/shared-list" (or "@/utils/supabase/*" for infra) instead — see CLAUDE.md "Stack".',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // The only places allowed to import the Supabase packages by value: the
+    // infra clients themselves, and the race integration test that needs its
+    // own connections. next/link and unstable_cache stay restricted here too,
+    // for the same "replaces, doesn't merge" reason as the block above.
+    files: ["src/utils/supabase/**", "**/*.integration.test.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "next/link",
+              message:
+                'Import Link from "@/components" instead — see the "Design system" section in CLAUDE.md.',
+            },
+            {
+              name: "next/cache",
+              importNames: ["unstable_cache"],
+              message:
+                "The shared list is per-viewer (organizer-blindness) — caching it would leak claim state across viewers. See CLAUDE.md \"Key business logic\".",
+            },
+          ],
+        },
+      ],
     },
   },
   // Override default ignores of eslint-config-next.
@@ -60,6 +133,7 @@ const eslintConfig = defineConfig([
     ".open-next/**", // OpenNext Cloudflare build output
     ".wrangler/**", // wrangler dev/preview local state (appears after `pnpm preview`)
     "cloudflare-env.d.ts", // `wrangler types` / `pnpm cf-typegen` output
+    "src/utils/supabase/database.types.ts", // `pnpm db:types` output
   ]),
 ]);
 
