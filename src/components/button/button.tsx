@@ -16,6 +16,7 @@ export function Button({
   type = "button",
   className,
   disabled,
+  "aria-busy": ariaBusy,
   children,
   ...props
 }: {
@@ -27,7 +28,7 @@ export function Button({
     <button
       type={type}
       disabled={disabled || pending}
-      aria-busy={pending || undefined}
+      aria-busy={pending || ariaBusy || undefined}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-control px-3 py-1.5 text-body disabled:opacity-60",
         VARIANT_CLASS[variant],

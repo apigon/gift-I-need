@@ -8,6 +8,8 @@ export function Input({
   error,
   hint,
   className,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedBy,
   ...props
 }: {
   id: string;
@@ -18,7 +20,7 @@ export function Input({
 } & InputHTMLAttributes<HTMLInputElement>) {
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  const describedBy = [ariaDescribedBy, hintId, errorId].filter(Boolean).join(" ") || undefined;
 
   return (
     <div className={cn("flex flex-col gap-1", className)}>
@@ -27,7 +29,7 @@ export function Input({
       </label>
       <input
         id={id}
-        aria-invalid={error ? true : undefined}
+        aria-invalid={error ? true : ariaInvalid}
         aria-describedby={describedBy}
         className={cn(
           "rounded-control border bg-surface px-2 py-1 text-body text-fg",

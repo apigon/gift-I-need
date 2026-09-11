@@ -538,6 +538,13 @@ There are no data changes. Everything happens on the single branch `GIN-17-desig
 - Next 16 CSS and font docs: `node_modules/next/dist/docs/01-app/01-getting-started/11-css.md`, `13-fonts.md`, `03-api-reference/02-components/font.md:160`
 - Tailwind default theme: `node_modules/tailwindcss/theme.css`
 
+## Deviations
+
+> Recorded at implementation review, 2026-09-11. The plan body above is the original contract; where the implementation departs from it, this section wins.
+
+- **`TextField` shipped as `Input`** (p2, `f0d455c`). It was renamed per review feedback and lives at `src/components/input/input.tsx`, exported as `Input` from `@/components`. Otherwise Phase 2 §5 holds: the same props, the `${id}-hint` / `${id}-error` ids and the `aria-invalid` / `aria-describedby` wiring, with hint and error rendered as `<span>`. Read every later `TextField` mention (Overview, Desired End State, §2.9, §3.1–3.2, Phase 3 manual checks, §4.1, Testing Strategy) as `Input`.
+- **`src/app/not-found.tsx` added** (`1e1d452`), outside every phase. It is a styled 404 built only from `Heading`, `Text` and `Link`, rendering inside the root layout with a real 404 status. The user approved it as a follow-up before the final review.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.

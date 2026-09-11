@@ -21,6 +21,11 @@ export function Toaster() {
   );
 }
 
+/**
+ * Client-only. This module is `"use client"`, so importing `notify` into a Server
+ * Component or Server Action compiles, then throws at runtime. Server Actions return
+ * state; call `notify` from the client form that receives it.
+ */
 export const notify = {
   success(title: string, description?: string) {
     toast.success(title, { description });
