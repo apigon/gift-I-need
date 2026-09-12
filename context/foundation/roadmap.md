@@ -32,7 +32,7 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 | F-01 | email-password-auth        | (foundation) email/password sign-up, sign-in, sign-out wired    | —                | FR-001, FR-002         | done     |
 | F-02 | surprise-rule-data-contract| (foundation) schema + enforced organizer-blindness & single-claim | —              | NFR (both), FR-011     | in-progress |
 | F-03 | design-system-baseline     | (foundation) shared design tokens + base theme (incl. available/taken status styles) | — | FR-007, FR-009, NFR (confirmation) | done |
-| S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | proposed |
+| S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | in-progress |
 | S-02 | browse-shared-list         | browse a shared list unauthenticated and see available/taken    | S-01, F-02       | US-01, FR-007, FR-009  | proposed |
 | S-03 | claim-gift-item            | sign in and claim an unclaimed item; it flips to "taken"        | S-02, F-01, F-02 | US-01, FR-008, FR-009  | proposed |
 | S-04 | edit-list-items            | edit items on their own event list                              | S-01, F-01       | FR-005                 | proposed |
@@ -118,7 +118,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Can a shared link be revoked/invalidated after sharing? — Owner: user. Block: no (links may be permanent for v1; see Open Roadmap Questions).
 - **Risk:** First slice to exercise the F-02 schema end-to-end; the event date captured here is the input the entire surprise rule keys off, so the create form must make the date unambiguous. Item deletion is out of scope (edit-only per Non-Goals).
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-02: Guest browses a shared list and sees available/taken status
 
