@@ -46,6 +46,7 @@ export type OwnedEvent = {
   eventDate: string;
   timezone: string;
   shareToken: string;
+  revealOpen: boolean;
 };
 
 export type OwnedItem = {

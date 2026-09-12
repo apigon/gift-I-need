@@ -12,7 +12,9 @@ vi.mock("@/utils/supabase/server", () => ({
   createClient: vi.fn(async () => ({ from: fromMock })),
 }));
 
-const { createEvent, addItem, getOwnedEvent } = await import("./owned-events");
+const { createEvent, addItem, updateItem, getOwnedEvent } = await import(
+  "./owned-events"
+);
 
 type Response = { data: unknown; error: unknown };
 
@@ -22,6 +24,7 @@ function makeBuilder(response: Response) {
   const builder: Record<string, unknown> = {};
   const returnsBuilder = () => builder;
   builder.insert = vi.fn(returnsBuilder);
+  builder.update = vi.fn(returnsBuilder);
   builder.select = vi.fn(returnsBuilder);
   builder.eq = vi.fn(returnsBuilder);
   builder.order = vi.fn(returnsBuilder);
@@ -93,6 +96,29 @@ describe("addItem", () => {
   });
 });
 
+describe("updateItem", () => {
+  it("returns ok on success", async () => {
+    fromMock.mockReturnValue(
+      makeBuilder({ data: { id: "i1" }, error: null }),
+    );
+
+    const result = await updateItem("i1", { title: "Ceramic mug" });
+
+    expect(result).toEqual({ ok: true });
+    expect(fromMock).toHaveBeenCalledWith("items");
+  });
+
+  it("maps a DAL error through mapRpcError", async () => {
+    fromMock.mockReturnValue(
+      makeBuilder({ data: null, error: { code: "23514", message: "check" } }),
+    );
+
+    const result = await updateItem("i1", { title: "Ceramic mug" });
+
+    expect(result).toEqual({ ok: false, code: "unknown" });
+  });
+});
+
 describe("getOwnedEvent", () => {
   function mockFrom(responses: { events: Response; items: Response }) {
     fromMock.mockImplementation((table: string) =>
@@ -132,6 +158,8 @@ describe("getOwnedEvent", () => {
             event_date: "2026-12-24",
             timezone: "Europe/Warsaw",
             share_token: "a".repeat(22),
+            revealed_at: null,
+            auto_reveal_at: "2099-01-01T00:00:00Z",
           },
         ],
         error: null,
@@ -155,6 +183,8 @@ describe("getOwnedEvent", () => {
             event_date: "2026-12-24",
             timezone: "Europe/Warsaw",
             share_token: "a".repeat(22),
+            revealed_at: null,
+            auto_reveal_at: "2099-01-01T00:00:00Z",
           },
         ],
         error: null,
@@ -181,6 +211,7 @@ describe("getOwnedEvent", () => {
         eventDate: "2026-12-24",
         timezone: "Europe/Warsaw",
         shareToken: "a".repeat(22),
+        revealOpen: false,
       },
       items: [
         {
@@ -192,5 +223,60 @@ describe("getOwnedEvent", () => {
         },
       ],
     });
+  });
+
+  function eventWith(revealFields: {
+    revealed_at: string | null;
+    auto_reveal_at: string;
+  }) {
+    return {
+      events: {
+        data: [
+          {
+            id: "e1",
+            name: "Birthday",
+            event_date: "2026-12-24",
+            timezone: "Europe/Warsaw",
+            share_token: "a".repeat(22),
+            ...revealFields,
+          },
+        ],
+        error: null,
+      },
+      items: { data: [], error: null },
+    };
+  }
+
+  it("revealOpen is false when neither revealed_at nor auto_reveal_at has passed", async () => {
+    mockFrom(
+      eventWith({ revealed_at: null, auto_reveal_at: "2099-01-01T00:00:00Z" }),
+    );
+
+    const result = await getOwnedEvent("e1");
+    expect(result.kind).toBe("ok");
+    expect(result.kind === "ok" && result.event.revealOpen).toBe(false);
+  });
+
+  it("revealOpen is true when revealed_at is set", async () => {
+    mockFrom(
+      eventWith({
+        revealed_at: "2020-01-01T00:00:00Z",
+        auto_reveal_at: "2099-01-01T00:00:00Z",
+      }),
+    );
+
+    const result = await getOwnedEvent("e1");
+    expect(result.kind).toBe("ok");
+    expect(result.kind === "ok" && result.event.revealOpen).toBe(true);
+  });
+
+  it("revealOpen is true when auto_reveal_at has passed", async () => {
+    mockFrom(
+      eventWith({ revealed_at: null, auto_reveal_at: "2020-01-01T00:00:00Z" }),
+    );
+
+    const result = await getOwnedEvent("e1");
+    expect(result.kind).toBe("ok");
+    expect(result.kind === "ok" && result.event.revealOpen).toBe(true);
   });
 });

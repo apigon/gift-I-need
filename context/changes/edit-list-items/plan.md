@@ -293,9 +293,9 @@ None — no schema change in this slice.
 
 #### Automated
 
-- [ ] 1.1 Type checking passes: `pnpm typecheck`
-- [ ] 1.2 Linting passes: `pnpm lint`
-- [ ] 1.3 Unit tests pass: `pnpm test`
+- [x] 1.1 Type checking passes: `pnpm typecheck`
+- [x] 1.2 Linting passes: `pnpm lint`
+- [x] 1.3 Unit tests pass: `pnpm test`
 
 ### Phase 2: `Modal` design-system primitive
 

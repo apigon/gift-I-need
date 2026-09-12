@@ -83,3 +83,8 @@ export type AddItemFieldErrors = {
   link?: string[];
   priceRange?: string[];
 };
+
+// An edit submits the same four fields under the same DB CHECK constraints
+// as add — aliased, not duplicated, so the two paths can't drift.
+export const EditItemSchema = AddItemSchema;
+export type EditItemFieldErrors = AddItemFieldErrors;
