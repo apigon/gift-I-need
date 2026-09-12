@@ -820,10 +820,10 @@ Bring the PRD, roadmap and supporting docs in line with the rule as built, recor
 
 #### Automated
 
-- [x] 5.1 All local suites pass: `pnpm test && pnpm test:db && pnpm test:integration`
-- [x] 5.2 Type checking, lint and build pass: `pnpm typecheck && pnpm lint && pnpm build`
-- [x] 5.3 No stale statements remain (grep returns nothing)
-- [x] 5.9 Committed types still match the final schema
+- [x] 5.1 All local suites pass: `pnpm test && pnpm test:db && pnpm test:integration` — 13d4ecd
+- [x] 5.2 Type checking, lint and build pass: `pnpm typecheck && pnpm lint && pnpm build` — 13d4ecd
+- [x] 5.3 No stale statements remain (grep returns nothing) — 13d4ecd
+- [x] 5.9 Committed types still match the final schema — 13d4ecd
 
 #### Manual
 
@@ -834,8 +834,8 @@ Bring the PRD, roadmap and supporting docs in line with the rule as built, recor
 > discriminating check is the `pg_class.relacl` / `pg_attribute.attacl`
 > query in `reviews/impl-review.md` (F1), still outstanding.
 
-- [x] 5.4 Human ran `supabase db push`; `supabase migration list --linked` shows all five migrations Local == Remote (the two originals plus the three impl-review fixes)
-- [x] 5.5 Hosted Security Advisor clean — no RLS-disabled, definer-in-exposed-schema or function-search-path-mutable findings (the Free-plan "Leaked password protection" warning remains accepted)
-- [x] 5.6 Hosted anon probes return only the permitted surface — 9/9: direct select on events/items/claims and on `items.xmax` all `42501`; both `get_shared_*` return `[]` for a bogus token; `claim_item` and `unlock_event` denied to anon
-- [x] 5.7 Production `/api/health` returns 200 (https://gin.andrzej-pigon.workers.dev, checked pre- and post-push)
-- [x] 5.8 PRD / roadmap / CLAUDE.md edits read correctly cold
+- [x] 5.4 Human ran `supabase db push`; `supabase migration list --linked` shows all five migrations Local == Remote (the two originals plus the three impl-review fixes) — 43e6938
+- [x] 5.5 Hosted Security Advisor clean — no RLS-disabled, definer-in-exposed-schema or function-search-path-mutable findings (the Free-plan "Leaked password protection" warning remains accepted) — de27baf
+- [x] 5.6 Hosted anon probes return only the permitted surface — 9/9: direct select on events/items/claims and on `items.xmax` all `42501`; both `get_shared_*` return `[]` for a bogus token; `claim_item` and `unlock_event` denied to anon — 43e6938
+- [x] 5.7 Production `/api/health` returns 200 (https://gin.andrzej-pigon.workers.dev, checked pre- and post-push) — 43e6938
+- [x] 5.8 PRD / roadmap / CLAUDE.md edits read correctly cold — de27baf
