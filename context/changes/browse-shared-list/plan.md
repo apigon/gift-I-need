@@ -186,17 +186,17 @@ None — no schema or data changes in this slice.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `pnpm test`
-- [x] 1.2 Type checking passes: `pnpm typecheck`
-- [x] 1.3 Linting passes: `pnpm lint`
+- [x] 1.1 Unit tests pass: `pnpm test` — b7c572d
+- [x] 1.2 Type checking passes: `pnpm typecheck` — b7c572d
+- [x] 1.3 Linting passes: `pnpm lint` — b7c572d
 
 ### Phase 2: Route wiring and manual verification
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `pnpm typecheck`
-- [ ] 2.2 Linting passes: `pnpm lint`
-- [ ] 2.3 Full unit suite still green: `pnpm test`
+- [x] 2.1 Type checking passes: `pnpm typecheck`
+- [x] 2.2 Linting passes: `pnpm lint`
+- [x] 2.3 Full unit suite still green: `pnpm test`
 
 #### Manual
 
