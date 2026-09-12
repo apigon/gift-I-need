@@ -129,6 +129,37 @@ curl -s -X DELETE 'http://localhost:54324/api/v1/messages'   # clear the mailbox
 
 ---
 
+## Database migrations
+
+Schema changes are Supabase CLI migrations under `supabase/migrations/`, applied to the **local** stack automatically but to the **hosted** project only when someone runs the push command by hand — there is no CI step that does this for you.
+
+### Writing one
+
+```bash
+supabase migration new <name>       # creates supabase/migrations/<timestamp>_<name>.sql
+```
+
+Edit the generated file, then apply it to your local stack and regenerate the TypeScript types from the result:
+
+```bash
+supabase db reset       # re-runs every migration from scratch against the LOCAL db (drops local data)
+pnpm db:types           # regenerates src/utils/supabase/database.types.ts from the local schema
+```
+
+`supabase db reset` only touches the local stack (`supabase start` must be running) — it never reaches the hosted project. Run `pnpm test:db` (pgTAP) afterwards to check RLS/constraints/triggers, and commit the migration file together with the regenerated `database.types.ts` in the same PR — a migration without its type-regen diff is a sign `pnpm db:types` wasn't re-run.
+
+### Promoting to production
+
+```bash
+supabase db push         # applies any local migrations the hosted project hasn't seen yet
+```
+
+This is a **manual, separate step from deploying app code.** Pushing to `main` triggers a Cloudflare Workers Build that deploys the Next.js app, but it does not touch the Supabase schema — nothing runs `supabase db push` on your behalf. After merging a PR that adds a migration, push it to the hosted project yourself (needs `supabase link` to have been run once — see `context/changes/deployment/deployment-plan.md`).
+
+> **Coordinate DB changes separately from Worker rollbacks.** `wrangler rollback` reverts the Worker in seconds, but a schema migration doesn't roll back with it — a migration that isn't backward-compatible with the previous app version can break a rolled-back Worker. Prefer additive, backward-compatible migrations (new nullable columns, new tables) over ones that remove/rename what the currently-deployed code still reads.
+
+---
+
 ## Checks
 
 ```bash
