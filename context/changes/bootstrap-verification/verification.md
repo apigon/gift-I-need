@@ -11,6 +11,8 @@ phase_3_status: ok
 audit_command: "npm audit --json (fell back to pnpm audit --json — pnpm project has no package-lock.json)"
 ---
 
+> ⚠️ **Superseded (2026-09-11).** This log records the bootstrap-time deployment hints (Vercel + GitHub Actions). The project actually deploys via **Cloudflare Workers** (`@opennextjs/cloudflare`) with **Workers Builds** as CI/CD — see `context/changes/deployment/`. Treat every Vercel/GitHub Actions reference below as historical, not current.
+
 ## Hand-off
 
 ```yaml

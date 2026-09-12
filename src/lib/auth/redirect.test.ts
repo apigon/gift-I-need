@@ -1,0 +1,40 @@
+import { describe, expect, it } from "vitest";
+
+import { DEFAULT_REDIRECT, safeReturnTo } from "./redirect";
+
+describe("safeReturnTo", () => {
+  it.each([
+    "https://evil.example",
+    "//evil.example",
+    "/\\evil.example",
+    "/.//evil",
+    "/%2e%2e//evil",
+    // C0 controls and DEL, written as escapes: a literal control byte
+    // makes this file binary to git (no diff review) and an editor that
+    // strips it would silently turn the case into "/evil", which
+    // safeReturnTo ACCEPTS -- inverting the test without renaming it.
+    "\u0000/evil", // NUL truncation in downstream parsers
+    "/evil\r\nX-Injected: 1", // CR/LF header smuggling
+    "/evil\rX", // bare CR
+    "/evil\nX", // bare LF
+    "/evil\u007f", // DEL
+    "",
+  ])("rejects %s", (value) => {
+    expect(safeReturnTo(value)).toBe(DEFAULT_REDIRECT);
+  });
+
+  it("rejects null", () => {
+    expect(safeReturnTo(null)).toBe(DEFAULT_REDIRECT);
+  });
+
+  it("rejects undefined", () => {
+    expect(safeReturnTo(undefined)).toBe(DEFAULT_REDIRECT);
+  });
+
+  it.each(["/", "/lists/abc", "/events/1?tab=x#h"])(
+    "accepts %s unchanged",
+    (value) => {
+      expect(safeReturnTo(value)).toBe(value);
+    },
+  );
+});

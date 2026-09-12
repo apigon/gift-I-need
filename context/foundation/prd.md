@@ -56,7 +56,7 @@ Guests who create an account to claim a gift are the same user type as organizer
 - **Then** the item is shown as "taken" to all other guests, the guest's claim is recorded against their account, and the organizer cannot see any claim status until the event date passes
 
 #### Acceptance Criteria
-- An unauthenticated visitor can see all items and their "taken"/"available" status without signing in
+- An unauthenticated visitor can see all items, without any claim status; seeing "taken"/"available" status requires signing in *(amended 2026-09-11, F-02)*
 - Attempting to claim without being signed in surfaces the sign-up / sign-in prompt
 - Once claimed, the item shows as "taken" to all other guests immediately
 - The organizer's view does not reveal which items are claimed or unclaimed before the event date
@@ -70,7 +70,7 @@ Guests who create an account to claim a gift are the same user type as organizer
 #### Acceptance Criteria
 - Before the event date, the organizer's view shows no claim information
 - After the event date, claim status and "given" confirmations are visible to the organizer
-- Both the guest who claimed an item and the organizer can independently mark it as "given"
+- Either the guest who claimed an item or the organizer can mark it as "given" — a single irreversible mark set by whichever party acts first *(amended 2026-09-11, F-02, replaces "independently")*
 
 ## Functional Requirements
 
@@ -105,10 +105,10 @@ Guests who create an account to claim a gift are the same user type as organizer
 
 ### Event management
 
-- FR-003: Organizer can create an event with a name and date. Priority: must-have
-  > Socrates: Counter-argument considered: "date is friction." Resolution: date is required because it is the automatic trigger for post-event mode (FR-011). Without it, a manual "close event" action would be needed. Required date is simpler.
+- FR-003: Organizer can create an event with a name, a date, and an IANA timezone (defaulting to the organizer's browser timezone). The date must be today or later. Neither the date nor the timezone can change after creation. Priority: must-have *(amended 2026-09-11, F-02)*
+  > Socrates: Counter-argument considered: "date is friction." Resolution: date is required because it is the automatic trigger for post-event mode (FR-011). Without it, a manual "close event" action would be needed. Required date is simpler. *(amended 2026-09-11, F-02)* The reveal instants (FR-011) are computed once from `event_date` and `timezone` at creation; letting either change afterward would let the organizer redefine the reveal after guests have already claimed under the original terms.
 
-- FR-004: Organizer can add gift ideas to an event list (title; optional: notes, link, price range). Priority: must-have
+- FR-004: Organizer can add gift ideas to an event list (title; optional: notes, link, price range). The optional link must be an `http(s)` URL. Priority: must-have *(amended 2026-09-11, F-02)*
   > Socrates: Counter-argument considered: "title only for v1." Resolution: optional metadata kept — a product link and approximate price are the most useful signals for a gift-giver and worth the added form complexity.
 
 - FR-005: Organizer can edit items on their event list. Priority: must-have
@@ -121,18 +121,18 @@ Guests who create an account to claim a gift are the same user type as organizer
 - FR-007: Guest can browse an event's gift list via a shared link without signing in. Priority: must-have
   > Socrates: Resolution of FR-001 counter-argument — viewing is unauthenticated; auth is required only to claim.
 
-- FR-008: Guest can claim one unclaimed item (requires sign-in). Priority: must-have
+- FR-008: Guest can claim one unclaimed item (requires sign-in). Claims close once the reveal opens (FR-011); the organizer cannot claim on their own event's items. Priority: must-have *(amended 2026-09-11, F-02)*
   > Socrates: Counter-argument considered: "unclaim is nice-to-have, so a claim is irreversible in v1." Resolution: accepted — organizer can edit the item as a workaround; irreversible claiming is acceptable for v1.
 
 - FR-009: Guest can see which items are claimed (shown as "taken"; no claimer name visible to other guests). Priority: must-have
 
 ### Post-event confirmation
 
-- FR-010: Both the guest who claimed an item and the organizer can mark it as "given" after the event date passes. Priority: must-have
+- FR-010: Either the guest who claimed an item or the organizer can mark it as "given" after the reveal opens (FR-011) — a single irreversible mark set by whichever party marks it first. Priority: must-have *(amended 2026-09-11, F-02, replaces "independently")*
   > Socrates: Counter-argument considered: "post-event engagement is low; guests won't return." Resolution: organizer can also confirm, so delivery tracking doesn't depend on the guest returning.
 
-- FR-011: Organizer can see the full claim and "given" status for all items after the event date has passed; claim status is hidden from the organizer before that date. Priority: must-have
-  > Socrates: Counter-argument considered: "organizer may want to peek early." Resolution: hard gate — no early unlock. Surprise is a core guarantee; an escape hatch would undermine it.
+- FR-011: Organizer can see the full claim and "given" status for all items after the reveal opens; claim status, and claimer identity always, are hidden from the organizer before that. The reveal opens automatically at 00:00 on `event_date + 2` in the event's timezone, or the organizer can unlock it manually starting 00:00 on `event_date + 1`. Priority: must-have *(amended 2026-09-11, F-02)*
+  > Socrates: Counter-argument considered: "organizer may want to peek early." Resolution: *(amended 2026-09-11, F-02, replaces "hard gate — no early unlock")* the organizer may unlock manually from `event_date + 1`, ahead of the automatic reveal at `event_date + 2`. Rationale (user): a determined organizer can already spoil the surprise with a second account, so a manual early unlock adds no new leak. The guarantee that actually matters — claimer identity is never revealed, before or after the reveal — is unaffected.
 
 ### Nice-to-have
 
@@ -154,7 +154,7 @@ Guests who create an account to claim a gift are the same user type as organizer
 
 GIN enforces asymmetric visibility: guests coordinate gift-claiming openly among themselves, but the organizer is blind to all claim activity until the event date passes, at which point the full delivery picture is revealed.
 
-The rule consumes two inputs the organizer provides: a list of gift ideas and an event date. Guests interact with the list in real time — seeing which items are available or taken — but that state is withheld from the organizer entirely. On and after the event date, the gate lifts and the organizer sees the complete picture: what was claimed, and what was confirmed as given by the guest or by the organizer themselves.
+The rule consumes two inputs the organizer provides: a list of gift ideas and an event date (with a timezone). Guests interact with the list in real time — seeing which items are available or taken — but that state is withheld from the organizer entirely. The gate lifts at the reveal: automatically at 00:00 on `event_date + 2` in the event's timezone, or earlier if the organizer unlocks manually from 00:00 on `event_date + 1`. From the reveal, the organizer sees the complete picture: what was claimed, and what was confirmed as given by the guest or by the organizer — but never who claimed what. *(amended 2026-09-11, F-02, replaces "On and after the event date")*
 
 The rule is what separates GIN from a shared spreadsheet: the time-gated information asymmetry is enforced by the product, not by social convention.
 
@@ -163,7 +163,7 @@ The rule is what separates GIN from a shared spreadsheet: the time-gated informa
 Single user role: authenticated user. No permanent "guest" or "viewer" role.
 
 - **Sign-up / sign-in**: email + password only for v1.
-- **Browsing a shared list does not require an account**: an unauthenticated visitor who opens a shared link may view all items and their claimed/available status. Sign-in is required only to claim an item.
+- **Browsing a shared list does not require an account**: an unauthenticated visitor who opens a shared link may view all items, but not their claimed/available status. Sign-in is required to see status, and to claim an item. *(amended 2026-09-11, F-02)*
 - **All write interactions require authentication**: claiming gifts and confirming post-event delivery require a logged-in account.
 - **No admin role in MVP**: every account has equal capabilities; there is no privileged operator or admin surface.
 
