@@ -410,36 +410,36 @@ One narrow migration, in Phase 1 §1: adds harmless `DEFAULT`s to `events.share_
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `pnpm typecheck`
-- [x] 3.2 Linting passes: `pnpm lint`
-- [x] 3.3 Unit tests pass: `pnpm test`
+- [x] 3.1 Type checking passes: `pnpm typecheck` — 04ce00d
+- [x] 3.2 Linting passes: `pnpm lint` — 04ce00d
+- [x] 3.3 Unit tests pass: `pnpm test` — 04ce00d
 
 #### Manual
 
-- [x] 3.4 Signed-out `/` shows the existing marketing copy, unchanged
-- [x] 3.5 Signed-in `/` shows the create-event form instead
-- [x] 3.6 Creating an event with a valid name/date redirects to `/events/<id>`
-- [x] 3.7 Invalid name/date shows the corresponding field error without losing entered values
-- [x] 3.8 Detected timezone matches the browser's zone; override Combobox works and its value is submitted
+- [x] 3.4 Signed-out `/` shows the existing marketing copy, unchanged — 04ce00d
+- [x] 3.5 Signed-in `/` shows the create-event form instead — 04ce00d
+- [x] 3.6 Creating an event with a valid name/date redirects to `/events/<id>` — 04ce00d
+- [x] 3.7 Invalid name/date shows the corresponding field error without losing entered values — 04ce00d
+- [x] 3.8 Detected timezone matches the browser's zone; override Combobox works and its value is submitted — 04ce00d
 
 ### Phase 4: Manage page — items, share link, and the organizer's own link
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `pnpm typecheck`
-- [ ] 4.2 Linting passes: `pnpm lint`
-- [ ] 4.3 Unit tests pass: `pnpm test`
+- [x] 4.1 Type checking passes: `pnpm typecheck`
+- [x] 4.2 Linting passes: `pnpm lint`
+- [x] 4.3 Unit tests pass: `pnpm test`
 
 #### Manual
 
-- [ ] 4.4 Adding an item appends it to the visible list without a full page navigation
-- [ ] 4.5 Invalid item fields (title >200 chars, `javascript:` link) show field errors
-- [ ] 4.6 Guest-link copy button copies the correct URL and shows both inline label change and toast
-- [ ] 4.7 Organizer-link copy button copies the correct URL and shows the same feedback
-- [ ] 4.8 Opening the copied organizer link while signed in as the owner returns to this page
-- [ ] 4.9 A non-owner (or a random id) visiting `/events/<id>` gets not-found
-- [ ] 4.10 Signed-out visit to `/events/<id>` redirects to `/login`
-- [ ] 4.11 Revisiting `/events/<id>` later still shows the event and its items
+- [x] 4.4 Adding an item appends it to the visible list without a full page navigation
+- [x] 4.5 Invalid item fields (title >200 chars, `javascript:` link) show field errors
+- [x] 4.6 Guest-link copy button copies the correct URL and shows both inline label change and toast
+- [x] 4.7 Organizer-link copy button copies the correct URL and shows the same feedback
+- [x] 4.8 Opening the copied organizer link while signed in as the owner returns to this page
+- [x] 4.9 A non-owner (or a random id) visiting `/events/<id>` gets not-found
+- [x] 4.10 Signed-out visit to `/events/<id>` redirects to `/login`
+- [x] 4.11 Revisiting `/events/<id>` later still shows the event and its items
 
 ### Phase 5: DB test coverage and doc hygiene
 
