@@ -76,6 +76,19 @@ export function Combobox({
     );
   }, [query, options, selectedOption]);
 
+  // Keyboard navigation can move the highlight past the edge of the
+  // scrollable popup (e.g. 7 ArrowDowns past a ~5-row visible window) with
+  // no corresponding scroll — the highlighted row must stay in view.
+  useEffect(() => {
+    if (!open) return;
+    const activeOption = filteredOptions[highlightedIndex];
+    if (!activeOption) return;
+
+    document
+      .getElementById(`${listboxId}-option-${highlightedIndex}`)
+      ?.scrollIntoView({ block: "nearest" });
+  }, [open, highlightedIndex, filteredOptions, listboxId]);
+
   useEffect(() => {
     if (!open) return;
 

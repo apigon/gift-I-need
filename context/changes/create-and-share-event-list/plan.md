@@ -395,32 +395,32 @@ One narrow migration, in Phase 1 §1: adds harmless `DEFAULT`s to `events.share_
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `pnpm typecheck`
-- [x] 2.2 Linting passes: `pnpm lint`
+- [x] 2.1 Type checking passes: `pnpm typecheck` — f5e50b9
+- [x] 2.2 Linting passes: `pnpm lint` — f5e50b9
 
 #### Manual
 
-- [x] 2.3 Typing into the Combobox filters the option list
-- [x] 2.4 Arrow keys highlight, Enter commits, Escape closes without changing the value
-- [x] 2.5 Clicking outside closes the popup without changing the value
-- [x] 2.6 Fully operable via keyboard alone
-- [x] 2.7 `/design-system` still 404s when `NODE_ENV=production`
+- [x] 2.3 Typing into the Combobox filters the option list — f5e50b9
+- [x] 2.4 Arrow keys highlight, Enter commits, Escape closes without changing the value — f5e50b9
+- [x] 2.5 Clicking outside closes the popup without changing the value — f5e50b9
+- [x] 2.6 Fully operable via keyboard alone — f5e50b9
+- [x] 2.7 `/design-system` still 404s when `NODE_ENV=production` — f5e50b9
 
 ### Phase 3: Create-event flow on the home page
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `pnpm typecheck`
-- [ ] 3.2 Linting passes: `pnpm lint`
-- [ ] 3.3 Unit tests pass: `pnpm test`
+- [x] 3.1 Type checking passes: `pnpm typecheck`
+- [x] 3.2 Linting passes: `pnpm lint`
+- [x] 3.3 Unit tests pass: `pnpm test`
 
 #### Manual
 
-- [ ] 3.4 Signed-out `/` shows the existing marketing copy, unchanged
-- [ ] 3.5 Signed-in `/` shows the create-event form instead
-- [ ] 3.6 Creating an event with a valid name/date redirects to `/events/<id>`
-- [ ] 3.7 Invalid name/date shows the corresponding field error without losing entered values
-- [ ] 3.8 Detected timezone matches the browser's zone; override Combobox works and its value is submitted
+- [x] 3.4 Signed-out `/` shows the existing marketing copy, unchanged
+- [x] 3.5 Signed-in `/` shows the create-event form instead
+- [x] 3.6 Creating an event with a valid name/date redirects to `/events/<id>`
+- [x] 3.7 Invalid name/date shows the corresponding field error without losing entered values
+- [x] 3.8 Detected timezone matches the browser's zone; override Combobox works and its value is submitted
 
 ### Phase 4: Manage page — items, share link, and the organizer's own link
 
