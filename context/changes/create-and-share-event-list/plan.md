@@ -445,6 +445,6 @@ One narrow migration, in Phase 1 §1: adds harmless `DEFAULT`s to `events.share_
 
 #### Automated
 
-- [x] 5.1 pgTAP suite passes: `pnpm test:db`
-- [x] 5.2 Integration test passes: `pnpm test:integration`
-- [x] 5.3 Linting passes: `pnpm lint`
+- [x] 5.1 pgTAP suite passes: `pnpm test:db` — 7f9c400
+- [x] 5.2 Integration test passes: `pnpm test:integration` — 7f9c400
+- [x] 5.3 Linting passes: `pnpm lint` — 7f9c400
