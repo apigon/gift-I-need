@@ -386,25 +386,25 @@ One narrow migration, in Phase 1 §1: adds harmless `DEFAULT`s to `events.share_
 
 #### Automated
 
-- [x] 1.1 pgTAP suite passes: `pnpm test:db`
-- [x] 1.2 Type checking passes: `pnpm typecheck`
-- [x] 1.3 Linting passes: `pnpm lint`
-- [x] 1.4 Unit tests pass: `pnpm test`
+- [x] 1.1 pgTAP suite passes: `pnpm test:db` — 432dd0d
+- [x] 1.2 Type checking passes: `pnpm typecheck` — 432dd0d
+- [x] 1.3 Linting passes: `pnpm lint` — 432dd0d
+- [x] 1.4 Unit tests pass: `pnpm test` — 432dd0d
 
 ### Phase 2: Design system — searchable Combobox primitive
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `pnpm typecheck`
-- [ ] 2.2 Linting passes: `pnpm lint`
+- [x] 2.1 Type checking passes: `pnpm typecheck`
+- [x] 2.2 Linting passes: `pnpm lint`
 
 #### Manual
 
-- [ ] 2.3 Typing into the Combobox filters the option list
-- [ ] 2.4 Arrow keys highlight, Enter commits, Escape closes without changing the value
-- [ ] 2.5 Clicking outside closes the popup without changing the value
-- [ ] 2.6 Fully operable via keyboard alone
-- [ ] 2.7 `/design-system` still 404s when `NODE_ENV=production`
+- [x] 2.3 Typing into the Combobox filters the option list
+- [x] 2.4 Arrow keys highlight, Enter commits, Escape closes without changing the value
+- [x] 2.5 Clicking outside closes the popup without changing the value
+- [x] 2.6 Fully operable via keyboard alone
+- [x] 2.7 `/design-system` still 404s when `NODE_ENV=production`
 
 ### Phase 3: Create-event flow on the home page
 
