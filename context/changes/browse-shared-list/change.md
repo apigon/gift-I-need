@@ -1,7 +1,7 @@
 ---
 change_id: browse-shared-list
 title: Browse shared list
-status: plan_reviewed
+status: implementing
 created: 2026-09-12
 updated: 2026-09-12
 archived_at: null

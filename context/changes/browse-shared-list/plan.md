@@ -186,9 +186,9 @@ None — no schema or data changes in this slice.
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `pnpm test`
-- [ ] 1.2 Type checking passes: `pnpm typecheck`
-- [ ] 1.3 Linting passes: `pnpm lint`
+- [x] 1.1 Unit tests pass: `pnpm test`
+- [x] 1.2 Type checking passes: `pnpm typecheck`
+- [x] 1.3 Linting passes: `pnpm lint`
 
 ### Phase 2: Route wiring and manual verification
 
