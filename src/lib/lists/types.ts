@@ -35,6 +35,27 @@ export type SharedItem = {
   status: ItemStatus | null;
 };
 
+// The owner's own direct read of an event/its items (owned-events.ts). Unlike
+// SharedEvent/SharedItem, these carry the same shape as the underlying DB
+// rows — including shareToken, since only the owner's own view needs to
+// render the share link — but never a claim `status`, since the owner's own
+// read has no concept of one (that's the organizer-blindness rule).
+export type OwnedEvent = {
+  id: string;
+  name: string;
+  eventDate: string;
+  timezone: string;
+  shareToken: string;
+};
+
+export type OwnedItem = {
+  id: string;
+  title: string;
+  notes: string | null;
+  link: string | null;
+  priceRange: string | null;
+};
+
 export type ListResult = { ok: true } | { ok: false; code: ListErrorCode };
 
 // A shared-list read has three outcomes, not two. Collapsing them into

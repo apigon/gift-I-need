@@ -10,7 +10,7 @@ import {
   Text,
 } from "@/components";
 
-import { ControlledFieldDemo, ToastDemo } from "./components";
+import { ComboboxDemo, ControlledFieldDemo, ToastDemo } from "./components";
 
 // Dev-only reference: exercises every token and primitive state so it can be
 // checked against `context/changes/design-system-baseline/palette-proof.html`.
@@ -133,6 +133,11 @@ export default function DesignSystemPage() {
           />
         </div>
         <ControlledFieldDemo />
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <Heading level={2}>Combobox</Heading>
+        <ComboboxDemo />
       </section>
 
       <section className="flex flex-col gap-4">

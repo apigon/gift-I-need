@@ -78,20 +78,14 @@ describe("claim_item concurrency", () => {
       eventDate.setUTCDate(eventDate.getUTCDate() + 7);
       const eventDateStr = eventDate.toISOString().slice(0, 10);
 
-      // `unlockable_at` / `auto_reveal_at` / `share_token` are NOT NULL with no
-      // column DEFAULT — `private.events_guard` (the INSERT trigger) computes
-      // them, and the column-level grant only covers (name, event_date,
-      // timezone), so they must not appear in the payload. The generated
-      // Insert type can't see past the trigger, hence the cast.
-      const eventInsert = {
-        name: "Race test",
-        event_date: eventDateStr,
-        timezone: "UTC",
-      } as unknown as Database["public"]["Tables"]["events"]["Insert"];
-
+      // `unlockable_at` / `auto_reveal_at` / `share_token` are trigger-computed
+      // by `private.events_guard` (the INSERT trigger) and the column-level
+      // grant only covers (name, event_date, timezone) — placeholder DEFAULTs
+      // (events-insert-defaults migration) make them optional on the generated
+      // Insert type, so no cast is needed here.
       const { data: event, error: eventError } = await owner
         .from("events")
-        .insert(eventInsert)
+        .insert({ name: "Race test", event_date: eventDateStr, timezone: "UTC" })
         .select()
         .single();
       if (eventError) throw eventError;

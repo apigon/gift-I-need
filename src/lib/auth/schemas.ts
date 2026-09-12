@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import {
+  initialFormState as sharedInitialFormState,
+  type FormState as GenericFormState,
+} from "@/lib/forms/form-state";
+
 // Form validation schemas and the shared Server Action result shape.
 //
 // NOTE: this module imports zod and must NOT be imported into the middleware
@@ -40,19 +45,11 @@ export type AuthFieldErrors = {
   password?: string[];
 };
 
-// The contract Server Actions return to `useActionState`. S-01's event form and
-// S-04's item form are expected to reuse this shape rather than invent their
-// own; when a second feature needs it, move it to `src/lib/forms/`.
-//
-// `status` discriminates so a form can tell "not submitted yet" from "submitted
-// and came back clean" — without it, an idle form and a successful one are
-// indistinguishable, and success normally ends in a redirect anyway.
-export type FormState =
-  | { status: "idle" }
-  | {
-      status: "error";
-      errors?: AuthFieldErrors;
-      message?: string;
-    };
+// The contract Server Actions return to `useActionState`. Relocated to
+// `src/lib/forms/form-state.ts` now that S-01's event/item forms are a second
+// consumer of the same shape (per that file's own forward-note) — this alias
+// keeps every existing import (`src/app/actions/auth.ts`, the two auth forms)
+// working unchanged.
+export type FormState = GenericFormState<AuthFieldErrors>;
 
-export const initialFormState: FormState = { status: "idle" };
+export const initialFormState: FormState = sharedInitialFormState;

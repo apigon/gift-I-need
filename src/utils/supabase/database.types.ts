@@ -59,16 +59,16 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          auto_reveal_at: string
+          auto_reveal_at?: string
           created_at?: string
           event_date: string
           id?: string
           name: string
           owner_id?: string
           revealed_at?: string | null
-          share_token: string
+          share_token?: string
           timezone: string
-          unlockable_at: string
+          unlockable_at?: string
           updated_at?: string
         }
         Update: {

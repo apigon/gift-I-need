@@ -129,6 +129,37 @@ curl -s -X DELETE 'http://localhost:54324/api/v1/messages'   # clear the mailbox
 
 ---
 
+## Database migrations
+
+Schema changes are Supabase CLI migrations under `supabase/migrations/`, applied to the **local** stack automatically but to the **hosted** project only when someone runs the push command by hand — there is no CI step that does this for you.
+
+### Writing one
+
+```bash
+supabase migration new <name>       # creates supabase/migrations/<timestamp>_<name>.sql
+```
+
+Edit the generated file, then apply it to your local stack and regenerate the TypeScript types from the result:
+
+```bash
+supabase db reset       # re-runs every migration from scratch against the LOCAL db (drops local data)
+pnpm db:types           # regenerates src/utils/supabase/database.types.ts from the local schema
+```
+
+`supabase db reset` only touches the local stack (`supabase start` must be running) — it never reaches the hosted project. Run `pnpm test:db` (pgTAP) afterwards to check RLS/constraints/triggers, and commit the migration file together with the regenerated `database.types.ts` in the same PR — a migration without its type-regen diff is a sign `pnpm db:types` wasn't re-run.
+
+### Promoting to production
+
+```bash
+supabase db push         # applies any local migrations the hosted project hasn't seen yet
+```
+
+This is a **manual, separate step from deploying app code.** Pushing to `main` triggers a Cloudflare Workers Build that deploys the Next.js app, but it does not touch the Supabase schema — nothing runs `supabase db push` on your behalf. After merging a PR that adds a migration, push it to the hosted project yourself (needs `supabase link` to have been run once — see `context/changes/deployment/deployment-plan.md`).
+
+> **Coordinate DB changes separately from Worker rollbacks.** `wrangler rollback` reverts the Worker in seconds, but a schema migration doesn't roll back with it — a migration that isn't backward-compatible with the previous app version can break a rolled-back Worker. Prefer additive, backward-compatible migrations (new nullable columns, new tables) over ones that remove/rename what the currently-deployed code still reads.
+
+---
+
 ## Checks
 
 ```bash
@@ -153,6 +184,30 @@ pnpm cf-typegen   # regenerate cloudflare-env.d.ts from wrangler config
 > `pnpm preview` is **not** a deployed preview. It has no Cloudflare edge cache, so edge-caching bugs are invisible to it. Pushing a branch triggers a real Cloudflare preview deployment; use that for anything cache- or header-related.
 
 `wrangler.jsonc` and `open-next.config.ts` are authoritative. Middleware runs on the **Edge** runtime.
+
+---
+
+## Environment variables
+
+Adding a new one — especially a `NEXT_PUBLIC_*` one — touches two separate mechanisms. Missing either half fails silently (no type/lint/test error catches it; it only shows up when you actually look at the running app).
+
+### Local dev
+
+1. Document it in `.env.example` (committed) — what it's for, and what value each environment should use.
+2. Add the real value to whichever `.env*` file(s) you actually run against:
+   - `.env` — hosted Supabase, read by `pnpm dev` (the one people forget)
+   - `.env.localdb` — local Supabase stack, read by `pnpm dev:local`
+3. Restart the dev server. `next dev` reads `.env*` once at process start — it does not pick up edits made while it's already running.
+
+### Cloudflare (production / preview deploys)
+
+`NEXT_PUBLIC_*` values are inlined into the client bundle **at build time**, which rules out the obvious places to set them:
+
+- ❌ Worker → **Settings → Variables & Secrets** (runtime) — populates `env` after the bundle is already built; too late for `NEXT_PUBLIC_*`.
+- ❌ `wrangler.jsonc`'s `[vars]` / `wrangler secret put` — same problem, runtime only.
+- ✅ Worker → **Settings → Build → Build variables and secrets** — the only place actually present while Workers Builds runs `next build`.
+
+**Preview deployments are a known gap.** Workers Builds has no `CF_PAGES_URL`-style variable exposing a preview's own URL at build time, and a preview's default URL (`<version-id>-gin.<subdomain>.workers.dev`) isn't knowable ahead of time. Any `NEXT_PUBLIC_*` value that needs to be the app's canonical origin (e.g. `NEXT_PUBLIC_SITE_URL`) will be wrong or absent on preview builds unless a `--preview-alias` deploy command plus a branch-derived build script is set up — not done yet. Code that consumes such a value should degrade gracefully (e.g. a relative path) rather than assume it's always correct. See `context/foundation/lessons.md` for the full writeup.
 
 ---
 
