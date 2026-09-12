@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(16);
+select plan(19);
 
 -- Fixtures ---------------------------------------------------------------
 insert into auth.users (id) values ('00000000-0000-0000-0000-0000000000a1'); -- owner
@@ -133,6 +133,10 @@ select ok(
 );
 
 -- Item insert and update after the reveal (time-travelled) -> 42501. -----
+-- Isolated in its own savepoint: revealed_at, once set, permanently closes
+-- item writes for the rest of the transaction, which would break the
+-- field-length cases below if they ran afterward in the same state.
+savepoint pre_reveal;
 reset role;
 alter table public.events disable trigger events_guard;
 update public.events set revealed_at = now() where name = 'Owner Event Renamed';
@@ -149,6 +153,32 @@ select throws_ok(
 select throws_ok(
   $$ update public.items set title = 'Renamed After Reveal' where title = 'Item One Renamed' $$,
   '42501'
+);
+
+rollback to savepoint pre_reveal;
+
+-- Item field-length constraints (items_title_length, items_notes_length,
+-- items_price_range_length) -- previously untested. Pinned SQLSTATE and
+-- constraint name, matching the items_link_format case above.
+select throws_ok(
+  format($$ insert into public.items (event_id, title) values (%L, '') $$, :'fx_event_id'),
+  '23514',
+  'new row for relation "items" violates check constraint "items_title_length"',
+  'an empty title is rejected by items_title_length'
+);
+
+select throws_ok(
+  format($$ insert into public.items (event_id, title, notes) values (%L, 'Item Two', %L) $$, :'fx_event_id', repeat('x', 2001)),
+  '23514',
+  'new row for relation "items" violates check constraint "items_notes_length"',
+  'notes over 2000 characters is rejected by items_notes_length'
+);
+
+select throws_ok(
+  format($$ insert into public.items (event_id, title, price_range) values (%L, 'Item Three', %L) $$, :'fx_event_id', repeat('x', 51)),
+  '23514',
+  'new row for relation "items" violates check constraint "items_price_range_length"',
+  'a price_range over 50 characters is rejected by items_price_range_length'
 );
 
 select * from finish();

@@ -426,25 +426,25 @@ One narrow migration, in Phase 1 §1: adds harmless `DEFAULT`s to `events.share_
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `pnpm typecheck`
-- [x] 4.2 Linting passes: `pnpm lint`
-- [x] 4.3 Unit tests pass: `pnpm test`
+- [x] 4.1 Type checking passes: `pnpm typecheck` — e349cd2
+- [x] 4.2 Linting passes: `pnpm lint` — e349cd2
+- [x] 4.3 Unit tests pass: `pnpm test` — e349cd2
 
 #### Manual
 
-- [x] 4.4 Adding an item appends it to the visible list without a full page navigation
-- [x] 4.5 Invalid item fields (title >200 chars, `javascript:` link) show field errors
-- [x] 4.6 Guest-link copy button copies the correct URL and shows both inline label change and toast
-- [x] 4.7 Organizer-link copy button copies the correct URL and shows the same feedback
-- [x] 4.8 Opening the copied organizer link while signed in as the owner returns to this page
-- [x] 4.9 A non-owner (or a random id) visiting `/events/<id>` gets not-found
-- [x] 4.10 Signed-out visit to `/events/<id>` redirects to `/login`
-- [x] 4.11 Revisiting `/events/<id>` later still shows the event and its items
+- [x] 4.4 Adding an item appends it to the visible list without a full page navigation — e349cd2
+- [x] 4.5 Invalid item fields (title >200 chars, `javascript:` link) show field errors — e349cd2
+- [x] 4.6 Guest-link copy button copies the correct URL and shows both inline label change and toast — e349cd2
+- [x] 4.7 Organizer-link copy button copies the correct URL and shows the same feedback — e349cd2
+- [x] 4.8 Opening the copied organizer link while signed in as the owner returns to this page — e349cd2
+- [x] 4.9 A non-owner (or a random id) visiting `/events/<id>` gets not-found — e349cd2
+- [x] 4.10 Signed-out visit to `/events/<id>` redirects to `/login` — e349cd2
+- [x] 4.11 Revisiting `/events/<id>` later still shows the event and its items — e349cd2
 
 ### Phase 5: DB test coverage and doc hygiene
 
 #### Automated
 
-- [ ] 5.1 pgTAP suite passes: `pnpm test:db`
-- [ ] 5.2 Integration test passes: `pnpm test:integration`
-- [ ] 5.3 Linting passes: `pnpm lint`
+- [x] 5.1 pgTAP suite passes: `pnpm test:db`
+- [x] 5.2 Integration test passes: `pnpm test:integration`
+- [x] 5.3 Linting passes: `pnpm lint`

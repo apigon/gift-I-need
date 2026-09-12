@@ -52,11 +52,10 @@ const PUBLIC_EXACT_PATHS = new Set([
 
 // Prefixes whose entire subtree is public.
 const PUBLIC_PREFIXES = [
-  // FORWARD DECLARATION for FR-007 (S-02's shared list), which does not exist
-  // yet. Guests must browse a shared list without signing in, so S-01 must
-  // either adopt this URL prefix or change this line. If it does neither,
-  // guests get bounced to `/login` and the north-star claim flow breaks in a
-  // way that looks like a routing bug rather than an access-control one.
+  // FR-007: `create-and-share-event-list` (S-01) generates guest share links
+  // under this prefix (`{site origin}/lists/<share_token>`); `browse-shared-list`
+  // (S-02) is what will serve them. Guests must browse a shared list without
+  // signing in, so this stays public.
   "/lists/",
 ];
 
