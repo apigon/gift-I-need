@@ -51,6 +51,13 @@
 - **Rule**: Give the column a harmless placeholder DEFAULT instead of casting at each call site. Postgres applies column defaults before BEFORE INSERT triggers run, so if the trigger overwrites the column unconditionally (not an `if new.x is null` guard), the placeholder is never observably stored — this flips the column to optional in the regenerated type with zero behavior change. Verify the trigger's overwrite is unconditional first; existing tests asserting the real trigger-computed value already prove no placeholder leaks through, so no new test is needed for the default itself.
 - **Applies to**: plan, implement, impl-review, plan-review
 
+## Column-scoped grants only cover INSERT/UPDATE — don't credit them for SELECT safety
+
+- **Context**: src/lib/lists/owned-events.ts:12-14 — any module-header comment explaining why an RLS-scoped read can't leak claim data.
+- **Problem**: The comment credited "column-scoped grants" for keeping SELECT safe, but this codebase's column-scoped grants (supabase/migrations/20260911211956_surprise_rule_schema.sql) only restrict INSERT/UPDATE columns — SELECT on events/items is table-wide. The actual safety mechanism is RLS scoped to owner_id plus the fact that events/items carry no claim-bearing column at all (public.claims has zero grants to any API role).
+- **Rule**: When documenting why a table read is safe, name the actual mechanism (RLS policy + absent/no-grant column), not grants that don't apply to SELECT.
+- **Applies to**: plan, implement, impl-review
+
 ## Set NEXT_PUBLIC_* build-time vars in Workers Builds' Build variables, and expect no preview-URL value
 
 - **Context**: Any time a new NEXT_PUBLIC_* env var is introduced, and any change to the Cloudflare Workers Builds / preview-deployment pipeline.
