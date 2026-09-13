@@ -279,4 +279,19 @@ describe("getOwnedEvent", () => {
     expect(result.kind).toBe("ok");
     expect(result.kind === "ok" && result.event.revealOpen).toBe(true);
   });
+
+  // Pins agreement with private.reveal_open's `now() >= e.auto_reveal_at`
+  // (inclusive) — a `>` here would silently disagree with the DB at the
+  // exact reveal instant.
+  it("revealOpen is true when auto_reveal_at exactly equals now", async () => {
+    const now = "2026-06-01T12:00:00.000Z";
+    vi.useFakeTimers().setSystemTime(new Date(now));
+    mockFrom(eventWith({ revealed_at: null, auto_reveal_at: now }));
+
+    const result = await getOwnedEvent("e1");
+    vi.useRealTimers();
+
+    expect(result.kind).toBe("ok");
+    expect(result.kind === "ok" && result.event.revealOpen).toBe(true);
+  });
 });

@@ -9,10 +9,13 @@ import { Heading } from "../typography/typography";
 // showModal() gives top-layer rendering, a built-in focus trap, and native
 // Escape-to-close for free. <dialog>'s modal state is imperative, not a
 // reactive attribute, so this component reconciles the `open` prop against
-// showModal()/close() itself. Every close path (Cancel button inside
-// `children`, backdrop click, Escape) routes through the dialog's own
-// close() call, so the native `close` event is the single place `onClose`
-// fires from — callers never call `onClose` directly.
+// showModal()/close() itself. Backdrop click and Escape both route through
+// the dialog's own close() call, which fires the native `close` event below.
+// A Cancel button inside `children` may instead call `onClose` directly
+// (there's no ref exposed to reach the dialog from outside) — `onClose` can
+// therefore fire twice for that path once the `open` prop catches up and
+// this component's own close() call re-fires the native event. Keep
+// `onClose` idempotent.
 export function Modal({
   open,
   onClose,

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button, Text } from "@/components";
 import type { OwnedItem } from "@/lib/lists/types";
 
-import { EditItemModal } from "../edit-item-modal/edit-item-modal";
+import { EditItemModal } from "..";
 
 // Plain text, no StatusBadge — the organizer's own items carry no claim
 // status by definition (the organizer-blindness rule applies to the guest

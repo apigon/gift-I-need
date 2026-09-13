@@ -147,8 +147,14 @@ export async function getOwnedEvent(eventId: string): Promise<
       eventDate: eventRow.event_date,
       timezone: eventRow.timezone,
       shareToken: eventRow.share_token,
-      // Mirrors private.reveal_open — computed here in JS against the
-      // already-fetched row rather than a second RPC round trip.
+      // Mirrors private.reveal_open (supabase/migrations/20260911211956_surprise_rule_schema.sql:202-204:
+      // `now() >= e.auto_reveal_at or e.revealed_at is not null`) — computed
+      // here in JS against the already-fetched row rather than a second RPC
+      // round trip. Keep the `>=` inclusive to match the SQL exactly; see the
+      // boundary case in owned-events.test.ts. Only gates the Edit button's
+      // visibility — the actual write is independently enforced by
+      // items_update_owner's RLS check against the real private.reveal_open,
+      // so drift here is cosmetic (button mismatch), never a claim-data leak.
       revealOpen:
         eventRow.revealed_at !== null ||
         Date.now() >= new Date(eventRow.auto_reveal_at).getTime(),
