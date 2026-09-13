@@ -36,7 +36,7 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 | S-02 | browse-shared-list         | browse a shared list unauthenticated and see available/taken    | S-01, F-02       | US-01, FR-007, FR-009  | done |
 | S-03 | claim-gift-item            | sign in and claim an unclaimed item; it flips to "taken"        | S-02, F-01, F-02 | US-01, FR-008, FR-009  | done |
 | S-04 | edit-list-items            | edit items on their own event list                              | S-01, F-01       | FR-005                 | done |
-| S-05 | post-event-reveal          | after the event date, see full claim status and mark items given | S-03, F-01, F-02 | US-02, FR-010, FR-011  | in-progress |
+| S-05 | post-event-reveal          | after the event date, see full claim status and mark items given | S-03, F-01, F-02 | US-02, FR-010, FR-011  | done |
 
 ## Streams
 
@@ -168,7 +168,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - What is the event lifecycle after the reveal — can the organizer archive/delete the event? — Owner: user. Block: no (see Open Roadmap Questions).
 - **Risk:** Exercises the reveal side of the surprise rule via the `unlock_event` / `get_shared_*` RPCs (F-02): the gate must flip exactly at the computed reveal instant and never before, under refresh/direct-URL access (NFR), and the organizer must never see claimer identity even after the reveal. "Given" is a single mark, not independent per-party state, so the UI must treat a second mark-given call as a no-op rather than a second confirmation. This is the second half of the F-02 contract made user-visible.
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -211,3 +211,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-02: an unauthenticated visitor can open a shared link and view all items; seeing each item's "available" or "taken" status requires signing in (F-02, amended PRD US-01 AC1). The list is read via `getSharedList` (`src/lib/lists/shared-list.ts`) — no other query path.** — Archived 2026-09-13 → `context/archive/2026-09-12-browse-shared-list/`. Lesson: —.
 - **S-04: an authenticated organizer can edit items on an event they created (e.g. rename, update notes/link/price).** — Archived 2026-09-13 → `context/archive/2026-09-12-edit-list-items/`. Lesson: —.
 - **S-03: a signed-in guest can claim one unclaimed item; the item immediately flips to "taken" for all other guests, and the organizer sees no claim status until the event date.** — Archived 2026-09-13 → `context/archive/2026-09-13-claim-gift-item/`. Lesson: —.
+- **S-05: after the reveal opens — automatically at 00:00 on `event_date + 2` in the event's timezone, or earlier if the organizer unlocks manually from `event_date + 1` — the organizer can see the full claim status (never claimer identity), and either the claiming guest or the organizer can mark an item as "given": a single irreversible mark set by whichever party acts first.** — Archived 2026-09-13 → `context/archive/2026-09-13-post-event-reveal/`. Lesson: —.
