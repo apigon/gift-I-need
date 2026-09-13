@@ -200,10 +200,10 @@ None — no schema or data changes in this slice.
 
 #### Manual
 
-- [ ] 2.4 Unauthenticated visitor: items visible, no badges, sign-in banner with working `next` round-trip
-- [ ] 2.5 Signed-in non-owner guest: real status badges on every item, no banner
-- [ ] 2.6 Organizer pre-reveal: no badges, Yoda banner, working link to `/events/[id]`
-- [ ] 2.7 Organizer/anyone post-reveal (unlocked or past `event_date + 2`): real status badges, no banner
-- [ ] 2.8 Invalid/malformed token renders the global 404
-- [ ] 2.9 Simulated RPC failure renders the danger `Alert`, not "not found"
-- [ ] 2.10 Zero-item event, each viewer state: guest-appropriate empty copy, no banner
+- [x] 2.4 Unauthenticated visitor: items visible, no badges, sign-in banner with working `next` round-trip
+- [x] 2.5 Signed-in non-owner guest: real status badges on every item, no banner
+- [x] 2.6 Organizer pre-reveal: no badges, Yoda banner, working link to `/events/[id]`
+- [x] 2.7 Organizer/anyone post-reveal (unlocked or past `event_date + 2`): real status badges, no banner
+- [x] 2.8 Invalid/malformed token renders the global 404
+- [x] 2.9 Simulated RPC failure renders the danger `Alert`, not "not found"
+- [x] 2.10 Zero-item event, each viewer state: guest-appropriate empty copy, no banner
