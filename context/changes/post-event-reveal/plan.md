@@ -172,6 +172,8 @@ The organizer's own event page shows real claim status once revealed, lets the o
 
 **Contract**: Rendered in `page.tsx` alongside the existing `Gift ideas` heading area, gated by `event.unlockable && !event.revealOpen`. Button label "Unlock now" (or similar); `pendingLabel="Unlocking…"`; toast "Reveal unlocked" on success. Also update `src/app/events/[id]/components/index.ts` to add `export { UnlockControl } from "./unlock-control/unlock-control";` — the barrel that `page.tsx` already imports the rest of this directory's components through.
 
+**Addendum (post-impl-review, 2026-09-13)**: Shipped as `src/app/events/[id]/components/reveal-control/reveal-control.tsx`, component `RevealControl`, barrel export `RevealControl` — not `unlock-control`/`UnlockControl`. Copy shipped as "Open the reveal now" / `pendingLabel="Opening…"` / toast "Reveal opened", not "Unlock now" / "Unlocking…" / "Reveal unlocked". Deliberate: a new organizer seeing "Unlock" would plausibly read it as "click this before sharing the link to let guests claim," not "reveal claim status early" — the opposite of what the button does. Gating logic (`event.unlockable && !event.revealOpen`) is unchanged from the contract above.
+
 ### Success Criteria:
 
 #### Automated Verification:

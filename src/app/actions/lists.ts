@@ -74,6 +74,8 @@ export async function markGivenAction(
   const result = await markGivenRpc(itemId);
 
   if (!result.ok) {
+    // Unlike claimItemAction, refresh() is skipped here: a failed mark
+    // genuinely changed nothing, so there's no new status to re-fetch.
     return { status: "error", message: GENERIC_ERROR };
   }
 
@@ -89,6 +91,8 @@ export async function unlockEventAction(
   const result = await unlockEventRpc(eventId);
 
   if (!result.ok) {
+    // Unlike claimItemAction, refresh() is skipped here: a failed unlock
+    // genuinely changed nothing, so there's no new status to re-fetch.
     return {
       status: "error",
       message: UNLOCK_ERROR_MESSAGES[result.code] ?? GENERIC_ERROR,
