@@ -314,30 +314,30 @@ None — no schema change in this slice.
 
 #### Automated
 
-- [x] 3.1 Type checking passes: `pnpm typecheck`
-- [x] 3.2 Linting passes: `pnpm lint`
-- [x] 3.3 Unit tests pass: `pnpm test`
+- [x] 3.1 Type checking passes: `pnpm typecheck` — a8dd34d
+- [x] 3.2 Linting passes: `pnpm lint` — a8dd34d
+- [x] 3.3 Unit tests pass: `pnpm test` — a8dd34d
 
 #### Manual
 
-- [x] 3.4 Edit opens the modal pre-filled with the item's current values
-- [x] 3.5 Saving updates the item in the list immediately and shows the toast
-- [x] 3.6 Cancel (button, Escape, backdrop click) discards edits with no change
-- [x] 3.7 A validation error shows inline, modal stays open, edits preserved
-- [x] 3.8 Editing two different items in sequence shows correct values each time
-- [x] 3.9 Clearing an optional field and saving actually clears it
+- [x] 3.4 Edit opens the modal pre-filled with the item's current values — a8dd34d
+- [x] 3.5 Saving updates the item in the list immediately and shows the toast — a8dd34d
+- [x] 3.6 Cancel (button, Escape, backdrop click) discards edits with no change — a8dd34d
+- [x] 3.7 A validation error shows inline, modal stays open, edits preserved — a8dd34d
+- [x] 3.8 Editing two different items in sequence shows correct values each time — a8dd34d
+- [x] 3.9 Clearing an optional field and saving actually clears it — a8dd34d
 
 ### Phase 4: Hide editing after the reveal
 
 #### Automated
 
-- [ ] 4.1 Type checking passes: `pnpm typecheck`
-- [ ] 4.2 Linting passes: `pnpm lint`
+- [x] 4.1 Type checking passes: `pnpm typecheck`
+- [x] 4.2 Linting passes: `pnpm lint`
 
 #### Manual
 
-- [ ] 4.3 No Edit buttons appear once the reveal has opened
-- [ ] 4.4 Edit buttons still appear before the reveal opens
+- [x] 4.3 No Edit buttons appear once the reveal has opened
+- [x] 4.4 Edit buttons still appear before the reveal opens
 
 ### Phase 5: DB test coverage
 

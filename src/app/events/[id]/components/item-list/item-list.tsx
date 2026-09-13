@@ -10,7 +10,13 @@ import { EditItemModal } from "../edit-item-modal/edit-item-modal";
 // Plain text, no StatusBadge — the organizer's own items carry no claim
 // status by definition (the organizer-blindness rule applies to the guest
 // side, not to this direct read).
-export function ItemList({ items }: { items: OwnedItem[] }) {
+export function ItemList({
+  items,
+  revealOpen,
+}: {
+  items: OwnedItem[];
+  revealOpen: boolean;
+}) {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const editingItem = items.find((item) => item.id === editingItemId);
 
@@ -28,12 +34,14 @@ export function ItemList({ items }: { items: OwnedItem[] }) {
           >
             <div className="flex items-start justify-between gap-2">
               <Text as="span">{item.title}</Text>
-              <Button
-                variant="secondary"
-                onClick={() => setEditingItemId(item.id)}
-              >
-                Edit
-              </Button>
+              {revealOpen ? null : (
+                <Button
+                  variant="secondary"
+                  onClick={() => setEditingItemId(item.id)}
+                >
+                  Edit
+                </Button>
+              )}
             </div>
             {item.notes ? (
               <Text variant="small" tone="muted">
