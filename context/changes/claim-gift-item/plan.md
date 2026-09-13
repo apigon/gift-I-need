@@ -235,31 +235,31 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [x] 1.1 Unit tests for `claimItem` pass
-- [x] 1.2 Unit tests for `claimItemAction` pass
-- [x] 1.3 Type checking passes
-- [x] 1.4 Linting passes
+- [x] 1.1 Unit tests for `claimItem` pass — 2c0df1c
+- [x] 1.2 Unit tests for `claimItemAction` pass — 2c0df1c
+- [x] 1.3 Type checking passes — 2c0df1c
+- [x] 1.4 Linting passes — 2c0df1c
 
 #### Manual
 
-- [x] 1.5 Error-message map reviewed against every realistic `ListErrorCode`
+- [x] 1.5 Error-message map reviewed against every realistic `ListErrorCode` — 2c0df1c
 
 ### Phase 2: Claim UI
 
 #### Automated
 
-- [ ] 2.1 Type checking passes
-- [ ] 2.2 Linting passes
-- [ ] 2.3 Full unit test suite passes
+- [x] 2.1 Type checking passes
+- [x] 2.2 Linting passes
+- [x] 2.3 Full unit test suite passes
 
 #### Manual
 
-- [ ] 2.4 Modal opens on Claim; Cancel/outside-click sends no request
-- [ ] 2.5 Confirm shows pending, then badge flips to "mine" + success toast, modal closes
-- [ ] 2.6 Reload confirms server-persisted claim
-- [ ] 2.7 Other guest sees "Taken", no Claim button
-- [ ] 2.8 Post-reveal organizer sees Available + Claim button on own list; Confirm surfaces `owner_cannot_claim`, no state change
-- [ ] 2.9 Lapsed session redirects to `/login?next=/lists/[token]` with toast
+- [x] 2.4 Modal opens on Claim; Cancel/outside-click sends no request
+- [x] 2.5 Confirm shows pending, then badge flips to "mine" + success toast, modal closes
+- [x] 2.6 Reload confirms server-persisted claim
+- [x] 2.7 Other guest sees "Taken", no Claim button
+- [x] 2.8 Post-reveal organizer sees Available + Claim button on own list; Confirm surfaces `owner_cannot_claim`, no state change
+- [x] 2.9 Lapsed session redirects to `/login?next=/lists/[token]` with toast
 
 ### Phase 3: Regression & Edge-Case Verification
 

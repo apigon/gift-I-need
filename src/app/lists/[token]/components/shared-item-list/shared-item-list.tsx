@@ -1,9 +1,17 @@
 import { StatusBadge, Text } from "@/components";
 import type { SharedItem } from "@/lib/lists/types";
 
+import { ClaimButton } from "../claim-button/claim-button";
+
 // The page-level VisibilityBanner already explains a hidden status — no
 // per-item explanation here, just omit the badge.
-export function SharedItemList({ items }: { items: SharedItem[] }) {
+export function SharedItemList({
+  items,
+  token,
+}: {
+  items: SharedItem[];
+  token: string;
+}) {
   if (items.length === 0) {
     return <Text tone="muted">No gift ideas here yet.</Text>;
   }
@@ -17,7 +25,15 @@ export function SharedItemList({ items }: { items: SharedItem[] }) {
         >
           <div className="flex items-center justify-between gap-2">
             <Text as="span">{item.title}</Text>
-            {item.status !== null ? <StatusBadge status={item.status} /> : null}
+            <div className="flex items-center gap-2">
+              {item.status !== null ? <StatusBadge status={item.status} /> : null}
+              <ClaimButton
+                itemId={item.id}
+                itemTitle={item.title}
+                itemStatus={item.status}
+                token={token}
+              />
+            </div>
           </div>
           {item.notes ? (
             <Text variant="small" tone="muted">
