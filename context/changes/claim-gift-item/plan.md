@@ -248,26 +248,26 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [x] 2.1 Type checking passes
-- [x] 2.2 Linting passes
-- [x] 2.3 Full unit test suite passes
+- [x] 2.1 Type checking passes — 87b60eb
+- [x] 2.2 Linting passes — 87b60eb
+- [x] 2.3 Full unit test suite passes — 87b60eb
 
 #### Manual
 
-- [x] 2.4 Modal opens on Claim; Cancel/outside-click sends no request
-- [x] 2.5 Confirm shows pending, then badge flips to "mine" + success toast, modal closes
-- [x] 2.6 Reload confirms server-persisted claim
-- [x] 2.7 Other guest sees "Taken", no Claim button
-- [x] 2.8 Post-reveal organizer sees Available + Claim button on own list; Confirm surfaces `owner_cannot_claim`, no state change
-- [x] 2.9 Lapsed session redirects to `/login?next=/lists/[token]` with toast
+- [x] 2.4 Modal opens on Claim; Cancel/outside-click sends no request — 87b60eb
+- [x] 2.5 Confirm shows pending, then badge flips to "mine" + success toast, modal closes — 87b60eb
+- [x] 2.6 Reload confirms server-persisted claim — 87b60eb
+- [x] 2.7 Other guest sees "Taken", no Claim button — 87b60eb
+- [x] 2.8 Post-reveal organizer sees Available + Claim button on own list; Confirm surfaces `owner_cannot_claim`, no state change — 87b60eb
+- [x] 2.9 Lapsed session redirects to `/login?next=/lists/[token]` with toast — 87b60eb
 
 ### Phase 3: Regression & Edge-Case Verification
 
 #### Automated
 
-- [ ] 3.1 `pnpm test:db` passes
-- [ ] 3.2 `pnpm test:integration` passes
-- [ ] 3.3 Full `pnpm test`, `pnpm lint`, `pnpm typecheck` clean
+- [x] 3.1 `pnpm test:db` passes
+- [x] 3.2 `pnpm test:integration` passes
+- [x] 3.3 Full `pnpm test`, `pnpm lint`, `pnpm typecheck` clean
 
 #### Manual
 
