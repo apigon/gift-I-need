@@ -259,15 +259,15 @@ None — no schema or data changes.
 
 #### Automated
 
-- [x] 3.1 Unit tests pass: `pnpm test`
-- [x] 3.2 Type checking passes: `pnpm typecheck`
-- [x] 3.3 Linting passes: `pnpm lint`
-- [x] 3.4 Production build succeeds: `pnpm build`
+- [x] 3.1 Unit tests pass: `pnpm test` — e1fa0f9
+- [x] 3.2 Type checking passes: `pnpm typecheck` — e1fa0f9
+- [x] 3.3 Linting passes: `pnpm lint` — e1fa0f9
+- [x] 3.4 Production build succeeds: `pnpm build` — e1fa0f9
 
 #### Manual
 
-- [x] 3.5 No unlock button before event_date + 1
-- [x] 3.6 Unlock button appears at/after unlockable_at and successfully unlocks
-- [x] 3.7 Post-unlock: real statuses shown (taken/available), no Edit buttons, unlock button gone
-- [x] 3.8 Organizer marks a taken item given; badge flips, toast confirms
-- [x] 3.9 Status-overlay RPC failure degrades gracefully (titles still render, inline note shown) and recovers on refresh
+- [x] 3.5 No unlock button before event_date + 1 — e1fa0f9
+- [x] 3.6 Unlock button appears at/after unlockable_at and successfully unlocks — e1fa0f9
+- [x] 3.7 Post-unlock: real statuses shown (taken/available), no Edit buttons, unlock button gone — e1fa0f9
+- [x] 3.8 Organizer marks a taken item given; badge flips, toast confirms — e1fa0f9
+- [x] 3.9 Status-overlay RPC failure degrades gracefully (titles still render, inline note shown) and recovers on refresh — e1fa0f9
