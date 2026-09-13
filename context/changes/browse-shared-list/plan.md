@@ -194,9 +194,9 @@ None — no schema or data changes in this slice.
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `pnpm typecheck`
-- [x] 2.2 Linting passes: `pnpm lint`
-- [x] 2.3 Full unit suite still green: `pnpm test`
+- [x] 2.1 Type checking passes: `pnpm typecheck` — 0093f46
+- [x] 2.2 Linting passes: `pnpm lint` — 0093f46
+- [x] 2.3 Full unit suite still green: `pnpm test` — 0093f46
 
 #### Manual
 
