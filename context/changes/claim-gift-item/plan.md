@@ -271,7 +271,7 @@ None — no schema or data changes in this plan.
 
 #### Manual
 
-- [ ] 3.4 Two-session race: loser sees toast + auto-updates to "Taken" without manual reload
-- [ ] 3.5 Claim completes within ~1s, no ambiguous pending state under throttled network
-- [ ] 3.6 Organizer's pre-reveal view still shows zero claim info after a guest has claimed
-- [ ] 3.7 Signed-out visitor never sees a Claim button
+- [x] 3.4 Two-session race: loser sees toast + auto-updates to "Taken" without manual reload
+- [x] 3.5 Claim completes within ~1s, no ambiguous pending state under throttled network
+- [x] 3.6 Organizer's pre-reveal view still shows zero claim info after a guest has claimed
+- [x] 3.7 Signed-out visitor never sees a Claim button
