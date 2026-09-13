@@ -236,24 +236,24 @@ None — no schema or data changes.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `pnpm test`
-- [x] 1.2 Type checking passes: `pnpm typecheck`
-- [x] 1.3 Linting passes: `pnpm lint`
+- [x] 1.1 Unit tests pass: `pnpm test` — 10c9537
+- [x] 1.2 Type checking passes: `pnpm typecheck` — 10c9537
+- [x] 1.3 Linting passes: `pnpm lint` — 10c9537
 
 ### Phase 2: Guest-Side Mark-Given UI
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `pnpm test`
-- [ ] 2.2 Type checking passes: `pnpm typecheck`
-- [ ] 2.3 Linting passes: `pnpm lint`
+- [x] 2.1 Unit tests pass: `pnpm test`
+- [x] 2.2 Type checking passes: `pnpm typecheck`
+- [x] 2.3 Linting passes: `pnpm lint`
 
 #### Manual
 
-- [ ] 2.4 Seeded 'mine' item post-reveal shows a Mark as given button
-- [ ] 2.5 Clicking it shows pending state, then flips the badge to given with a success toast
-- [ ] 2.6 Repeat click / already-given item shows no error and no duplicate button
-- [ ] 2.7 Pre-reveal 'mine' item shows badge but no Mark as given button
+- [x] 2.4 Seeded 'mine' item post-reveal shows a Mark as given button
+- [x] 2.5 Clicking it shows pending state, then flips the badge to given with a success toast
+- [x] 2.6 Repeat click / already-given item shows no error and no duplicate button
+- [x] 2.7 Pre-reveal 'mine' item shows badge but no Mark as given button
 
 ### Phase 3: Organizer-Side Status Overlay, Mark-Given & Manual Unlock
 

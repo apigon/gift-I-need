@@ -44,7 +44,11 @@ export default async function SharedListPage({
 
       <div className="flex flex-col gap-4">
         <Heading level={2}>Gift ideas</Heading>
-        <SharedItemList items={items} token={token} />
+        <SharedItemList
+          items={items}
+          token={token}
+          revealOpen={event.revealOpen}
+        />
       </div>
     </main>
   );
