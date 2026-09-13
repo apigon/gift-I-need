@@ -30,7 +30,7 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 | ID   | Change ID                  | Outcome (user can …)                                            | Prerequisites    | PRD refs               | Status   |
 | ---- | -------------------------- | --------------------------------------------------------------- | ---------------- | ---------------------- | -------- |
 | F-01 | email-password-auth        | (foundation) email/password sign-up, sign-in, sign-out wired    | —                | FR-001, FR-002         | done     |
-| F-02 | surprise-rule-data-contract| (foundation) schema + enforced organizer-blindness & single-claim | —              | NFR (both), FR-011     | in-progress |
+| F-02 | surprise-rule-data-contract| (foundation) schema + enforced organizer-blindness & single-claim | —              | NFR (both), FR-011     | done |
 | F-03 | design-system-baseline     | (foundation) shared design tokens + base theme (incl. available/taken status styles) | — | FR-007, FR-009, NFR (confirmation) | done |
 | S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | done |
 | S-02 | browse-shared-list         | browse a shared list unauthenticated and see available/taken    | S-01, F-02       | US-01, FR-007, FR-009  | done |
@@ -90,7 +90,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - ~~Should the date gate be enforced purely in RLS, purely in query filters, or both (defense in depth)?~~ Resolved in `/10x-plan`: RLS plus `private.reveal_open`; no parallel app-side filter.
 - **Risk:** This is the riskiest correctness surface in the product and the one place `speed` does not relax the bar — the surprise rule and duplicate-prevention are must-hold guarantees. Kept to a minimal enabler contract (only the entities the first slices need + the two invariants + a focused test), NOT a full data-layer build: every downstream slice still integrates and exercises these tables through a real user capability.
-- **Status:** in-progress
+- **Status:** done
 
 ### F-03: Design tokens + base theme
 
@@ -212,3 +212,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-04: an authenticated organizer can edit items on an event they created (e.g. rename, update notes/link/price).** — Archived 2026-09-13 → `context/archive/2026-09-12-edit-list-items/`. Lesson: —.
 - **S-03: a signed-in guest can claim one unclaimed item; the item immediately flips to "taken" for all other guests, and the organizer sees no claim status until the event date.** — Archived 2026-09-13 → `context/archive/2026-09-13-claim-gift-item/`. Lesson: —.
 - **S-05: after the reveal opens — automatically at 00:00 on `event_date + 2` in the event's timezone, or earlier if the organizer unlocks manually from `event_date + 1` — the organizer can see the full claim status (never claimer identity), and either the claiming guest or the organizer can mark an item as "given": a single irreversible mark set by whichever party acts first.** — Archived 2026-09-13 → `context/archive/2026-09-13-post-event-reveal/`. Lesson: —.
+- **F-02: (foundation) the minimal schema for events, items, and claims exists, with row-level policies that enforce organizer-blindness (a query-level event-date gate) and a database constraint that makes a single claim per item atomic; a test runner plus one test lock both guarantees.** — Archived 2026-09-13 → `context/archive/2026-09-11-surprise-rule-data-contract/`. Lesson: —.
