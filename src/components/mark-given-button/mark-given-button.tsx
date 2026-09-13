@@ -3,9 +3,17 @@
 import { useActionState, useEffect } from "react";
 
 import { markGivenAction } from "@/app/actions/lists";
-import { Alert, Button, notify } from "@/components";
 import { initialFormState } from "@/lib/forms/form-state";
 
+import { Alert } from "../alert/alert";
+import { Button } from "../button/button";
+import { notify } from "../toaster/toaster";
+
+// Shared between the claiming guest's own 'mine' item (/lists/[token]) and
+// the organizer's 'taken' item (/events/[id]) once the reveal is open — same
+// action, same UI. Whichever party clicks first wins: mark_given is a single
+// `UPDATE ... WHERE given_at IS NULL` statement, so the loser's click is a
+// no-op success, not an error.
 export function MarkGivenButton({ itemId }: { itemId: string }) {
   const markGivenForItem = markGivenAction.bind(null, itemId);
   const [state, formAction, pending] = useActionState(
@@ -13,10 +21,9 @@ export function MarkGivenButton({ itemId }: { itemId: string }) {
     initialFormState,
   );
 
-  // `state !== initialFormState` is the same idiom ClaimModal/EditItemModal
-  // use: useActionState returns a fresh object reference on every
-  // resolution, so this distinguishes "just resolved after a submit" from
-  // the initial mount.
+  // `state !== initialFormState` distinguishes "just resolved after a
+  // submit" from the initial mount — useActionState returns a fresh object
+  // reference on every resolution.
   useEffect(() => {
     if (state === initialFormState) return;
     if (state.status === "idle") {

@@ -2,20 +2,23 @@
 
 import { useState } from "react";
 
-import { Button, Text } from "@/components";
-import type { OwnedItem } from "@/lib/lists/types";
+import { Button, MarkGivenButton, StatusBadge, Text } from "@/components";
+import type { OwnedItemWithStatus } from "@/lib/lists/reveal-status";
 
 import { EditItemModal } from "..";
 
-// Plain text, no StatusBadge — the organizer's own items carry no claim
-// status by definition (the organizer-blindness rule applies to the guest
-// side, not to this direct read).
+// Once revealed, the Edit button is replaced by the real claim status
+// (StatusBadge) plus a "Mark as given" control on `taken` items — `mine`
+// never occurs here (owner_cannot_claim blocks self-claims), and `available`
+// items get only the badge, nothing to act on.
 export function ItemList({
   items,
   revealOpen,
+  statusUnavailable,
 }: {
-  items: OwnedItem[];
+  items: OwnedItemWithStatus[];
   revealOpen: boolean;
+  statusUnavailable: boolean;
 }) {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const editingItem = items.find((item) => item.id === editingItemId);
@@ -34,7 +37,22 @@ export function ItemList({
           >
             <div className="flex items-start justify-between gap-2">
               <Text as="span">{item.title}</Text>
-              {revealOpen ? null : (
+              {revealOpen ? (
+                statusUnavailable ? (
+                  <Text variant="small" tone="muted">
+                    Couldn&apos;t load claim status — try refreshing
+                  </Text>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    {item.status !== null ? (
+                      <StatusBadge status={item.status} />
+                    ) : null}
+                    {item.status === "taken" ? (
+                      <MarkGivenButton itemId={item.id} />
+                    ) : null}
+                  </div>
+                )
+              ) : (
                 <Button
                   variant="secondary"
                   onClick={() => setEditingItemId(item.id)}

@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 
-import { StatusBadge, Text } from "@/components";
+import { MarkGivenButton, StatusBadge, Text } from "@/components";
 import type { SharedItem } from "@/lib/lists/types";
 
-import { ClaimButton, ClaimModal, MarkGivenButton } from "..";
+import { ClaimButton, ClaimModal } from "..";
 
 // The page-level VisibilityBanner already explains a hidden status — no
 // per-item explanation here, just omit the badge.

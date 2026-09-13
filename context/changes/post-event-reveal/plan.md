@@ -244,30 +244,30 @@ None — no schema or data changes.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `pnpm test`
-- [x] 2.2 Type checking passes: `pnpm typecheck`
-- [x] 2.3 Linting passes: `pnpm lint`
+- [x] 2.1 Unit tests pass: `pnpm test` — 8932999
+- [x] 2.2 Type checking passes: `pnpm typecheck` — 8932999
+- [x] 2.3 Linting passes: `pnpm lint` — 8932999
 
 #### Manual
 
-- [x] 2.4 Seeded 'mine' item post-reveal shows a Mark as given button
-- [x] 2.5 Clicking it shows pending state, then flips the badge to given with a success toast
-- [x] 2.6 Repeat click / already-given item shows no error and no duplicate button
-- [x] 2.7 Pre-reveal 'mine' item shows badge but no Mark as given button
+- [x] 2.4 Seeded 'mine' item post-reveal shows a Mark as given button — 8932999
+- [x] 2.5 Clicking it shows pending state, then flips the badge to given with a success toast — 8932999
+- [x] 2.6 Repeat click / already-given item shows no error and no duplicate button — 8932999
+- [x] 2.7 Pre-reveal 'mine' item shows badge but no Mark as given button — 8932999
 
 ### Phase 3: Organizer-Side Status Overlay, Mark-Given & Manual Unlock
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass: `pnpm test`
-- [ ] 3.2 Type checking passes: `pnpm typecheck`
-- [ ] 3.3 Linting passes: `pnpm lint`
-- [ ] 3.4 Production build succeeds: `pnpm build`
+- [x] 3.1 Unit tests pass: `pnpm test`
+- [x] 3.2 Type checking passes: `pnpm typecheck`
+- [x] 3.3 Linting passes: `pnpm lint`
+- [x] 3.4 Production build succeeds: `pnpm build`
 
 #### Manual
 
-- [ ] 3.5 No unlock button before event_date + 1
-- [ ] 3.6 Unlock button appears at/after unlockable_at and successfully unlocks
-- [ ] 3.7 Post-unlock: real statuses shown (taken/available), no Edit buttons, unlock button gone
-- [ ] 3.8 Organizer marks a taken item given; badge flips, toast confirms
-- [ ] 3.9 Status-overlay RPC failure degrades gracefully (titles still render, inline note shown) and recovers on refresh
+- [x] 3.5 No unlock button before event_date + 1
+- [x] 3.6 Unlock button appears at/after unlockable_at and successfully unlocks
+- [x] 3.7 Post-unlock: real statuses shown (taken/available), no Edit buttons, unlock button gone
+- [x] 3.8 Organizer marks a taken item given; badge flips, toast confirms
+- [x] 3.9 Status-overlay RPC failure degrades gracefully (titles still render, inline note shown) and recovers on refresh

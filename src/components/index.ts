@@ -9,3 +9,4 @@ export { StatusBadge } from "./status-badge/status-badge";
 export type { BadgeStatus } from "./status-badge/status-badge";
 export { Alert } from "./alert/alert";
 export { Toaster, notify } from "./toaster/toaster";
+export { MarkGivenButton } from "./mark-given-button/mark-given-button";
