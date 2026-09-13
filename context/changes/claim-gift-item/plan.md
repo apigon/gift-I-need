@@ -235,14 +235,14 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [ ] 1.1 Unit tests for `claimItem` pass
-- [ ] 1.2 Unit tests for `claimItemAction` pass
-- [ ] 1.3 Type checking passes
-- [ ] 1.4 Linting passes
+- [x] 1.1 Unit tests for `claimItem` pass
+- [x] 1.2 Unit tests for `claimItemAction` pass
+- [x] 1.3 Type checking passes
+- [x] 1.4 Linting passes
 
 #### Manual
 
-- [ ] 1.5 Error-message map reviewed against every realistic `ListErrorCode`
+- [x] 1.5 Error-message map reviewed against every realistic `ListErrorCode`
 
 ### Phase 2: Claim UI
 
