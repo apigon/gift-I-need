@@ -343,5 +343,5 @@ None — no schema change in this slice.
 
 #### Automated
 
-- [x] 5.1 DB tests pass: `pnpm test:db`
-- [x] 5.2 Full suite green: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:db`
+- [x] 5.1 DB tests pass: `pnpm test:db` — a3e09fd
+- [x] 5.2 Full suite green: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:db` — a3e09fd
