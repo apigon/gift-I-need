@@ -34,9 +34,9 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 | F-03 | design-system-baseline     | (foundation) shared design tokens + base theme (incl. available/taken status styles) | — | FR-007, FR-009, NFR (confirmation) | done |
 | S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | done |
 | S-02 | browse-shared-list         | browse a shared list unauthenticated and see available/taken    | S-01, F-02       | US-01, FR-007, FR-009  | done |
-| S-03 | claim-gift-item            | sign in and claim an unclaimed item; it flips to "taken"        | S-02, F-01, F-02 | US-01, FR-008, FR-009  | proposed |
+| S-03 | claim-gift-item            | sign in and claim an unclaimed item; it flips to "taken"        | S-02, F-01, F-02 | US-01, FR-008, FR-009  | planning |
 | S-04 | edit-list-items            | edit items on their own event list                              | S-01, F-01       | FR-005                 | done |
-| S-05 | post-event-reveal          | after the event date, see full claim status and mark items given | S-03, F-01, F-02 | US-02, FR-010, FR-011  | proposed |
+| S-05 | post-event-reveal          | after the event date, see full claim status and mark items given | S-03, F-01, F-02 | US-02, FR-010, FR-011  | planning |
 
 ## Streams
 
@@ -141,9 +141,9 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:**
-  - What does a guest see when they attempt to claim an item another guest just took (race loser UX)? The DAL (F-02) maps the race loser's `23505` to `already_taken` — this slice still owns the UX response to it. — Owner: TBD (resolve in `/10x-plan`). Block: no.
-- **Risk:** The north star and the highest-stakes slice: duplicate-prevention must be reliable under concurrent claims (rests on the F-02 DB constraint, not UI checks), the claim must confirm within ~1s (NFR), and claiming is irreversible in v1 (unclaim is parked). If F-02's invariants are sound, this slice is mostly wiring the action + optimistic UI.
-- **Status:** proposed
+  - ~~What does a guest see when they attempt to claim an item another guest just took (race loser UX)?~~ Resolved in `/10x-plan`: toast error + `refresh()`-driven badge flip to "taken", the same treatment given to the `claims_closed` mid-session edge case.
+- **Risk:** The north star and the highest-stakes slice: duplicate-prevention must be reliable under concurrent claims (rests on the F-02 DB constraint, not UI checks), the claim must confirm within ~1s (NFR), and claiming is irreversible in v1 (unclaim is parked, and the user chose a modal confirmation step as an extra safeguard). If F-02's invariants are sound, this slice is mostly wiring the action + a pending-state (non-optimistic) UI.
+- **Status:** planning
 
 ### S-04: Organizer edits items on their own list
 
@@ -168,7 +168,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - What is the event lifecycle after the reveal — can the organizer archive/delete the event? — Owner: user. Block: no (see Open Roadmap Questions).
 - **Risk:** Exercises the reveal side of the surprise rule via the `unlock_event` / `get_shared_*` RPCs (F-02): the gate must flip exactly at the computed reveal instant and never before, under refresh/direct-URL access (NFR), and the organizer must never see claimer identity even after the reveal. "Given" is a single mark, not independent per-party state, so the UI must treat a second mark-given call as a no-op rather than a second confirmation. This is the second half of the F-02 contract made user-visible.
-- **Status:** proposed
+- **Status:** planning
 
 ## Backlog Handoff
 
