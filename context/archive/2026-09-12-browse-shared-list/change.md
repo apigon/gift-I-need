@@ -1,10 +1,10 @@
 ---
 change_id: browse-shared-list
 title: Browse shared list
-status: impl_reviewed
+status: archived
 created: 2026-09-12
 updated: 2026-09-13
-archived_at: null
+archived_at: 2026-09-13T09:23:57Z
 ---
 
 ## Notes
