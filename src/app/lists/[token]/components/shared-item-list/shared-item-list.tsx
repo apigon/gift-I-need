@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { StatusBadge, Text } from "@/components";
+import { MarkGivenButton, StatusBadge, Text } from "@/components";
 import type { SharedItem } from "@/lib/lists/types";
 
 import { ClaimButton, ClaimModal } from "..";
@@ -12,9 +12,11 @@ import { ClaimButton, ClaimModal } from "..";
 export function SharedItemList({
   items,
   token,
+  revealOpen,
 }: {
   items: SharedItem[];
   token: string;
+  revealOpen: boolean;
 }) {
   const [claimingItemId, setClaimingItemId] = useState<string | null>(null);
   const claimingItem = items.find((item) => item.id === claimingItemId);
@@ -37,6 +39,9 @@ export function SharedItemList({
                 {item.status !== null ? <StatusBadge status={item.status} /> : null}
                 {item.status === "available" ? (
                   <ClaimButton onClick={() => setClaimingItemId(item.id)} />
+                ) : null}
+                {revealOpen && item.status === "mine" ? (
+                  <MarkGivenButton itemId={item.id} />
                 ) : null}
               </div>
             </div>

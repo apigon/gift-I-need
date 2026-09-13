@@ -2,8 +2,16 @@ import { notFound } from "next/navigation";
 
 import { Alert, Heading, Text } from "@/components";
 import { getOwnedEvent } from "@/lib/lists/owned-events";
+import { mergeOwnedItemsWithStatus } from "@/lib/lists/reveal-status";
+import { getSharedList } from "@/lib/lists/shared-list";
+import type { SharedItem } from "@/lib/lists/types";
 
-import { AddItemForm, CopyableLinkCard, ItemList } from "./components";
+import {
+  AddItemForm,
+  CopyableLinkCard,
+  ItemList,
+  RevealControl,
+} from "./components";
 
 // Both links are built server-side from NEXT_PUBLIC_SITE_URL, never from a
 // request header — mirrors `buildConfirmUrl` in `src/app/actions/auth.ts`,
@@ -54,6 +62,27 @@ export default async function EventPage({
   const shareUrl = buildSiteUrl(`/lists/${event.shareToken}`);
   const organizerUrl = buildSiteUrl(`/events/${event.id}`);
 
+  // Pre-reveal, status would only ever come back null anyway (see
+  // private.get_shared_items's owner branch) — skip the RPC round trip
+  // entirely rather than issue a call whose result is thrown away.
+  let statusUnavailable = false;
+  let sharedItems: SharedItem[] | null = null;
+
+  if (event.revealOpen) {
+    const sharedResult = await getSharedList(event.shareToken);
+    if (sharedResult.kind === "ok") {
+      sharedItems = sharedResult.items;
+    } else {
+      // Both "error" and the structurally-unreachable "not_found" (the
+      // owner is reading their own already-validated share_token) degrade
+      // the same way: render titles with a "couldn't load status" note
+      // instead of failing the whole page.
+      statusUnavailable = true;
+    }
+  }
+
+  const itemsWithStatus = mergeOwnedItemsWithStatus(items, sharedItems);
+
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 py-16">
       <div>
@@ -77,8 +106,17 @@ export default async function EventPage({
       </div>
 
       <div className="flex flex-col gap-4">
-        <Heading level={2}>Gift ideas</Heading>
-        <ItemList items={items} revealOpen={event.revealOpen} />
+        <div className="flex items-center justify-between gap-2">
+          <Heading level={2}>Gift ideas</Heading>
+          {event.unlockable && !event.revealOpen ? (
+            <RevealControl eventId={event.id} />
+          ) : null}
+        </div>
+        <ItemList
+          items={itemsWithStatus}
+          revealOpen={event.revealOpen}
+          statusUnavailable={statusUnavailable}
+        />
         {!event.revealOpen && <AddItemForm eventId={event.id} />}
       </div>
     </main>

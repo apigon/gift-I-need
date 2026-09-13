@@ -7,15 +7,21 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // why a claim attempt failed.
 
 const claimItem = vi.fn();
+const markGiven = vi.fn();
+const unlockEvent = vi.fn();
 const refresh = vi.fn();
 
-vi.mock("@/lib/lists/shared-list", () => ({ claimItem }));
+vi.mock("@/lib/lists/shared-list", () => ({ claimItem, markGiven, unlockEvent }));
 vi.mock("next/cache", () => ({ refresh }));
 
-const { claimItemAction } = await import("./lists");
+const { claimItemAction, markGivenAction, unlockEventAction } = await import(
+  "./lists"
+);
 
 beforeEach(() => {
   claimItem.mockReset();
+  markGiven.mockReset();
+  unlockEvent.mockReset();
   refresh.mockReset();
 });
 
@@ -55,4 +61,91 @@ describe("claimItemAction", () => {
       expect(result).toEqual({ status: "error", code, message });
     },
   );
+});
+
+describe("markGivenAction", () => {
+  it("returns idle and calls refresh() on success", async () => {
+    markGiven.mockResolvedValue({ ok: true });
+
+    const result = await markGivenAction(
+      "i1",
+      { status: "idle" },
+      new FormData(),
+    );
+
+    expect(markGiven).toHaveBeenCalledWith("i1");
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ status: "idle" });
+  });
+
+  it.each([
+    "not_claimed",
+    "not_permitted",
+    "not_revealed",
+    "item_not_found",
+  ] as const)(
+    "maps %s to the generic error message and does not call refresh()",
+    async (code) => {
+      markGiven.mockResolvedValue({ ok: false, code });
+
+      const result = await markGivenAction(
+        "i1",
+        { status: "idle" },
+        new FormData(),
+      );
+
+      expect(refresh).not.toHaveBeenCalled();
+      expect(result).toEqual({
+        status: "error",
+        message: "Something went wrong. Please try again.",
+      });
+    },
+  );
+});
+
+describe("unlockEventAction", () => {
+  it("returns idle and calls refresh() on success", async () => {
+    unlockEvent.mockResolvedValue({ ok: true });
+
+    const result = await unlockEventAction(
+      "e1",
+      { status: "idle" },
+      new FormData(),
+    );
+
+    expect(unlockEvent).toHaveBeenCalledWith("e1");
+    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ status: "idle" });
+  });
+
+  it("maps unlock_too_early to a specific message and does not call refresh()", async () => {
+    unlockEvent.mockResolvedValue({ ok: false, code: "unlock_too_early" });
+
+    const result = await unlockEventAction(
+      "e1",
+      { status: "idle" },
+      new FormData(),
+    );
+
+    expect(refresh).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      status: "error",
+      message: "Try again after it opens.",
+    });
+  });
+
+  it("maps an unexpected repeat-unlock error to the generic message", async () => {
+    unlockEvent.mockResolvedValue({ ok: false, code: "event_not_found" });
+
+    const result = await unlockEventAction(
+      "e1",
+      { status: "idle" },
+      new FormData(),
+    );
+
+    expect(result).toEqual({
+      status: "error",
+      message: "Something went wrong. Please try again.",
+    });
+  });
 });

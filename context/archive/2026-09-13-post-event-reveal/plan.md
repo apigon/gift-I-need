@@ -172,6 +172,8 @@ The organizer's own event page shows real claim status once revealed, lets the o
 
 **Contract**: Rendered in `page.tsx` alongside the existing `Gift ideas` heading area, gated by `event.unlockable && !event.revealOpen`. Button label "Unlock now" (or similar); `pendingLabel="Unlocking…"`; toast "Reveal unlocked" on success. Also update `src/app/events/[id]/components/index.ts` to add `export { UnlockControl } from "./unlock-control/unlock-control";` — the barrel that `page.tsx` already imports the rest of this directory's components through.
 
+**Addendum (post-impl-review, 2026-09-13)**: Shipped as `src/app/events/[id]/components/reveal-control/reveal-control.tsx`, component `RevealControl`, barrel export `RevealControl` — not `unlock-control`/`UnlockControl`. Copy shipped as "Open the reveal now" / `pendingLabel="Opening…"` / toast "Reveal opened", not "Unlock now" / "Unlocking…" / "Reveal unlocked". Deliberate: a new organizer seeing "Unlock" would plausibly read it as "click this before sharing the link to let guests claim," not "reveal claim status early" — the opposite of what the button does. Gating logic (`event.unlockable && !event.revealOpen`) is unchanged from the contract above.
+
 ### Success Criteria:
 
 #### Automated Verification:
@@ -236,38 +238,38 @@ None — no schema or data changes.
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `pnpm test`
-- [ ] 1.2 Type checking passes: `pnpm typecheck`
-- [ ] 1.3 Linting passes: `pnpm lint`
+- [x] 1.1 Unit tests pass: `pnpm test` — 10c9537
+- [x] 1.2 Type checking passes: `pnpm typecheck` — 10c9537
+- [x] 1.3 Linting passes: `pnpm lint` — 10c9537
 
 ### Phase 2: Guest-Side Mark-Given UI
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `pnpm test`
-- [ ] 2.2 Type checking passes: `pnpm typecheck`
-- [ ] 2.3 Linting passes: `pnpm lint`
+- [x] 2.1 Unit tests pass: `pnpm test` — 8932999
+- [x] 2.2 Type checking passes: `pnpm typecheck` — 8932999
+- [x] 2.3 Linting passes: `pnpm lint` — 8932999
 
 #### Manual
 
-- [ ] 2.4 Seeded 'mine' item post-reveal shows a Mark as given button
-- [ ] 2.5 Clicking it shows pending state, then flips the badge to given with a success toast
-- [ ] 2.6 Repeat click / already-given item shows no error and no duplicate button
-- [ ] 2.7 Pre-reveal 'mine' item shows badge but no Mark as given button
+- [x] 2.4 Seeded 'mine' item post-reveal shows a Mark as given button — 8932999
+- [x] 2.5 Clicking it shows pending state, then flips the badge to given with a success toast — 8932999
+- [x] 2.6 Repeat click / already-given item shows no error and no duplicate button — 8932999
+- [x] 2.7 Pre-reveal 'mine' item shows badge but no Mark as given button — 8932999
 
 ### Phase 3: Organizer-Side Status Overlay, Mark-Given & Manual Unlock
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass: `pnpm test`
-- [ ] 3.2 Type checking passes: `pnpm typecheck`
-- [ ] 3.3 Linting passes: `pnpm lint`
-- [ ] 3.4 Production build succeeds: `pnpm build`
+- [x] 3.1 Unit tests pass: `pnpm test` — e1fa0f9
+- [x] 3.2 Type checking passes: `pnpm typecheck` — e1fa0f9
+- [x] 3.3 Linting passes: `pnpm lint` — e1fa0f9
+- [x] 3.4 Production build succeeds: `pnpm build` — e1fa0f9
 
 #### Manual
 
-- [ ] 3.5 No unlock button before event_date + 1
-- [ ] 3.6 Unlock button appears at/after unlockable_at and successfully unlocks
-- [ ] 3.7 Post-unlock: real statuses shown (taken/available), no Edit buttons, unlock button gone
-- [ ] 3.8 Organizer marks a taken item given; badge flips, toast confirms
-- [ ] 3.9 Status-overlay RPC failure degrades gracefully (titles still render, inline note shown) and recovers on refresh
+- [x] 3.5 No unlock button before event_date + 1 — e1fa0f9
+- [x] 3.6 Unlock button appears at/after unlockable_at and successfully unlocks — e1fa0f9
+- [x] 3.7 Post-unlock: real statuses shown (taken/available), no Edit buttons, unlock button gone — e1fa0f9
+- [x] 3.8 Organizer marks a taken item given; badge flips, toast confirms — e1fa0f9
+- [x] 3.9 Status-overlay RPC failure degrades gracefully (titles still render, inline note shown) and recovers on refresh — e1fa0f9

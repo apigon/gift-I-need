@@ -113,7 +113,9 @@ export async function getOwnedEvent(eventId: string): Promise<
   const [eventResult, itemsResult] = await Promise.all([
     supabase
       .from("events")
-      .select("id, name, event_date, timezone, share_token, revealed_at, auto_reveal_at")
+      .select(
+        "id, name, event_date, timezone, share_token, revealed_at, auto_reveal_at, unlockable_at",
+      )
       .eq("id", eventId),
     supabase
       .from("items")
@@ -158,6 +160,10 @@ export async function getOwnedEvent(eventId: string): Promise<
       revealOpen:
         eventRow.revealed_at !== null ||
         Date.now() >= new Date(eventRow.auto_reveal_at).getTime(),
+      // Mirrors private.unlock_event's `now() < v_unlockable_at` (inclusive
+      // boundary flips to unlockable at exactly unlockable_at) — only
+      // meaningful pre-reveal; see the OwnedEvent field comment.
+      unlockable: Date.now() >= new Date(eventRow.unlockable_at).getTime(),
     },
     items: (itemRows ?? []).map((row) => ({
       id: row.id,
