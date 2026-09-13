@@ -265,13 +265,13 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [x] 3.1 `pnpm test:db` passes
-- [x] 3.2 `pnpm test:integration` passes
-- [x] 3.3 Full `pnpm test`, `pnpm lint`, `pnpm typecheck` clean
+- [x] 3.1 `pnpm test:db` passes — 9e1058d
+- [x] 3.2 `pnpm test:integration` passes — 9e1058d
+- [x] 3.3 Full `pnpm test`, `pnpm lint`, `pnpm typecheck` clean — 9e1058d
 
 #### Manual
 
-- [x] 3.4 Two-session race: loser sees toast + auto-updates to "Taken" without manual reload
-- [x] 3.5 Claim completes within ~1s, no ambiguous pending state under throttled network
-- [x] 3.6 Organizer's pre-reveal view still shows zero claim info after a guest has claimed
-- [x] 3.7 Signed-out visitor never sees a Claim button
+- [x] 3.4 Two-session race: loser sees toast + auto-updates to "Taken" without manual reload — 9e1058d
+- [x] 3.5 Claim completes within ~1s, no ambiguous pending state under throttled network — 9e1058d
+- [x] 3.6 Organizer's pre-reveal view still shows zero claim info after a guest has claimed — 9e1058d
+- [x] 3.7 Signed-out visitor never sees a Claim button — 9e1058d
