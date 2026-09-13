@@ -59,6 +59,8 @@ export async function getSharedList(token: string): Promise<SharedListResult> {
       notes: row.notes,
       link: row.link,
       priceRange: row.price_range,
+      // visibility.ts infers a hidden reveal from status === null on a
+      // present row — never change this to omit hidden-item rows instead.
       status: row.status as ItemStatus | null,
     })),
   };
