@@ -10,7 +10,12 @@ import {
   Text,
 } from "@/components";
 
-import { ComboboxDemo, ControlledFieldDemo, ToastDemo } from "./components";
+import {
+  ComboboxDemo,
+  ControlledFieldDemo,
+  ModalDemo,
+  ToastDemo,
+} from "./components";
 
 // Dev-only reference: exercises every token and primitive state so it can be
 // checked against `context/changes/design-system-baseline/palette-proof.html`.
@@ -42,6 +47,12 @@ const SWATCHES: Array<{ name: string; hex: string; role: string; className: stri
   { name: "status-mine-surface", hex: "#ECE4F7", role: "status: mine surface", className: "bg-status-mine-surface" },
   { name: "status-given", hex: "#7A5A1E", role: "status: given", className: "bg-status-given" },
   { name: "status-given-surface", hex: "#FBEBC8", role: "status: given surface", className: "bg-status-given-surface" },
+  {
+    name: "overlay",
+    hex: "color-mix(in srgb, var(--color-fg) 45%, transparent)",
+    role: "modal backdrop scrim",
+    className: "bg-overlay",
+  },
 ];
 
 export default function DesignSystemPage() {
@@ -66,7 +77,13 @@ export default function DesignSystemPage() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {SWATCHES.map((swatch) => (
             <div key={swatch.name} className="flex flex-col gap-2 rounded-control border border-hairline p-3">
-              <div className={`h-12 rounded-control border border-hairline ${swatch.className}`} />
+              {swatch.name === "overlay" ? (
+                <div className="flex h-12 items-center justify-center rounded-control border border-hairline bg-fg">
+                  <div className={`h-8 w-8 rounded-control ${swatch.className}`} />
+                </div>
+              ) : (
+                <div className={`h-12 rounded-control border border-hairline ${swatch.className}`} />
+              )}
               <Text variant="small" className="font-bold">
                 {swatch.name}
               </Text>
@@ -138,6 +155,11 @@ export default function DesignSystemPage() {
       <section className="flex flex-col gap-4">
         <Heading level={2}>Combobox</Heading>
         <ComboboxDemo />
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <Heading level={2}>Modal</Heading>
+        <ModalDemo />
       </section>
 
       <section className="flex flex-col gap-4">

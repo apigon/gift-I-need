@@ -67,6 +67,41 @@ export async function addItem(
   return { ok: true };
 }
 
+export async function updateItem(
+  itemId: string,
+  input: {
+    title: string;
+    notes?: string;
+    link?: string;
+    priceRange?: string;
+  },
+): Promise<ListResult> {
+  const supabase = await createClient();
+
+  // `items_update_owner`'s USING clause scopes the match to
+  // is_event_owner(event_id) with no error on a non-match — a non-owned or
+  // stale itemId just matches 0 rows and Postgres reports success. .single()
+  // is required (not just tidy) so a 0-row match surfaces as a PGRST116
+  // error instead of a silent no-op false-positive.
+  const { error } = await supabase
+    .from("items")
+    .update({
+      title: input.title,
+      notes: input.notes ?? null,
+      link: input.link ?? null,
+      price_range: input.priceRange ?? null,
+    })
+    .eq("id", itemId)
+    .select("id")
+    .single();
+
+  if (error) {
+    return { ok: false, code: mapRpcError(error) };
+  }
+
+  return { ok: true };
+}
+
 export async function getOwnedEvent(eventId: string): Promise<
   | { kind: "ok"; event: OwnedEvent; items: OwnedItem[] }
   | { kind: "not_found" }
@@ -78,7 +113,7 @@ export async function getOwnedEvent(eventId: string): Promise<
   const [eventResult, itemsResult] = await Promise.all([
     supabase
       .from("events")
-      .select("id, name, event_date, timezone, share_token")
+      .select("id, name, event_date, timezone, share_token, revealed_at, auto_reveal_at")
       .eq("id", eventId),
     supabase
       .from("items")
@@ -112,6 +147,17 @@ export async function getOwnedEvent(eventId: string): Promise<
       eventDate: eventRow.event_date,
       timezone: eventRow.timezone,
       shareToken: eventRow.share_token,
+      // Mirrors private.reveal_open (supabase/migrations/20260911211956_surprise_rule_schema.sql:202-204:
+      // `now() >= e.auto_reveal_at or e.revealed_at is not null`) — computed
+      // here in JS against the already-fetched row rather than a second RPC
+      // round trip. Keep the `>=` inclusive to match the SQL exactly; see the
+      // boundary case in owned-events.test.ts. Only gates the Edit button's
+      // visibility — the actual write is independently enforced by
+      // items_update_owner's RLS check against the real private.reveal_open,
+      // so drift here is cosmetic (button mismatch), never a claim-data leak.
+      revealOpen:
+        eventRow.revealed_at !== null ||
+        Date.now() >= new Date(eventRow.auto_reveal_at).getTime(),
     },
     items: (itemRows ?? []).map((row) => ({
       id: row.id,

@@ -4,6 +4,7 @@ export { Link } from "./link/link";
 export { Input } from "./input/input";
 export { Combobox } from "./combobox/combobox";
 export type { ComboboxOption } from "./combobox/combobox";
+export { Modal } from "./modal/modal";
 export { StatusBadge } from "./status-badge/status-badge";
 export type { BadgeStatus } from "./status-badge/status-badge";
 export { Alert } from "./alert/alert";

@@ -19,11 +19,13 @@ const DEFAULT_SIZE_BY_LEVEL: Record<1 | 2 | 3, HeadingSize> = {
 export function Heading({
   level,
   size,
+  id,
   className,
   children,
 }: {
   level: 1 | 2 | 3;
   size?: HeadingSize;
+  id?: string;
   className?: string;
   children: ReactNode;
 }) {
@@ -32,6 +34,7 @@ export function Heading({
 
   return (
     <Tag
+      id={id}
       className={cn(
         "font-display",
         HEADING_SIZE_CLASS[resolvedSize],

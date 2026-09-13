@@ -5,12 +5,18 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import type { FormState } from "@/lib/forms/form-state";
-import { addItem as insertItem, createEvent as insertEvent } from "@/lib/lists/owned-events";
+import {
+  addItem as insertItem,
+  createEvent as insertEvent,
+  updateItem as updateItemRow,
+} from "@/lib/lists/owned-events";
 import {
   AddItemSchema,
   CreateEventSchema,
+  EditItemSchema,
   type AddItemFieldErrors,
   type CreateEventFieldErrors,
+  type EditItemFieldErrors,
 } from "@/lib/lists/schemas";
 
 // Event/item Server Actions, shaped for `useActionState` — same contract as
@@ -90,6 +96,37 @@ export async function addItem(
   // (rather than a distinct "success" state) is deliberate — see the
   // field-clearing note in AddItemForm, which treats idle and just-succeeded
   // as the same "reset every field" case.
+  refresh();
+  return { status: "idle" };
+}
+
+export async function updateItem(
+  itemId: string,
+  _prevState: FormState<EditItemFieldErrors>,
+  formData: FormData,
+): Promise<FormState<EditItemFieldErrors>> {
+  const parsed = EditItemSchema.safeParse({
+    title: formData.get("title"),
+    notes: formData.get("notes"),
+    link: formData.get("link"),
+    priceRange: formData.get("priceRange"),
+  });
+
+  if (!parsed.success) {
+    return {
+      status: "error",
+      errors: z.flattenError(parsed.error).fieldErrors,
+    };
+  }
+
+  const result = await updateItemRow(itemId, parsed.data);
+
+  if (!result.ok) {
+    return { status: "error", message: GENERIC_ERROR };
+  }
+
+  // Same contract as addItem: refresh() re-runs getOwnedEvent, idle signals
+  // "just succeeded" to the caller (EditItemModal closes on idle).
   refresh();
   return { status: "idle" };
 }

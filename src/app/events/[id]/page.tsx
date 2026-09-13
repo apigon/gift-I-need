@@ -78,8 +78,8 @@ export default async function EventPage({
 
       <div className="flex flex-col gap-4">
         <Heading level={2}>Gift ideas</Heading>
-        <ItemList items={items} />
-        <AddItemForm eventId={event.id} />
+        <ItemList items={items} revealOpen={event.revealOpen} />
+        {!event.revealOpen && <AddItemForm eventId={event.id} />}
       </div>
     </main>
   );

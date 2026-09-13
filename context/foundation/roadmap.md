@@ -35,7 +35,7 @@ GIN decouples a gift list from any retailer: an organizer curates gift ideas, sh
 | S-01 | create-and-share-event-list| create an event, add gift ideas, and share a link               | F-01, F-02, F-03 | US-01, FR-003, FR-004, FR-006 | done |
 | S-02 | browse-shared-list         | browse a shared list unauthenticated and see available/taken    | S-01, F-02       | US-01, FR-007, FR-009  | done |
 | S-03 | claim-gift-item            | sign in and claim an unclaimed item; it flips to "taken"        | S-02, F-01, F-02 | US-01, FR-008, FR-009  | proposed |
-| S-04 | edit-list-items            | edit items on their own event list                              | S-01, F-01       | FR-005                 | proposed |
+| S-04 | edit-list-items            | edit items on their own event list                              | S-01, F-01       | FR-005                 | done |
 | S-05 | post-event-reveal          | after the event date, see full claim status and mark items given | S-03, F-01, F-02 | US-02, FR-010, FR-011  | proposed |
 
 ## Streams
@@ -155,7 +155,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Off the north-star critical path, so sequenced after the core loop under the `speed` bias — but it is the strongest parallel-with candidate, so it is the natural slice to fan out to a separate agent run when capacity is the blocker. Edit-only; deletion is a Non-Goal.
-- **Status:** proposed
+- **Status:** done
 
 ### S-05: Post-event reveal and delivery confirmation
 
@@ -209,3 +209,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **F-03: (foundation) a shared visual layer over the existing Tailwind v4 setup — design tokens (color, typography scale, spacing) and a base theme that includes the load-bearing "available" vs "taken" status styles and a consistent claim-confirmation feedback state; every feature UI consumes it instead of inventing its own.** — Archived 2026-09-11 → `context/archive/2026-09-10-design-system-baseline/`. Lesson: —.
 - **S-01: an authenticated organizer can create an event (name + date), add gift ideas (title; optional notes, link, price range), and get a shareable link.** — Archived 2026-09-12 → `context/archive/2026-09-12-create-and-share-event-list/`. Lesson: —.
 - **S-02: an unauthenticated visitor can open a shared link and view all items; seeing each item's "available" or "taken" status requires signing in (F-02, amended PRD US-01 AC1). The list is read via `getSharedList` (`src/lib/lists/shared-list.ts`) — no other query path.** — Archived 2026-09-13 → `context/archive/2026-09-12-browse-shared-list/`. Lesson: —.
+- **S-04: an authenticated organizer can edit items on an event they created (e.g. rename, update notes/link/price).** — Archived 2026-09-13 → `context/archive/2026-09-12-edit-list-items/`. Lesson: —.
