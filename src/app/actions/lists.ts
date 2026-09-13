@@ -2,12 +2,18 @@
 
 import { refresh } from "next/cache";
 
-import { claimItem } from "@/lib/lists/shared-list";
+import type { FormState } from "@/lib/forms/form-state";
 import type { ListErrorCode } from "@/lib/lists/errors";
+import {
+  claimItem,
+  markGiven as markGivenRpc,
+  unlockEvent as unlockEventRpc,
+} from "@/lib/lists/shared-list";
 
-// Server Actions for the shared-list page (S-03). Unlike src/app/actions/events.ts,
-// these wrap RPCs with no form fields to parse — formData is accepted only to
-// satisfy the useActionState signature.
+// Server Actions for the shared-list page (S-03) and post-event reveal
+// (S-05). Unlike src/app/actions/events.ts, these wrap RPCs with no form
+// fields to parse — formData is accepted only to satisfy the useActionState
+// signature.
 
 export type ClaimFormState =
   | { status: "idle" }
@@ -47,5 +53,48 @@ export async function claimItemAction(
     };
   }
 
+  return { status: "idle" };
+}
+
+// Copy policy mirrors src/app/actions/events.ts: specific messages only for
+// codes the user can act on, generic for everything else. `not_claimed` /
+// `not_permitted` / `not_revealed` on markGiven, and a repeat `unlock_event`
+// call, all collapse to the generic message — a no-op success (second mark
+// by the same allowed party) is not an error at the RPC level, so no
+// special-casing is needed here.
+const UNLOCK_ERROR_MESSAGES: Partial<Record<ListErrorCode, string>> = {
+  unlock_too_early: "Try again after it opens.",
+};
+
+export async function markGivenAction(
+  itemId: string,
+  _prevState: FormState<never>,
+  _formData: FormData,
+): Promise<FormState<never>> {
+  const result = await markGivenRpc(itemId);
+
+  if (!result.ok) {
+    return { status: "error", message: GENERIC_ERROR };
+  }
+
+  refresh();
+  return { status: "idle" };
+}
+
+export async function unlockEventAction(
+  eventId: string,
+  _prevState: FormState<never>,
+  _formData: FormData,
+): Promise<FormState<never>> {
+  const result = await unlockEventRpc(eventId);
+
+  if (!result.ok) {
+    return {
+      status: "error",
+      message: UNLOCK_ERROR_MESSAGES[result.code] ?? GENERIC_ERROR,
+    };
+  }
+
+  refresh();
   return { status: "idle" };
 }

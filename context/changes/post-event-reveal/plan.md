@@ -236,9 +236,9 @@ None — no schema or data changes.
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `pnpm test`
-- [ ] 1.2 Type checking passes: `pnpm typecheck`
-- [ ] 1.3 Linting passes: `pnpm lint`
+- [x] 1.1 Unit tests pass: `pnpm test`
+- [x] 1.2 Type checking passes: `pnpm typecheck`
+- [x] 1.3 Linting passes: `pnpm lint`
 
 ### Phase 2: Guest-Side Mark-Given UI
 

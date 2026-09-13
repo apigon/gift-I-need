@@ -47,6 +47,10 @@ export type OwnedEvent = {
   timezone: string;
   shareToken: string;
   revealOpen: boolean;
+  // Only meaningful when revealOpen is false — gates the manual-unlock
+  // control's visibility. Mirrors private.unlock_event's `now() <
+  // v_unlockable_at` check (supabase/migrations/20260911211956_surprise_rule_schema.sql:410).
+  unlockable: boolean;
 };
 
 export type OwnedItem = {

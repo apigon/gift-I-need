@@ -160,6 +160,7 @@ describe("getOwnedEvent", () => {
             share_token: "a".repeat(22),
             revealed_at: null,
             auto_reveal_at: "2099-01-01T00:00:00Z",
+            unlockable_at: "2020-01-01T00:00:00Z",
           },
         ],
         error: null,
@@ -185,6 +186,7 @@ describe("getOwnedEvent", () => {
             share_token: "a".repeat(22),
             revealed_at: null,
             auto_reveal_at: "2099-01-01T00:00:00Z",
+            unlockable_at: "2020-01-01T00:00:00Z",
           },
         ],
         error: null,
@@ -212,6 +214,7 @@ describe("getOwnedEvent", () => {
         timezone: "Europe/Warsaw",
         shareToken: "a".repeat(22),
         revealOpen: false,
+        unlockable: true,
       },
       items: [
         {
@@ -228,6 +231,7 @@ describe("getOwnedEvent", () => {
   function eventWith(revealFields: {
     revealed_at: string | null;
     auto_reveal_at: string;
+    unlockable_at?: string;
   }) {
     return {
       events: {
@@ -238,6 +242,7 @@ describe("getOwnedEvent", () => {
             event_date: "2026-12-24",
             timezone: "Europe/Warsaw",
             share_token: "a".repeat(22),
+            unlockable_at: "2020-01-01T00:00:00Z",
             ...revealFields,
           },
         ],
@@ -293,5 +298,54 @@ describe("getOwnedEvent", () => {
 
     expect(result.kind).toBe("ok");
     expect(result.kind === "ok" && result.event.revealOpen).toBe(true);
+  });
+
+  it("unlockable is false before unlockable_at", async () => {
+    mockFrom(
+      eventWith({
+        revealed_at: null,
+        auto_reveal_at: "2099-01-01T00:00:00Z",
+        unlockable_at: "2099-01-01T00:00:00Z",
+      }),
+    );
+
+    const result = await getOwnedEvent("e1");
+    expect(result.kind).toBe("ok");
+    expect(result.kind === "ok" && result.event.unlockable).toBe(false);
+  });
+
+  it("unlockable is true after unlockable_at", async () => {
+    mockFrom(
+      eventWith({
+        revealed_at: null,
+        auto_reveal_at: "2099-01-01T00:00:00Z",
+        unlockable_at: "2020-01-01T00:00:00Z",
+      }),
+    );
+
+    const result = await getOwnedEvent("e1");
+    expect(result.kind).toBe("ok");
+    expect(result.kind === "ok" && result.event.unlockable).toBe(true);
+  });
+
+  // Pins agreement with private.unlock_event's `now() < v_unlockable_at`
+  // (so `>=` is the unlockable instant) — a `>` here would silently disagree
+  // with the DB at the exact boundary.
+  it("unlockable is true when unlockable_at exactly equals now", async () => {
+    const now = "2026-06-01T12:00:00.000Z";
+    vi.useFakeTimers().setSystemTime(new Date(now));
+    mockFrom(
+      eventWith({
+        revealed_at: null,
+        auto_reveal_at: "2099-01-01T00:00:00Z",
+        unlockable_at: now,
+      }),
+    );
+
+    const result = await getOwnedEvent("e1");
+    vi.useRealTimers();
+
+    expect(result.kind).toBe("ok");
+    expect(result.kind === "ok" && result.event.unlockable).toBe(true);
   });
 });
