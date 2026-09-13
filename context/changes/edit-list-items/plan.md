@@ -331,17 +331,17 @@ None — no schema change in this slice.
 
 #### Automated
 
-- [x] 4.1 Type checking passes: `pnpm typecheck`
-- [x] 4.2 Linting passes: `pnpm lint`
+- [x] 4.1 Type checking passes: `pnpm typecheck` — fd58566
+- [x] 4.2 Linting passes: `pnpm lint` — fd58566
 
 #### Manual
 
-- [x] 4.3 No Edit buttons appear once the reveal has opened
-- [x] 4.4 Edit buttons still appear before the reveal opens
+- [x] 4.3 No Edit buttons appear once the reveal has opened — fd58566
+- [x] 4.4 Edit buttons still appear before the reveal opens — fd58566
 
 ### Phase 5: DB test coverage
 
 #### Automated
 
-- [ ] 5.1 DB tests pass: `pnpm test:db`
-- [ ] 5.2 Full suite green: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:db`
+- [x] 5.1 DB tests pass: `pnpm test:db`
+- [x] 5.2 Full suite green: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:db`

@@ -4,7 +4,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(19);
+select plan(20);
 
 -- Fixtures ---------------------------------------------------------------
 insert into auth.users (id) values ('00000000-0000-0000-0000-0000000000a1'); -- owner
@@ -130,6 +130,18 @@ update public.items set title = 'Item One Renamed' where title = 'Item One';
 select ok(
   (select updated_at > '2000-01-01'::timestamptz from public.items where title = 'Item One Renamed'),
   'updated_at advances on update'
+);
+
+select id as fx_item_id from public.items where title = 'Item One Renamed' \gset
+
+-- A stranger's update to another owner's item affects 0 rows. ------------
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a2","role":"authenticated"}', true);
+update public.items set title = 'Hijacked' where id = :'fx_item_id';
+
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
+select isnt_empty(
+  format($$ select 1 from public.items where id = %L and title = 'Item One Renamed' $$, :'fx_item_id'),
+  'a stranger''s update did not change the item'
 );
 
 -- Item insert and update after the reveal (time-travelled) -> 42501. -----
