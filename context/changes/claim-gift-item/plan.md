@@ -118,13 +118,17 @@ Add the Claim button and its confirmation modal to the shared-list page, wired t
 
 **Contract**: `ClaimButton({ itemId, itemTitle, token }: { itemId: string; itemTitle: string; token: string })`. On `state.status === "idle"` after a real submission (matching `EditItemModal`'s `state !== INITIAL_STATE` idiom): `notify.success("Claimed!")`, close the modal. On `state.status === "error"`: if `state.code === "not_authenticated"`, `notify.error(state.message)` then navigate to `` `/login?next=/lists/${token}` `` (client-side, via `useRouter` from `next/navigation`); for every other code, `notify.error(state.message)` and close the modal — no other special-casing, since `refresh()` inside the action has already brought the item's real status back for the next render. Modal title: e.g. `` `Claim "${itemTitle}"?` ``; body: a short confirmation sentence plus Cancel/Confirm buttons (Cancel calls `onClose` directly with no request sent, matching `EditItemModal`'s Cancel button).
 
+> **Addendum (impl-review, 2026-09-13, commit `59770fb`)**: Implemented, then split. Mounting this design as originally specified means one `useActionState`+`Modal` instance per *available* item rendered in the list. `ClaimButton` was refactored down to a bare presentational trigger (`onClick` only); the `useActionState`/`Modal`/toast/redirect logic described above moved into a new sibling component, `ClaimModal` (`src/app/lists/[token]/components/claim-modal/claim-modal.tsx`), rendered once and shared across all items — mirroring the lifted-state pattern S-04's `ItemList` already uses. This is a legitimate simplicity/perf tradeoff, not a behavior change: the contract above (props, error-code handling, modal copy) still holds, just split across `ClaimButton` (trigger) + `ClaimModal` (everything else), with the item being claimed tracked as lifted state in `SharedItemList` (see below). Verified safe by `/10x-impl-review`: no claim data reaches the client as a result — `item.status` is already nulled pre-reveal at the `get_shared_items` RPC layer, so promoting `SharedItemList` to a Client Component adds no new exposure.
+
 #### 2. Wire `ClaimButton` into the shared item list
 
 **File**: `src/app/lists/[token]/components/shared-item-list/shared-item-list.tsx`
 
 **Intent**: Render `<ClaimButton .../>` next to the `StatusBadge` only when `item.status === "available"` — for every other status (`taken`, `mine`, `given`, or `null`), render nothing extra, exactly as today.
 
-**Contract**: `SharedItemList` gains a `token: string` prop (needed by `ClaimButton` for the sign-in redirect) and passes it through; the component itself stays a plain Server Component (no `"use client"` needed at this level — `ClaimButton` is the client boundary).
+**Contract**: `SharedItemList` gains a `token: string` prop (needed by `ClaimButton` for the sign-in redirect) and passes it through. ~~The component itself stays a plain Server Component (no `"use client"` needed at this level — `ClaimButton` is the client boundary).~~
+
+> **Addendum (impl-review, 2026-09-13, commit `59770fb`)**: Superseded — see the ClaimButton addendum above. `SharedItemList` is now `"use client"` and owns a lifted `claimingItemId` state (`useState<string | null>`) that selects which item's shared `ClaimModal` instance is open, instead of each `ClaimButton` owning its own modal. The original "stays a Server Component" rationale (no shared state needed across items) turned out to trade against avoiding N mounted action instances; the latter won. No invariant impact — see above.
 
 #### 3. Pass `token` from the page
 
