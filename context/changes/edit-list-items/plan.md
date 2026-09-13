@@ -293,22 +293,22 @@ None — no schema change in this slice.
 
 #### Automated
 
-- [x] 1.1 Type checking passes: `pnpm typecheck`
-- [x] 1.2 Linting passes: `pnpm lint`
-- [x] 1.3 Unit tests pass: `pnpm test`
+- [x] 1.1 Type checking passes: `pnpm typecheck` — 9072ecc
+- [x] 1.2 Linting passes: `pnpm lint` — 9072ecc
+- [x] 1.3 Unit tests pass: `pnpm test` — 9072ecc
 
 ### Phase 2: `Modal` design-system primitive
 
 #### Automated
 
-- [ ] 2.1 Type checking passes: `pnpm typecheck`
-- [ ] 2.2 Linting passes: `pnpm lint`
+- [x] 2.1 Type checking passes: `pnpm typecheck`
+- [x] 2.2 Linting passes: `pnpm lint`
 
 #### Manual
 
-- [ ] 2.3 `/design-system` Modal demo opens, traps focus, closes on Escape/backdrop/close button
-- [ ] 2.4 New `overlay` swatch renders correctly in the Colour tokens section
-- [ ] 2.5 Visual check against `palette-proof.html` conventions
+- [x] 2.3 `/design-system` Modal demo opens, traps focus, closes on Escape/backdrop/close button
+- [x] 2.4 New `overlay` swatch renders correctly in the Colour tokens section
+- [x] 2.5 Visual check against `palette-proof.html` conventions
 
 ### Phase 3: Edit item flow
 

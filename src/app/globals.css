@@ -29,6 +29,7 @@
   --color-status-mine-surface: #ECE4F7;
   --color-status-given: #7A5A1E;
   --color-status-given-surface: #FBEBC8;
+  --color-overlay: color-mix(in srgb, var(--color-fg) 45%, transparent);
 
   --text-display: 2.5rem;
   --text-display--line-height: 1.1;
