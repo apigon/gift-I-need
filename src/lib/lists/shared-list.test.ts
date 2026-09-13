@@ -12,7 +12,7 @@ vi.mock("@/utils/supabase/server", () => ({
   createClient: vi.fn(async () => ({ rpc })),
 }));
 
-const { getSharedList } = await import("./shared-list");
+const { getSharedList, claimItem } = await import("./shared-list");
 
 const VALID_TOKEN = "abcdefghijklmnopqrstuv"; // 22 URL-safe chars
 
@@ -116,5 +116,27 @@ describe("getSharedList", () => {
         },
       ],
     });
+  });
+});
+
+describe("claimItem", () => {
+  it("calls claim_item with the given item id and returns ok on success", async () => {
+    rpc.mockResolvedValue({ error: null });
+
+    const result = await claimItem("i1");
+
+    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(rpc).toHaveBeenCalledWith("claim_item", { p_item_id: "i1" });
+    expect(result).toEqual({ ok: true });
+  });
+
+  it("maps an RPC error through the real mapRpcError", async () => {
+    // 23505 -> already_taken is mapRpcError's job (errors.test.ts owns that
+    // mapping in isolation) — this just pins that claimItem doesn't re-map it.
+    rpc.mockResolvedValue({
+      error: { code: "23505", message: "duplicate key value" },
+    });
+
+    expect(await claimItem("i1")).toEqual({ ok: false, code: "already_taken" });
   });
 });

@@ -71,6 +71,7 @@ export async function claimItem(itemId: string): Promise<ListResult> {
   const { error } = await supabase.rpc("claim_item", { p_item_id: itemId });
 
   if (error) {
+    console.error("[shared-list] claim_item failed", error);
     return { ok: false, code: mapRpcError(error) };
   }
 

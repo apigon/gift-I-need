@@ -1,10 +1,10 @@
 ---
 change_id: claim-gift-item
 title: Claim gift item
-status: planned
+status: archived
 created: 2026-09-13
 updated: 2026-09-13
-archived_at: null
+archived_at: 2026-09-13T14:20:20Z
 ---
 
 ## Notes

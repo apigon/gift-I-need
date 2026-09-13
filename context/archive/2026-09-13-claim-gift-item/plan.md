@@ -118,13 +118,17 @@ Add the Claim button and its confirmation modal to the shared-list page, wired t
 
 **Contract**: `ClaimButton({ itemId, itemTitle, token }: { itemId: string; itemTitle: string; token: string })`. On `state.status === "idle"` after a real submission (matching `EditItemModal`'s `state !== INITIAL_STATE` idiom): `notify.success("Claimed!")`, close the modal. On `state.status === "error"`: if `state.code === "not_authenticated"`, `notify.error(state.message)` then navigate to `` `/login?next=/lists/${token}` `` (client-side, via `useRouter` from `next/navigation`); for every other code, `notify.error(state.message)` and close the modal — no other special-casing, since `refresh()` inside the action has already brought the item's real status back for the next render. Modal title: e.g. `` `Claim "${itemTitle}"?` ``; body: a short confirmation sentence plus Cancel/Confirm buttons (Cancel calls `onClose` directly with no request sent, matching `EditItemModal`'s Cancel button).
 
+> **Addendum (impl-review, 2026-09-13, commit `59770fb`)**: Implemented, then split. Mounting this design as originally specified means one `useActionState`+`Modal` instance per *available* item rendered in the list. `ClaimButton` was refactored down to a bare presentational trigger (`onClick` only); the `useActionState`/`Modal`/toast/redirect logic described above moved into a new sibling component, `ClaimModal` (`src/app/lists/[token]/components/claim-modal/claim-modal.tsx`), rendered once and shared across all items — mirroring the lifted-state pattern S-04's `ItemList` already uses. This is a legitimate simplicity/perf tradeoff, not a behavior change: the contract above (props, error-code handling, modal copy) still holds, just split across `ClaimButton` (trigger) + `ClaimModal` (everything else), with the item being claimed tracked as lifted state in `SharedItemList` (see below). Verified safe by `/10x-impl-review`: no claim data reaches the client as a result — `item.status` is already nulled pre-reveal at the `get_shared_items` RPC layer, so promoting `SharedItemList` to a Client Component adds no new exposure.
+
 #### 2. Wire `ClaimButton` into the shared item list
 
 **File**: `src/app/lists/[token]/components/shared-item-list/shared-item-list.tsx`
 
 **Intent**: Render `<ClaimButton .../>` next to the `StatusBadge` only when `item.status === "available"` — for every other status (`taken`, `mine`, `given`, or `null`), render nothing extra, exactly as today.
 
-**Contract**: `SharedItemList` gains a `token: string` prop (needed by `ClaimButton` for the sign-in redirect) and passes it through; the component itself stays a plain Server Component (no `"use client"` needed at this level — `ClaimButton` is the client boundary).
+**Contract**: `SharedItemList` gains a `token: string` prop (needed by `ClaimButton` for the sign-in redirect) and passes it through. ~~The component itself stays a plain Server Component (no `"use client"` needed at this level — `ClaimButton` is the client boundary).~~
+
+> **Addendum (impl-review, 2026-09-13, commit `59770fb`)**: Superseded — see the ClaimButton addendum above. `SharedItemList` is now `"use client"` and owns a lifted `claimingItemId` state (`useState<string | null>`) that selects which item's shared `ClaimModal` instance is open, instead of each `ClaimButton` owning its own modal. The original "stays a Server Component" rationale (no shared state needed across items) turned out to trade against avoiding N mounted action instances; the latter won. No invariant impact — see above.
 
 #### 3. Pass `token` from the page
 
@@ -235,43 +239,43 @@ None — no schema or data changes in this plan.
 
 #### Automated
 
-- [ ] 1.1 Unit tests for `claimItem` pass
-- [ ] 1.2 Unit tests for `claimItemAction` pass
-- [ ] 1.3 Type checking passes
-- [ ] 1.4 Linting passes
+- [x] 1.1 Unit tests for `claimItem` pass — 2c0df1c
+- [x] 1.2 Unit tests for `claimItemAction` pass — 2c0df1c
+- [x] 1.3 Type checking passes — 2c0df1c
+- [x] 1.4 Linting passes — 2c0df1c
 
 #### Manual
 
-- [ ] 1.5 Error-message map reviewed against every realistic `ListErrorCode`
+- [x] 1.5 Error-message map reviewed against every realistic `ListErrorCode` — 2c0df1c
 
 ### Phase 2: Claim UI
 
 #### Automated
 
-- [ ] 2.1 Type checking passes
-- [ ] 2.2 Linting passes
-- [ ] 2.3 Full unit test suite passes
+- [x] 2.1 Type checking passes — 87b60eb
+- [x] 2.2 Linting passes — 87b60eb
+- [x] 2.3 Full unit test suite passes — 87b60eb
 
 #### Manual
 
-- [ ] 2.4 Modal opens on Claim; Cancel/outside-click sends no request
-- [ ] 2.5 Confirm shows pending, then badge flips to "mine" + success toast, modal closes
-- [ ] 2.6 Reload confirms server-persisted claim
-- [ ] 2.7 Other guest sees "Taken", no Claim button
-- [ ] 2.8 Post-reveal organizer sees Available + Claim button on own list; Confirm surfaces `owner_cannot_claim`, no state change
-- [ ] 2.9 Lapsed session redirects to `/login?next=/lists/[token]` with toast
+- [x] 2.4 Modal opens on Claim; Cancel/outside-click sends no request — 87b60eb
+- [x] 2.5 Confirm shows pending, then badge flips to "mine" + success toast, modal closes — 87b60eb
+- [x] 2.6 Reload confirms server-persisted claim — 87b60eb
+- [x] 2.7 Other guest sees "Taken", no Claim button — 87b60eb
+- [x] 2.8 Post-reveal organizer sees Available + Claim button on own list; Confirm surfaces `owner_cannot_claim`, no state change — 87b60eb
+- [x] 2.9 Lapsed session redirects to `/login?next=/lists/[token]` with toast — 87b60eb
 
 ### Phase 3: Regression & Edge-Case Verification
 
 #### Automated
 
-- [ ] 3.1 `pnpm test:db` passes
-- [ ] 3.2 `pnpm test:integration` passes
-- [ ] 3.3 Full `pnpm test`, `pnpm lint`, `pnpm typecheck` clean
+- [x] 3.1 `pnpm test:db` passes — 9e1058d
+- [x] 3.2 `pnpm test:integration` passes — 9e1058d
+- [x] 3.3 Full `pnpm test`, `pnpm lint`, `pnpm typecheck` clean — 9e1058d
 
 #### Manual
 
-- [ ] 3.4 Two-session race: loser sees toast + auto-updates to "Taken" without manual reload
-- [ ] 3.5 Claim completes within ~1s, no ambiguous pending state under throttled network
-- [ ] 3.6 Organizer's pre-reveal view still shows zero claim info after a guest has claimed
-- [ ] 3.7 Signed-out visitor never sees a Claim button
+- [x] 3.4 Two-session race: loser sees toast + auto-updates to "Taken" without manual reload — 9e1058d
+- [x] 3.5 Claim completes within ~1s, no ambiguous pending state under throttled network — 9e1058d
+- [x] 3.6 Organizer's pre-reveal view still shows zero claim info after a guest has claimed — 9e1058d
+- [x] 3.7 Signed-out visitor never sees a Claim button — 9e1058d
