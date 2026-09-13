@@ -3,7 +3,7 @@ change_id: edit-list-items
 title: Edit list items
 status: implementing
 created: 2026-09-12
-updated: 2026-09-12
+updated: 2026-09-13
 archived_at: null
 ---
 

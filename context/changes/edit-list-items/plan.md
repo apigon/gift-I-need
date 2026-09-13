@@ -301,31 +301,31 @@ None — no schema change in this slice.
 
 #### Automated
 
-- [x] 2.1 Type checking passes: `pnpm typecheck`
-- [x] 2.2 Linting passes: `pnpm lint`
+- [x] 2.1 Type checking passes: `pnpm typecheck` — 08931f9
+- [x] 2.2 Linting passes: `pnpm lint` — 08931f9
 
 #### Manual
 
-- [x] 2.3 `/design-system` Modal demo opens, traps focus, closes on Escape/backdrop/close button
-- [x] 2.4 New `overlay` swatch renders correctly in the Colour tokens section
-- [x] 2.5 Visual check against `palette-proof.html` conventions
+- [x] 2.3 `/design-system` Modal demo opens, traps focus, closes on Escape/backdrop/close button — 08931f9
+- [x] 2.4 New `overlay` swatch renders correctly in the Colour tokens section — 08931f9
+- [x] 2.5 Visual check against `palette-proof.html` conventions — 08931f9
 
 ### Phase 3: Edit item flow
 
 #### Automated
 
-- [ ] 3.1 Type checking passes: `pnpm typecheck`
-- [ ] 3.2 Linting passes: `pnpm lint`
-- [ ] 3.3 Unit tests pass: `pnpm test`
+- [x] 3.1 Type checking passes: `pnpm typecheck`
+- [x] 3.2 Linting passes: `pnpm lint`
+- [x] 3.3 Unit tests pass: `pnpm test`
 
 #### Manual
 
-- [ ] 3.4 Edit opens the modal pre-filled with the item's current values
-- [ ] 3.5 Saving updates the item in the list immediately and shows the toast
-- [ ] 3.6 Cancel (button, Escape, backdrop click) discards edits with no change
-- [ ] 3.7 A validation error shows inline, modal stays open, edits preserved
-- [ ] 3.8 Editing two different items in sequence shows correct values each time
-- [ ] 3.9 Clearing an optional field and saving actually clears it
+- [x] 3.4 Edit opens the modal pre-filled with the item's current values
+- [x] 3.5 Saving updates the item in the list immediately and shows the toast
+- [x] 3.6 Cancel (button, Escape, backdrop click) discards edits with no change
+- [x] 3.7 A validation error shows inline, modal stays open, edits preserved
+- [x] 3.8 Editing two different items in sequence shows correct values each time
+- [x] 3.9 Clearing an optional field and saving actually clears it
 
 ### Phase 4: Hide editing after the reveal
 
