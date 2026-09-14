@@ -131,7 +131,11 @@ relevant rollout phase ships; before that it reads "TBD — see §3 Phase N."
 
 ### 6.2 Adding an integration test
 
-- TBD — see §3 Phase 1. Existing reference: `src/lib/lists/claim-race.integration.test.ts` (naming: `<module>.integration.test.ts`; run: `pnpm test:integration`, needs `colima start` + `supabase start`).
+- **Location**: co-located with the module under test (e.g. `src/lib/lists/organizer-view.integration.test.ts` next to `organizer-view.ts`).
+- **Naming**: `<module>.integration.test.ts`.
+- **Pattern**: a real `@supabase/supabase-js` client against the local stack, anon key only — no client mocking. Guard every test with `it.skipIf(!ENV_READY)` so the suite degrades to a visible skip (not a false pass) when the local stack isn't running. Use the shared `signedInClient`/`uniqueEmail` helpers to sign in as distinct real users rather than reusing one session.
+- **Reference tests**: `src/lib/lists/claim-race.integration.test.ts` (original — real-DB claim race), `src/lib/lists/organizer-view.integration.test.ts` (pre-reveal composition proof against a real guest claim).
+- **Run locally**: `pnpm test:integration` (needs `colima start` + `supabase start`).
 
 ### 6.3 Adding a pgTAP test
 
@@ -150,6 +154,8 @@ relevant rollout phase ships; before that it reads "TBD — see §3 Phase N."
 ### 6.6 Per-rollout-phase notes
 
 (Fills in after each phase lands — captures anything surprising the phase taught.)
+
+**2026-09-14 — Rollout Phase 1 (`testing-organizer-blindness-claim-integrity`, Risks #1–#3):** Vitest cannot render this codebase's async Server Components at all, so `page.tsx`-shaped composition logic is untestable in place — the only way to get coverage on it is to extract the orchestration into a plain function first (`organizer-view.ts`), then test the extracted function directly. Once extracted, a two-layer split covers the invariant cheaply: unit tests (mocked `getOwnedEvent`/`getSharedList`) prove every branch, and exactly one integration test against the real local stack (real event, real guest claim, real RPC) proves the branch that matters for the security invariant — pre-reveal status stays `null` — holds against live data, not just a mock that could quietly drift from the real RPC's behavior. Separately: `refresh()` (Next.js 16) is synchronous, so guarding a post-commit call needs only a plain `try/catch`, no `await`. And the cross-owner pgTAP fixture (Phase 4) confirmed each write RPC's owner check is scoped to the *specific event*, not "is this caller an owner of anything" — `claim_item` treats a cross-owner caller exactly like any other guest (allowed), while `mark_given`/`unlock_event` reject one identically to a stranger.
 
 ## 7. What We Deliberately Don't Test
 

@@ -540,10 +540,10 @@ a transaction that's rolled back (`begin; ... rollback;`), same as today.
 
 #### Automated
 
-- [x] 4.1 pgTAP suite passes: `pnpm test:db`
+- [x] 4.1 pgTAP suite passes: `pnpm test:db` — b47fd11
 
 ### Phase 5: Cookbook + lessons sync
 
 #### Manual
 
-- [ ] 5.1 test-plan.md §6.2/§6.6 and lessons.md read correctly on review
+- [x] 5.1 test-plan.md §6.2/§6.6 and lessons.md read correctly on review
