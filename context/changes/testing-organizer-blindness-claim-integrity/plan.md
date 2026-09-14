@@ -504,9 +504,9 @@ a transaction that's rolled back (`begin; ... rollback;`), same as today.
 
 #### Automated
 
-- [ ] 1.1 Unit tests pass: `pnpm test`
-- [ ] 1.2 Type checking passes: `pnpm typecheck`
-- [ ] 1.3 Linting passes: `pnpm lint`
+- [x] 1.1 Unit tests pass: `pnpm test`
+- [x] 1.2 Type checking passes: `pnpm typecheck`
+- [x] 1.3 Linting passes: `pnpm lint`
 
 #### Manual
 
