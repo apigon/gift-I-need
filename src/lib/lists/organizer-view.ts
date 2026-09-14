@@ -1,3 +1,4 @@
+import "server-only";
 import { getOwnedEvent } from "./owned-events";
 import { mergeOwnedItemsWithStatus, type OwnedItemWithStatus } from "./reveal-status";
 import { getSharedList } from "./shared-list";

@@ -74,8 +74,8 @@ orchestrator updates Status as artifacts appear on disk.
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|---|---|---|---|---|---|
-| 1 | Organizer-blindness & claim-integrity guard | Lock the composition-layer leak and claim-write integrity guarantees; close the RPC-bypass abuse case alongside since it's cheap at the same layer | #1, #2, #3 | integration (Vitest), pgTAP | change opened | `context/changes/testing-organizer-blindness-claim-integrity/` |
-| 2 | Migration/RLS regression net | Audit and close gaps in pgTAP coverage so a future edit to an existing policy fails CI | #5 | pgTAP | not started | — |
+| 1 | Organizer-blindness & claim-integrity guard | Lock the composition-layer leak and claim-write integrity guarantees; close the RPC-bypass abuse case alongside since it's cheap at the same layer | #1, #2, #3 | integration (Vitest), pgTAP | complete | `context/changes/testing-organizer-blindness-claim-integrity/` |
+| 2 | Migration/RLS regression net | Audit and close gaps in pgTAP coverage so a future edit to an existing policy fails CI | #5 | pgTAP | change opened | `context/changes/testing-migration-rls-regression-net/` |
 | 3 | Reveal-timing correctness | Close the DST/timezone gap in the reveal-instant computation | #4 | unit or pgTAP (whichever layer owns the computation) | not started | — |
 | 4 | E2E on critical flows | Add e2e covering the guest claim flow (incl. race) and organizer reveal/mark-given flow, re-exercising Phase 1's leak check at the full-render level | #6 (+ #1) | e2e (new tooling) | not started | — |
 | 5 | Quality-gates wiring | Wire lint/typecheck/unit/integration/pgTAP/e2e as required merge gates — none run in CI today (deploy is Cloudflare Git auto-deploy, no gate) | cross-cutting | gates | not started | — |
@@ -133,7 +133,7 @@ relevant rollout phase ships; before that it reads "TBD — see §3 Phase N."
 
 - **Location**: co-located with the module under test (e.g. `src/lib/lists/organizer-view.integration.test.ts` next to `organizer-view.ts`).
 - **Naming**: `<module>.integration.test.ts`.
-- **Pattern**: a real `@supabase/supabase-js` client against the local stack, anon key only — no client mocking. Guard every test with `it.skipIf(!ENV_READY)` so the suite degrades to a visible skip (not a false pass) when the local stack isn't running. Use the shared `signedInClient`/`uniqueEmail` helpers to sign in as distinct real users rather than reusing one session.
+- **Pattern**: a real `@supabase/supabase-js` client against the local stack, anon key only — no client mocking. Guard every test with `it.skipIf(!ENV_READY)` so the suite degrades to a visible skip (not a false pass) when the local stack isn't running. Use the `signedInClient`/`uniqueEmail` helpers (`claim-race.integration.test.ts`) to sign in as distinct real guest users rather than reusing one session. Note: `signedInClient` isn't a shared export — it's a local helper copied per test file. A test exercising a Server-Component-adjacent function (e.g. `getOrganizerView`, which transitively needs `cookies()`/`connection()`) can't reuse it as-is and needs its own cookie-jar-backed sign-in helper instead (`signInOrganizer` in `organizer-view.integration.test.ts` — signs in via `@supabase/ssr`'s `createServerClient` against an in-memory cookie jar, then mocks `next/headers`'s `cookies()` to read from that jar).
 - **Reference tests**: `src/lib/lists/claim-race.integration.test.ts` (original — real-DB claim race), `src/lib/lists/organizer-view.integration.test.ts` (pre-reveal composition proof against a real guest claim).
 - **Run locally**: `pnpm test:integration` (needs `colima start` + `supabase start`).
 
