@@ -516,25 +516,25 @@ a transaction that's rolled back (`begin; ... rollback;`), same as today.
 
 #### Automated
 
-- [x] 2.1 Integration test passes: `pnpm test:integration`
-- [x] 2.2 Type checking passes: `pnpm typecheck`
-- [x] 2.3 Linting passes: `pnpm lint`
+- [x] 2.1 Integration test passes: `pnpm test:integration` — 9e3e2f4
+- [x] 2.2 Type checking passes: `pnpm typecheck` — 9e3e2f4
+- [x] 2.3 Linting passes: `pnpm lint` — 9e3e2f4
 
 #### Manual
 
-- [x] 2.4 Confirm the integration test actually runs (not skipped) locally
+- [x] 2.4 Confirm the integration test actually runs (not skipped) locally — 9e3e2f4
 
 ### Phase 3: Guard refresh() in all three Server Actions
 
 #### Automated
 
-- [ ] 3.1 Unit tests pass: `pnpm test`
-- [ ] 3.2 Type checking passes: `pnpm typecheck`
-- [ ] 3.3 Linting passes: `pnpm lint`
+- [x] 3.1 Unit tests pass: `pnpm test`
+- [x] 3.2 Type checking passes: `pnpm typecheck`
+- [x] 3.3 Linting passes: `pnpm lint`
 
 #### Manual
 
-- [ ] 3.4 Claim happy path unchanged in local dev (toast + status update)
+- [x] 3.4 Claim happy path unchanged in local dev (toast + status update)
 
 ### Phase 4: Cross-owner pgTAP coverage
 
