@@ -42,8 +42,18 @@ export async function claimItemAction(
 
   // refresh() runs on every outcome, not only success — the item's real
   // status (taken by someone else, still available, etc.) must come back
-  // regardless of why this claim attempt failed.
-  refresh();
+  // regardless of why this claim attempt failed. A throw here must not
+  // reject this action's promise: the write already committed (or the
+  // error result is already known), so losing the return value would be
+  // strictly worse than a stale client view.
+  try {
+    refresh();
+  } catch (error) {
+    console.error(
+      "[actions/lists] refresh() failed after claimItem",
+      error,
+    );
+  }
 
   if (!result.ok) {
     return {
@@ -79,7 +89,14 @@ export async function markGivenAction(
     return { status: "error", message: GENERIC_ERROR };
   }
 
-  refresh();
+  try {
+    refresh();
+  } catch (error) {
+    console.error(
+      "[actions/lists] refresh() failed after markGiven",
+      error,
+    );
+  }
   return { status: "idle" };
 }
 
@@ -99,6 +116,13 @@ export async function unlockEventAction(
     };
   }
 
-  refresh();
+  try {
+    refresh();
+  } catch (error) {
+    console.error(
+      "[actions/lists] refresh() failed after unlockEvent",
+      error,
+    );
+  }
   return { status: "idle" };
 }

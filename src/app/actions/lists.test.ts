@@ -61,6 +61,21 @@ describe("claimItemAction", () => {
       expect(result).toEqual({ status: "error", code, message });
     },
   );
+
+  it("resolves with the normal result when refresh() throws after a committed claim", async () => {
+    claimItem.mockResolvedValue({ ok: true });
+    refresh.mockImplementation(() => {
+      throw new Error("refresh failed");
+    });
+
+    const result = await claimItemAction(
+      "i1",
+      { status: "idle" },
+      new FormData(),
+    );
+
+    expect(result).toEqual({ status: "idle" });
+  });
 });
 
 describe("markGivenAction", () => {
@@ -101,6 +116,21 @@ describe("markGivenAction", () => {
       });
     },
   );
+
+  it("resolves with the normal result when refresh() throws after a committed mark-given", async () => {
+    markGiven.mockResolvedValue({ ok: true });
+    refresh.mockImplementation(() => {
+      throw new Error("refresh failed");
+    });
+
+    const result = await markGivenAction(
+      "i1",
+      { status: "idle" },
+      new FormData(),
+    );
+
+    expect(result).toEqual({ status: "idle" });
+  });
 });
 
 describe("unlockEventAction", () => {
@@ -147,5 +177,20 @@ describe("unlockEventAction", () => {
       status: "error",
       message: "Something went wrong. Please try again.",
     });
+  });
+
+  it("resolves with the normal result when refresh() throws after a committed unlock", async () => {
+    unlockEvent.mockResolvedValue({ ok: true });
+    refresh.mockImplementation(() => {
+      throw new Error("refresh failed");
+    });
+
+    const result = await unlockEventAction(
+      "e1",
+      { status: "idle" },
+      new FormData(),
+    );
+
+    expect(result).toEqual({ status: "idle" });
   });
 });
