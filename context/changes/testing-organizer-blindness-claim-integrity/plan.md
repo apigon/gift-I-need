@@ -546,4 +546,4 @@ a transaction that's rolled back (`begin; ... rollback;`), same as today.
 
 #### Manual
 
-- [x] 5.1 test-plan.md §6.2/§6.6 and lessons.md read correctly on review
+- [x] 5.1 test-plan.md §6.2/§6.6 and lessons.md read correctly on review — d566ded
