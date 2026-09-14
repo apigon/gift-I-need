@@ -528,19 +528,19 @@ a transaction that's rolled back (`begin; ... rollback;`), same as today.
 
 #### Automated
 
-- [x] 3.1 Unit tests pass: `pnpm test`
-- [x] 3.2 Type checking passes: `pnpm typecheck`
-- [x] 3.3 Linting passes: `pnpm lint`
+- [x] 3.1 Unit tests pass: `pnpm test` — ca1cf1c
+- [x] 3.2 Type checking passes: `pnpm typecheck` — ca1cf1c
+- [x] 3.3 Linting passes: `pnpm lint` — ca1cf1c
 
 #### Manual
 
-- [x] 3.4 Claim happy path unchanged in local dev (toast + status update)
+- [x] 3.4 Claim happy path unchanged in local dev (toast + status update) — ca1cf1c
 
 ### Phase 4: Cross-owner pgTAP coverage
 
 #### Automated
 
-- [ ] 4.1 pgTAP suite passes: `pnpm test:db`
+- [x] 4.1 pgTAP suite passes: `pnpm test:db`
 
 ### Phase 5: Cookbook + lessons sync
 

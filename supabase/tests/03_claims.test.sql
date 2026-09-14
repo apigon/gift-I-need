@@ -3,12 +3,13 @@
 -- repeat-mark no-op, and the unlock window, all through the RPCs.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(26);
+select plan(31);
 
 -- Fixtures -----------------------------------------------------------------
 insert into auth.users (id) values ('00000000-0000-0000-0000-0000000000b1'); -- owner
 insert into auth.users (id) values ('00000000-0000-0000-0000-0000000000b2'); -- guest A
 insert into auth.users (id) values ('00000000-0000-0000-0000-0000000000b3'); -- guest B / stranger
+insert into auth.users (id) values ('00000000-0000-0000-0000-0000000000b4'); -- organizer C, unrelated event owner
 
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}', true);
@@ -27,6 +28,16 @@ select id as j1 from public.items where event_id = :'ev2' and title = 'J1' \gset
 
 insert into public.events (name, event_date, timezone) values ('Ev3 Unlock', current_date + 10, 'UTC');
 select id as ev3 from public.events where name = 'Ev3 Unlock' \gset
+
+-- Ev4 belongs to a second, unrelated organizer (C) -- used by the
+-- cross-owner section near the end of this file.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b4","role":"authenticated"}', true);
+insert into public.events (name, event_date, timezone) values ('Ev4 CrossOwner', current_date + 10, 'UTC');
+select id as ev4 from public.events where name = 'Ev4 CrossOwner' \gset
+insert into public.items (event_id, title) values (:'ev4', 'D1'), (:'ev4', 'D2');
+select id as d1 from public.items where event_id = :'ev4' and title = 'D1' \gset
+select id as d2 from public.items where event_id = :'ev4' and title = 'D2' \gset
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}', true);
 
 -- === Claiming ===============================================================
 
@@ -148,6 +159,39 @@ select is(
   :'ev3_revealed_at'::timestamptz,
   'revealed_at unchanged after a repeat unlock'
 );
+
+-- === Cross-owner (organizer A vs. organizer C's event D) ====================
+-- claim_item's owner-exclusion check is scoped to the specific event being
+-- claimed against, not "is this caller an owner of anything" -- organizer A
+-- claiming on event D looks like any other guest to that check, exactly like
+-- the stranger who owns nothing (see "guest A claims item I1" above).
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}', true);
+select lives_ok(format($$ select public.claim_item(%L) $$, :'d1'), 'organizer A claims item D1 on organizer C''s event (not the owner there)');
+
+-- D2 claimed by an unrelated guest, then event D revealed, so mark_given's
+-- not_permitted branch is reachable for the cross-owner assertion below.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b2","role":"authenticated"}', true);
+select lives_ok(format($$ select public.claim_item(%L) $$, :'d2'), 'guest A claims item D2 on event D');
+
+reset role;
+alter table public.events disable trigger events_guard;
+update public.events set unlockable_at = now() - interval '1 minute' where id = :'ev4';
+alter table public.events enable trigger events_guard;
+
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b4","role":"authenticated"}', true);
+select lives_ok(format($$ select public.unlock_event(%L) $$, :'ev4'), 'organizer C unlocks event D manually');
+
+-- Organizer A owns nothing on event D and isn't D2's claimer -> not_permitted,
+-- the same code the existing stranger case above already asserts.
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b1","role":"authenticated"}', true);
+select throws_ok(format($$ select public.mark_given(%L) $$, :'d2'), 'P0001', 'not_permitted');
+
+-- unlock_event's owner check runs before any unlockable_at/reveal check, so a
+-- cross-owner caller collapses to the same event_not_found the stranger case
+-- ("unlock_too_early"/"event_not_found" pair above) already asserts --
+-- non-existent and not-yours deliberately share one code.
+select throws_ok(format($$ select public.unlock_event(%L) $$, :'ev4'), 'P0001', 'event_not_found');
 
 select * from finish();
 
