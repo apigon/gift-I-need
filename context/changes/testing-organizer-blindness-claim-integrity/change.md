@@ -1,7 +1,7 @@
 ---
 change_id: testing-organizer-blindness-claim-integrity
 title: Organizer-blindness and claim-integrity guard
-status: preparing
+status: planned
 created: 2026-09-14
 updated: 2026-09-14
 archived_at: null
