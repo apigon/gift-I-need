@@ -504,25 +504,25 @@ a transaction that's rolled back (`begin; ... rollback;`), same as today.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `pnpm test`
-- [x] 1.2 Type checking passes: `pnpm typecheck`
-- [x] 1.3 Linting passes: `pnpm lint`
+- [x] 1.1 Unit tests pass: `pnpm test` — a7c959d
+- [x] 1.2 Type checking passes: `pnpm typecheck` — a7c959d
+- [x] 1.3 Linting passes: `pnpm lint` — a7c959d
 
 #### Manual
 
-- [ ] 1.4 Organizer page renders correctly pre- and post-reveal in local dev
+- [x] 1.4 Organizer page renders correctly pre- and post-reveal in local dev — a7c959d
 
 ### Phase 2: Prove the pre-reveal invariant end-to-end (integration)
 
 #### Automated
 
-- [ ] 2.1 Integration test passes: `pnpm test:integration`
-- [ ] 2.2 Type checking passes: `pnpm typecheck`
-- [ ] 2.3 Linting passes: `pnpm lint`
+- [x] 2.1 Integration test passes: `pnpm test:integration`
+- [x] 2.2 Type checking passes: `pnpm typecheck`
+- [x] 2.3 Linting passes: `pnpm lint`
 
 #### Manual
 
-- [ ] 2.4 Confirm the integration test actually runs (not skipped) locally
+- [x] 2.4 Confirm the integration test actually runs (not skipped) locally
 
 ### Phase 3: Guard refresh() in all three Server Actions
 
