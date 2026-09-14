@@ -18,10 +18,13 @@ already-discovered gap.
   render — so today only the pure sub-piece (`mergeOwnedItemsWithStatus`,
   via `reveal-status.test.ts`) has coverage, not the orchestration around it.
 - `src/app/actions/lists.ts` calls `refresh()` unguarded, with no
-  `try/catch`, after every RPC outcome in `claimItemAction`,
-  `markGivenAction`, and `unlockEventAction` — and the app has no
-  `error.tsx`/`global-error.tsx` anywhere, so a throw there surfaces as
-  Next's default crash screen even though the write already committed.
+  `try/catch`, after a successful write in all three actions
+  (`claimItemAction`, `markGivenAction`, `unlockEventAction`) — and after
+  every outcome, success or failure, in `claimItemAction` specifically,
+  since a failed claim still needs the item's real status re-fetched. The
+  app has no `error.tsx`/`global-error.tsx` anywhere, so a throw there
+  surfaces as Next's default crash screen even though the write already
+  committed.
 - `supabase/tests/03_claims.test.sql` has one organizer fixture
   (`...b1`) and two guest/stranger fixtures who own nothing — no fixture
   exercises a second, unrelated organizer calling a write RPC on the first
@@ -36,8 +39,10 @@ already-discovered gap.
   Supabase stack (real event, real guest claim, real RPC).
 - All three Server Actions in `lists.ts` survive a `refresh()` throw without
   rejecting their caller's promise; each has a regression test proving it.
-- `03_claims.test.sql` proves `claim_item`, `mark_given`, and `unlock_event`
-  all reject a cross-owner caller the same way they reject a stranger.
+- `03_claims.test.sql` proves `mark_given` and `unlock_event` reject a
+  cross-owner caller the same way they reject a stranger, and that
+  `claim_item` correctly treats a cross-owner caller like any other guest
+  (allowed), matching each RPC's actual per-event ownership scoping.
 - `test-plan.md` §6.2 and §6.6 are filled in; `lessons.md` records the
   "cheap local check, never trust it for security" pattern as confirmed.
 
@@ -314,9 +319,11 @@ the manual testing was successful before proceeding to the next phase.
 
 ### Overview
 
-Extend the existing pgTAP claims suite with a second, unrelated organizer
-and prove all three write RPCs reject a cross-owner caller identically to a
-stranger.
+Extend the existing pgTAP claims suite with a second, unrelated organizer.
+Prove `mark_given` and `unlock_event` reject a cross-owner caller identically
+to a stranger, and prove `claim_item` correctly does *not* reject a
+cross-owner caller — each RPC's owner check is scoped to the specific event,
+not "is this caller an owner of anything."
 
 ### Changes Required:
 
@@ -334,16 +341,34 @@ same-event unauthorized assertions.
 **Contract**: Follow the file's existing fixture/role-switching pattern
 (`insert into auth.users`, `set_config('request.jwt.claims', ...)`, `\gset`
 for captured ids). Bump `select plan(26)` to the new total assertion count.
-For `claim_item`/`mark_given`, the expected error code is the same
-`P0001`/`owner_cannot_claim` or role-mismatch code the same-event case
-already produces for that RPC (an owner calling `claim_item` on any event —
-their own or another's — hits `owner_cannot_claim`; an unrelated organizer
-calling `mark_given` on a claim they don't hold and don't own hits
-`not_permitted`, mirroring the existing stranger assertion). For
-`unlock_event`, the cross-owner call must produce `event_not_found` — the
+
+`claim_item`'s owner-exclusion check (`private.is_event_owner`) is scoped to
+the *specific event being claimed against*, not "is this caller an owner of
+anything" — a caller who owns a different event is indistinguishable from
+any other guest to this check, exactly like the existing stranger who owns
+nothing (see the file's own "guest A claims item I1" `lives_ok` assertion).
+So organizer A calling `claim_item` on organizer C's event D item is
+expected to **succeed** (`lives_ok`), not be rejected — this sub-case proves
+the RPC does *not* wrongly generalize "owner of something" into "owner of
+this," guarding against a future regression that would over-broadly block
+any organizer from claiming elsewhere. Only `claim_item` against the
+caller's *own* event throws `owner_cannot_claim` (already covered by the
+existing same-event assertions, unaffected by this phase).
+
+For `mark_given`, an unrelated organizer calling on a claim they don't hold
+and don't own hits `not_permitted`, mirroring the existing stranger
+assertion — reaching that branch requires event D's item to already be
+claimed (by a guest, not organizer A) and event D to be revealed first (via
+the same manual-unlock time-travel pattern already used for ev1/ev3 in this
+file), since `mark_given` checks `not_revealed` and `not_claimed` before
+`not_permitted`.
+
+For `unlock_event`, the cross-owner call must produce `event_not_found` — the
 same enumeration-resistant code the existing "stranger" case already
 asserts, per the file's own note that non-existent and not-yours
-deliberately collapse to one code.
+deliberately collapse to one code. No extra fixture state is needed here:
+`unlock_event`'s owner check runs first, before any unlockable_at/reveal
+check.
 
 ### Success Criteria:
 
@@ -417,11 +442,6 @@ grants only cover INSERT/UPDATE" entry for the exact shape), citing
 `private.get_shared_items`'s live re-derivation as the concrete instance.
 
 ### Success Criteria:
-
-#### Automated Verification:
-
-- Linting passes on the touched markdown where applicable (no code to lint
-  here beyond prose — no command needed)
 
 #### Manual Verification:
 
