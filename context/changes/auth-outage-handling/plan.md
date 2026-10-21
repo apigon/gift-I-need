@@ -120,7 +120,7 @@ Remove the redundant `getUser()` from the root layout.
 
 #### Manual Verification:
 
-- On the deployed preview, a single page load shows one `GET /auth/v1/user` in `edge_logs` (plus at most one JWKS fetch), down from several.
+- Every request makes exactly one `GET /auth/v1/user`, issued by the middleware (user-agent `Next.js Middleware`) and none from the server render, with at most one JWKS fetch; verified in `edge_logs`.
 - Header still shows the email and Sign out when signed in, and Sign in / Create account when signed out.
 - After Sign out, the redirect to `/` shows the signed-out header and `/auth/v1/user` returns no 403 burst.
 
@@ -191,28 +191,28 @@ Record the 403 decision and the follow-ups.
 
 #### Automated
 
-- [x] 1.1 Unit tests pass: `pnpm test`
-- [x] 1.2 Linting passes: `pnpm lint`
-- [x] 1.3 Type checking and build pass: `pnpm build`
+- [x] 1.1 Unit tests pass: `pnpm test` — cf5c224
+- [x] 1.2 Linting passes: `pnpm lint` — cf5c224
+- [x] 1.3 Type checking and build pass: `pnpm build` — cf5c224
 
 #### Manual
 
-- [x] 1.4 Unreachable Supabase URL shows the unavailable Alert on sign-in; wrong password still shows "Invalid email or password."
-- [x] 1.5 Same check on `/signup`
+- [x] 1.4 Unreachable Supabase URL shows the unavailable Alert on sign-in; wrong password still shows "Invalid email or password." — cf5c224
+- [x] 1.5 Same check on `/signup` — cf5c224
 
 ### Phase 2: One getUser per request
 
 #### Automated
 
-- [ ] 2.1 Unit tests pass: `pnpm test`
-- [ ] 2.2 Linting passes: `pnpm lint`
-- [ ] 2.3 Build passes: `pnpm build`
+- [x] 2.1 Unit tests pass: `pnpm test`
+- [x] 2.2 Linting passes: `pnpm lint`
+- [x] 2.3 Build passes: `pnpm build`
 
 #### Manual
 
-- [ ] 2.4 One `GET /auth/v1/user` per page load in `edge_logs` on the deployed preview
-- [ ] 2.5 Header renders correctly signed in and signed out
-- [ ] 2.6 No 403 burst after Sign out
+- [x] 2.4 One `GET /auth/v1/user` per request, from the middleware only, in `edge_logs`
+- [x] 2.5 Header renders correctly signed in and signed out
+- [x] 2.6 No 403 burst after Sign out
 
 ### Phase 3: Document and close out
 
