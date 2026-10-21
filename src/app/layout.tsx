@@ -38,7 +38,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {/* NOTE: AuthStatus calls getUser() -> cookies(), a request-time API, in
+        {/* NOTE: AuthStatus calls getClaims() -> cookies(), a request-time API, in
             the ROOT layout — which opts every route in the app into dynamic
             rendering. Accepted: wrangler.jsonc records R2 incremental caching as
             deferred and no route uses revalidate/ISR, so there is no static

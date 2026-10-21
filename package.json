@@ -2,6 +2,7 @@
   "name": "gin",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.6.0",
   "scripts": {
     "dev": "next dev",
     "dev:local": "dotenv -e .env.localdb -- next dev",

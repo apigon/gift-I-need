@@ -5,10 +5,9 @@ import { CreateEventForm } from "./components";
 
 export default async function Home() {
   // getClaims(), not getUser(): this only needs a signed-in/signed-out
-  // boolean, and the root layout's AuthStatus already pays one getUser()
-  // round trip per request — a second one here would double that cost.
-  // getClaims() verifies the session JWT locally against the (cached)
-  // project JWKS instead.
+  // boolean. The middleware already pays the one getUser() round trip per
+  // request; getClaims() verifies the session JWT locally against the (cached)
+  // project JWKS instead, as AuthStatus in the root layout does too.
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
 
