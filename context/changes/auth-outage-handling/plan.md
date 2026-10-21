@@ -218,8 +218,8 @@ Record the 403 decision and the follow-ups.
 
 #### Automated
 
-- [x] 3.1 Lint passes: `pnpm lint`
+- [x] 3.1 Lint passes: `pnpm lint` — 6ef8a8a
 
 #### Manual
 
-- [x] 3.2 `login.md` and the lesson read correctly
+- [x] 3.2 `login.md` and the lesson read correctly — 6ef8a8a

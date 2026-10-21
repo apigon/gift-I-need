@@ -1,7 +1,7 @@
 ---
 change_id: auth-outage-handling
 title: Auth outage handling + duplicate getUser calls
-status: implementing
+status: implemented
 created: 2026-10-20
 updated: 2026-10-21
 ---
