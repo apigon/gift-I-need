@@ -18,7 +18,11 @@ import { createClient } from "@/utils/supabase/server";
 // renders — so a second getUser() here only doubled the load on Auth, which
 // multiplied timeouts during the 2026-10-19 outage. Caveat: with a symmetric
 // (HS256) JWT secret getClaims() falls back to a /user call, and the saving
-// disappears. Mounting this in the root layout still opts the whole app out of
+// disappears. Also unlike getUser(), it cannot see a session revoked elsewhere:
+// signOut() is global, so after signing out on another device this header keeps
+// showing the email until the access token expires. Display only — the
+// middleware's getUser() still redirects protected routes. Mounting this in the
+// root layout still opts the whole app out of
 // static rendering; accepted deliberately, see the plan's Performance
 // Considerations.
 

@@ -47,7 +47,7 @@ describe("signIn", () => {
   it.each([
     ["504 gateway timeout", retryableAuthError(504)],
     ["network failure", retryableAuthError(0)],
-    ["plain 500", apiAuthError(500, "unexpected_failure")],
+    ["5xx outside the retryable list", apiAuthError(505, "unexpected_failure")],
   ])("reports service unavailable on %s", async (_label, error) => {
     signInWithPassword.mockResolvedValue({ data: {}, error });
 
@@ -76,7 +76,7 @@ describe("signIn", () => {
 describe("signUp", () => {
   it.each([
     ["504 gateway timeout", retryableAuthError(504)],
-    ["plain 500", apiAuthError(500, "unexpected_failure")],
+    ["5xx outside the retryable list", apiAuthError(505, "unexpected_failure")],
   ])("reports service unavailable on %s", async (_label, error) => {
     signUp.mockResolvedValue({ data: {}, error });
 

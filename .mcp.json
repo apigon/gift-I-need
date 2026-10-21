@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@supabase/mcp-server-supabase@latest",
+        "@supabase/mcp-server-supabase@0.14.0",
         "--project-ref=yszmpbngdvbnnlrapixv",
         "--read-only"
       ],

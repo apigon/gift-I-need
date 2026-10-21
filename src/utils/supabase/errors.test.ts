@@ -11,7 +11,7 @@ describe("isAuthUnavailableError", () => {
     ["502", retryableAuthError(502)],
     ["503", retryableAuthError(503)],
     ["504 gateway timeout", retryableAuthError(504)],
-    ["plain 500 (not classed retryable by supabase-js)", apiAuthError(500, "unexpected_failure")],
+    ["5xx outside supabase-js's retryable list (safety net)", apiAuthError(505, "unexpected_failure")],
   ])("is true for %s", (_label, error) => {
     expect(isAuthUnavailableError(error)).toBe(true);
   });
