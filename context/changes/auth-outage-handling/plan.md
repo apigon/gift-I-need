@@ -204,22 +204,22 @@ Record the 403 decision and the follow-ups.
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `pnpm test`
-- [x] 2.2 Linting passes: `pnpm lint`
-- [x] 2.3 Build passes: `pnpm build`
+- [x] 2.1 Unit tests pass: `pnpm test` — 85a1427
+- [x] 2.2 Linting passes: `pnpm lint` — 85a1427
+- [x] 2.3 Build passes: `pnpm build` — 85a1427
 
 #### Manual
 
-- [x] 2.4 One `GET /auth/v1/user` per request, from the middleware only, in `edge_logs`
-- [x] 2.5 Header renders correctly signed in and signed out
-- [x] 2.6 No 403 burst after Sign out
+- [x] 2.4 One `GET /auth/v1/user` per request, from the middleware only, in `edge_logs` — 85a1427
+- [x] 2.5 Header renders correctly signed in and signed out — 85a1427
+- [x] 2.6 No 403 burst after Sign out — 85a1427
 
 ### Phase 3: Document and close out
 
 #### Automated
 
-- [ ] 3.1 Lint passes: `pnpm lint`
+- [x] 3.1 Lint passes: `pnpm lint`
 
 #### Manual
 
-- [ ] 3.2 `login.md` and the lesson read correctly
+- [x] 3.2 `login.md` and the lesson read correctly
