@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { isAuthUnavailableError } from "./errors";
-import { apiAuthError, retryableAuthError } from "./test-errors";
+import { apiAuthError, retryableAuthError } from "@/test-utils/supabase-errors";
 
 // Oracle: an error is "unavailable" when Auth could not answer (network, 5xx),
 // never when it answered "no" (4xx) — a wrong password must not read as an outage.

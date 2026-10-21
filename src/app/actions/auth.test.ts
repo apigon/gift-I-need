@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { apiAuthError, retryableAuthError } from "@/utils/supabase/test-errors";
+import { apiAuthError, retryableAuthError } from "@/test-utils/supabase-errors";
 
 // Pins the user-facing copy for each Auth failure class. The regression this
 // guards: an Auth outage (2026-10-19, gateway 504s) rendered as "Invalid email

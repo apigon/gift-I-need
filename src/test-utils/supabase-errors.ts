@@ -1,7 +1,8 @@
-// Test-only factories for real supabase-js auth errors. They live here because
-// only `src/utils/supabase/**` may import the package by value (eslint.config.mjs),
-// and tests elsewhere need genuine instances: `isAuthRetryableFetchError` checks
-// the error's brand, so a plain `{ status: 504 }` object would not exercise it.
+// Test-only factories for real supabase-js auth errors. Kept out of the app tree
+// (`src/test-utils/` is on the by-value import allow-list in eslint.config.mjs)
+// so app code has no reason to import it. Tests need genuine instances:
+// `isAuthRetryableFetchError` checks the error's brand, so a plain
+// `{ status: 504 }` object would not exercise it.
 import { AuthApiError, AuthRetryableFetchError } from "@supabase/supabase-js";
 
 /** What supabase-js throws on a network failure (status 0) or 502/503/504. */

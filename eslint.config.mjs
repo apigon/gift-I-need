@@ -97,10 +97,15 @@ const eslintConfig = defineConfig([
   },
   {
     // The only places allowed to import the Supabase packages by value: the
-    // infra clients themselves, and the race integration test that needs its
-    // own connections. next/link and unstable_cache stay restricted here too,
+    // infra clients themselves, the race integration test that needs its
+    // own connections, and the test-only helpers in src/test-utils. next/link
+    // and unstable_cache stay restricted here too,
     // for the same "replaces, doesn't merge" reason as the block above.
-    files: ["src/utils/supabase/**", "**/*.integration.test.ts"],
+    files: [
+      "src/utils/supabase/**",
+      "src/test-utils/**",
+      "**/*.integration.test.ts",
+    ],
     rules: {
       "no-restricted-imports": [
         "error",

@@ -10,10 +10,10 @@ export { isAuthRetryableFetchError };
 
 /**
  * True when an Auth call failed because the service could not answer, as
- * opposed to answering "no". Wider than `isAuthRetryableFetchError`, which
- * supabase-js limits to network failures and 502/503/504 — a plain 500 from
- * GoTrue arrives as an ordinary API error and would otherwise read as a bad
- * password.
+ * opposed to answering "no". supabase-js already raises
+ * `AuthRetryableFetchError` for network failures, 500-504 and 520-530; the
+ * `status >= 500` check is a safety net for any other 5xx (e.g. 505-519) that
+ * would otherwise surface as an ordinary API error and read as a bad password.
  */
 export function isAuthUnavailableError(
   error: AuthError | null | undefined,
