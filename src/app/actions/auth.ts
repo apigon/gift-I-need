@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { safeReturnTo } from "@/lib/auth/redirect";
 import { SignInSchema, SignUpSchema, type FormState } from "@/lib/auth/schemas";
+import { isAuthUnavailableError } from "@/utils/supabase/errors";
 import { createClient } from "@/utils/supabase/server";
 
 // Auth Server Actions, shaped for `useActionState`:
@@ -22,6 +23,14 @@ import { createClient } from "@/utils/supabase/server";
 //     signal, and v1 has no password reset to fall back on.
 //   - Everything else is a generic form-level message. Raw Supabase strings are
 //     diagnostics, not user-facing copy.
+//   - An Auth outage (5xx, timeout, network) is reported as such on both forms.
+//     It says nothing about the account, so unlike a credentials-specific
+//     message it leaks nothing — and it stops an outage reading as a bad
+//     password.
+const SIGN_IN_UNAVAILABLE_ERROR =
+  "Unavailable, sign-in is. Try again in a few minutes, you must.";
+const SIGN_UP_UNAVAILABLE_ERROR =
+  "Unavailable, account creation is. Try again in a few minutes, you must.";
 const GENERIC_SIGN_IN_ERROR = "Invalid email or password.";
 const ALREADY_REGISTERED_ERROR =
   "That email is already registered. Try signing in instead.";
@@ -83,6 +92,10 @@ export async function signIn(
   });
 
   if (error) {
+    if (isAuthUnavailableError(error)) {
+      console.error("[auth] sign-in failed: auth unavailable", error);
+      return { status: "error", message: SIGN_IN_UNAVAILABLE_ERROR };
+    }
     return { status: "error", message: GENERIC_SIGN_IN_ERROR };
   }
 
@@ -128,6 +141,11 @@ export async function signUp(
   });
 
   if (error) {
+    if (isAuthUnavailableError(error)) {
+      console.error("[auth] sign-up failed: auth unavailable", error);
+      return { status: "error", message: SIGN_UP_UNAVAILABLE_ERROR };
+    }
+
     // COUPLED TO CONFIRMATIONS BEING OFF. With `enable_confirmations = false`,
     // Supabase returns an explicit already-exists error. Turn confirmations ON
     // and it deliberately obfuscates this to prevent account enumeration —
